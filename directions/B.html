@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方向B — 和モダン明朝</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbfbf4;
+    --card:#ffffff;
+    --ink:#272219;
+    --ink2:#544c3f;
+    --muted:#9d9384;
+    --line:#ece5d6;
+    --line2:#d9d1bd;
+    --ai:#10a3a6;          /* fresh teal accent */
+    --quiet:#33a565;
+    --okay:#e8a623;
+    --busy:#ed5d3c;
+    --sans:"Zen Kaku Gothic New","Noto Sans TC",system-ui,sans-serif;
+    --jp:"Shippori Mincho",serif;
+    --serif:"Newsreader",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--jp);color:var(--ink);background:var(--paper);line-height:1.85;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .wrap{max-width:430px;margin:0 auto;padding:46px 26px 60px;position:relative}
+
+  /* ---- Masthead ---- */
+  .eyebrow{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ai);letter-spacing:.02em;text-align:center}
+  .eyebrow::before,.eyebrow::after{content:"";display:inline-block;width:24px;height:1px;background:var(--line2);vertical-align:middle;margin:0 10px}
+  h1{margin:18px 0 0;text-align:center;line-height:1.18}
+  .h1jp{display:block;font-family:var(--jp);font-weight:800;font-size:40px;letter-spacing:.14em;text-indent:.14em}
+  .h1en{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:15px;color:var(--muted);margin-top:14px;letter-spacing:.03em}
+  .dek{font-size:14.5px;color:var(--ink2);line-height:2;text-align:center;margin:20px auto 0;max-width:30em}
+  .ornament{display:flex;align-items:center;justify-content:center;gap:12px;margin:26px 0}
+  .ornament .ln{width:60px;height:1px;background:var(--line2)}
+  .ornament .dm{width:5px;height:5px;background:var(--ai);transform:rotate(45deg)}
+
+  .meta{text-align:center}
+  .meta .d{font-family:var(--jp);font-weight:700;font-size:17px;letter-spacing:.04em}
+  .meta .s{font-size:12.5px;color:var(--muted);margin-top:6px;letter-spacing:.04em}
+
+  /* ---- Policy ---- */
+  .policy{margin:30px 0 0;padding:22px 22px;background:var(--card);border:1px solid var(--line);text-align:center}
+  .policy .lab{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--ai);letter-spacing:.03em}
+  .policy p{margin:10px 0 0;font-size:13.5px;line-height:2;color:var(--ink2)}
+  .policy b{color:var(--ink);font-weight:700}
+  .policy b.u{box-shadow:inset 0 -8px 0 rgba(16,163,166,.12)}
+
+  /* ---- Legend ---- */
+  .legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 20px;margin:24px 0 0;font-size:12.5px;color:var(--ink2)}
+  .lg{display:inline-flex;align-items:center;gap:7px}
+  .cd{width:9px;height:9px;border-radius:50%}
+  .cd.quiet{background:var(--quiet)}.cd.okay{background:var(--okay)}.cd.busy{background:var(--busy)}
+  .cd.tac{background:none;border:1.5px solid var(--ai);width:8px;height:8px;transform:rotate(45deg)}
+
+  /* ---- Tabs ---- */
+  .tabs{display:flex;justify-content:center;gap:0;margin:30px 0 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+  .tab{flex:1;text-align:center;padding:13px 4px;font-family:var(--jp);font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;position:relative}
+  .tab+.tab{border-left:1px solid var(--line)}
+  .tab small{display:block;font-family:var(--sans);font-weight:500;font-size:10px;margin-top:3px;letter-spacing:.02em}
+  .tab.on{color:var(--ink)}
+  .tab.on::after{content:"";position:absolute;left:18%;right:18%;bottom:-1px;height:2px;background:var(--ai)}
+
+  /* ---- Day head ---- */
+  .dayhead{position:relative;text-align:center;margin:40px 0 8px}
+  .dayhead .kanji{font-family:var(--jp);font-weight:800;font-size:120px;line-height:1;color:var(--ai);opacity:.07;letter-spacing:0}
+  .dayhead .lab{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);font-family:var(--serif);font-style:italic;font-size:14px;color:var(--muted);letter-spacing:.06em}
+  .flow{text-align:center;font-family:var(--jp);font-weight:700;font-size:17px;letter-spacing:.06em;margin-top:-6px}
+  .flow .arr{color:var(--ai);margin:0 7px;font-size:13px}
+
+  /* ---- Timeline ---- */
+  .tl{margin-top:30px}
+  .entry{display:grid;grid-template-columns:58px 1fr;column-gap:18px;padding:24px 0;border-top:1px solid var(--line)}
+  .entry:first-child{border-top:1px solid var(--line2)}
+  .when{text-align:right}
+  .when .t{font-family:var(--serif);font-size:15px;color:var(--ink);letter-spacing:.02em}
+  .when .cd{display:inline-block;margin-top:9px}
+  .e-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .name{font-family:var(--jp);font-weight:700;font-size:17px;line-height:1.55}
+  .name a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line2)}
+  .name a:hover{color:var(--ai);border-color:var(--ai)}
+  .name .pin{font-size:.65em;vertical-align:super;color:var(--muted);border:0;margin-left:1px}
+  .area{font-family:var(--serif);font-style:italic;font-size:12px;color:var(--muted);white-space:nowrap}
+  .clab{font-size:11px;font-family:var(--jp);font-weight:600;letter-spacing:.04em;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .clab.quiet{color:var(--quiet)}.clab.okay{color:var(--okay)}.clab.busy{color:var(--busy)}.clab.base{color:var(--muted)}.clab.tac{color:var(--ai)}
+  .hours{font-size:12.5px;color:var(--ink2);margin-top:9px;line-height:1.85}
+  .hours b{color:var(--busy);font-weight:700}
+
+  .note{margin-top:13px;padding:12px 15px;background:rgba(16,163,166,.05);border-left:2px solid var(--ai);font-size:12.5px;line-height:1.9;color:var(--ink2)}
+  .note.warm{background:rgba(168,80,58,.06);border-color:var(--busy)}
+  .note .nl{font-family:var(--serif);font-style:italic;color:var(--ai);font-size:12px;margin-right:6px}
+  .note.warm .nl{color:var(--busy)}
+  .note b{color:var(--ink)}
+
+  .sub{margin-top:16px;display:flex;flex-direction:column;gap:16px}
+  .srow{display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:start}
+  .ph{position:relative;width:60px;height:60px;background:var(--card);border:1px solid var(--line2);overflow:hidden}
+  .ph::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,transparent 0 6px,rgba(16,163,166,.07) 6px 7px)}
+  .ph .cap{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-family:var(--serif);font-style:italic;font-size:8px;color:var(--muted)}
+  .sname{font-family:var(--jp);font-weight:700;font-size:14px;line-height:1.5}
+  .sname a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line2)}
+  .sname a:hover{color:var(--ai);border-color:var(--ai)}
+  .sname .pin{font-size:.65em;vertical-align:super;color:var(--muted);border:0}
+  .smeta{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.75}
+  .smeta .x{color:var(--busy);font-weight:700}.smeta b{color:var(--ink2);font-weight:700}
+
+  .feat-img{position:relative;height:150px;margin-top:14px;background:var(--card);border:1px solid var(--line2);overflow:hidden}
+  .feat-img::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,transparent 0 9px,rgba(16,163,166,.07) 9px 10px)}
+  .feat-img .cap{position:absolute;left:12px;bottom:10px;font-family:var(--serif);font-style:italic;font-size:11px;color:var(--muted)}
+
+  .transit{text-align:center;font-family:var(--serif);font-style:italic;font-size:12px;color:var(--muted);padding:14px 0;letter-spacing:.03em}
+  .transit::before,.transit::after{content:"·";margin:0 8px;color:var(--line2)}
+
+  .slice-end{margin-top:22px;text-align:center;font-family:var(--serif);font-style:italic;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Taipei Food Crawl &middot; vol.1</div>
+  <h1>
+    <span class="h1jp">台湾 食べ歩き</span>
+    <span class="h1en">A Taipei Food Pilgrimage</span>
+  </h1>
+  <p class="dek">並ばない動線設計。<br>行列必至の名店を、曜日と開店直後、整理券の先取りで<br>ピークから外して巡る四日間。</p>
+
+  <div class="ornament"><span class="ln"></span><span class="dm"></span><span class="ln"></span></div>
+
+  <div class="meta">
+    <div class="d">6 / 18 (木) — 6 / 21 (日)</div>
+    <div class="s">桃園 12:10 着 ・ 13:10 発</div>
+  </div>
+
+  <div class="policy">
+    <div class="lab">Crowd Strategy — 混雑回避の方針</div>
+    <p>行列必至の人気店は<b class="u">平日（木・金）</b>に。<br>土曜は<b class="u">朝イチ・開店直後</b>、または<b class="u">整理券の先取り</b>でピークを外す。</p>
+  </div>
+
+  <div class="legend">
+    <span class="lg"><span class="cd quiet"></span>空いてる</span>
+    <span class="lg"><span class="cd okay"></span>ふつう</span>
+    <span class="lg"><span class="cd busy"></span>行列・要対策</span>
+    <span class="lg" style="color:var(--ai)"><span class="cd tac"></span>段取りで回避</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on">一日目<small>木</small></div>
+    <div class="tab">二日目<small>金</small></div>
+    <div class="tab">三日目<small>土</small></div>
+    <div class="tab">四日目<small>日</small></div>
+  </div>
+
+  <div class="dayhead">
+    <span class="kanji">壱</span>
+    <span class="lab">Day One — 木曜</span>
+  </div>
+  <div class="flow">萬華<span class="arr">—</span>大稻埕<span class="arr">—</span>雙連<span class="arr">—</span>中山</div>
+
+  <div class="tl">
+
+    <div class="entry">
+      <div class="when"><div class="t">14:15</div><div class="cd" style="background:var(--muted)"></div></div>
+      <div>
+        <div class="e-head"><div class="name"><a href="#">豪景大酒店<span class="pin">↗</span></a></div><span class="clab base">荷物預け</span></div>
+        <div class="area">西門・萬華 — 拠点</div>
+        <div class="hours">桃園着 → 空港MRT → 台北駅 → 紅線。チェックイン前に荷物だけ預けて出発。</div>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="when"><div class="t">14:45</div><div class="cd okay"></div></div>
+      <div>
+        <div class="e-head"><div class="name">華西街 観光夜市で二軒</div><span class="clab okay">やや混</span></div>
+        <div class="area">龍山寺 — 必比登</div>
+        <div class="sub">
+          <div class="srow">
+            <div class="ph"><span class="cap">Gua Bao</span></div>
+            <div>
+              <div class="sname"><a href="#">源芳刈包<span class="pin">↗</span></a></div>
+              <div class="smeta">11:30–20:00／<span class="x">月休</span>（木OK）・<b>刈包はテイクアウト</b></div>
+            </div>
+          </div>
+          <div class="srow">
+            <div class="ph"><span class="cap">Lu Rou Fan</span></div>
+            <div>
+              <div class="sname"><a href="#">小王煮瓜<span class="pin">↗</span></a></div>
+              <div class="smeta">9:00–20:00／<span class="x">火休</span>（木OK）。黑金滷肉飯＋瓜仔肉湯を<b>ここで着席</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="transit">MRT 龍山寺 → 北門／大橋頭</div>
+
+    <div class="entry">
+      <div class="when"><div class="t">15:45</div><div class="cd quiet"></div></div>
+      <div>
+        <div class="e-head"><div class="name">大稻埕・迪化街</div><span class="clab quiet">空いてる</span></div>
+        <div class="area">永楽市場周辺</div>
+        <div class="hours">平日午後は全体的に空いていて回りやすい。</div>
+        <div class="sub">
+          <div class="srow">
+            <div class="ph"><span class="cap">Dessert</span></div>
+            <div>
+              <div class="sname"><a href="#">夏樹甜品<span class="pin">↗</span></a></div>
+              <div class="smeta">〜18:30｜伝統甜品</div>
+            </div>
+          </div>
+          <div class="srow">
+            <div class="ph"><span class="cap">Shave Ice</span></div>
+            <div>
+              <div class="sname"><a href="#">悠哉呷氷<span class="pin">↗</span></a></div>
+              <div class="smeta">迪化街一段6號・10:30–18:00頃｜マンゴー雪花冰</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="when"><div class="t">17:00</div><div class="cd tac" style="margin-top:9px"></div></div>
+      <div>
+        <div class="e-head"><div class="name">鼎泰豐の整理番号を取得</div><span class="clab tac">先取り</span></div>
+        <div class="area">南西店</div>
+        <div class="feat-img"><span class="cap">鼎泰豐 — Xiao Long Bao</span></div>
+        <div class="note"><span class="nl">段取り</span>予約不可だが<b>ウェブ整理番号（叫号）</b>がある。番号を取り、雙連→中山を回って呼ばれた頃に戻る。</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="slice-end">— 代表スライス／一日目 冒頭 —</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方向A — Monocleドシエ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Archivo:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fdfbf4;
+    --paper2:#fdf0dd;
+    --card:#ffffff;
+    --ink:#23201a;
+    --ink2:#5b5345;
+    --muted:#9a9080;
+    --line:#efe7d6;
+    --line2:#dccfb8;
+    --accent:#f15a35;        /* bright coral */
+    --quiet:#1fa15f;         /* fresh green */
+    --okay:#f2a517;          /* mango */
+    --busy:#ef4f2c;          /* coral red */
+    --tactic:#0e9fb3;        /* bright teal */
+    --sun:#ffd24d;           /* sunny highlight */
+    --sans:"Zen Kaku Gothic New","Noto Sans TC",system-ui,sans-serif;
+    --jp:"Shippori Mincho",serif;
+    --grotesk:"Archivo",system-ui,sans-serif;
+    --mono:"Spline Sans Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--sans);color:var(--ink);background:var(--paper);
+    line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:430px;margin:0 auto;padding:30px 22px 56px;position:relative}
+
+  /* ---------- Hero header ---------- */
+  .mast{background:var(--accent);color:#fff;margin:-30px -22px 0;padding:13px 22px;display:flex;justify-content:space-between;align-items:center}
+  .mast .brand{font-family:var(--grotesk);font-weight:800;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#fff}
+  .mast .issue{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:rgba(255,255,255,.82)}
+
+  .hero{position:relative;margin:0 -22px;height:210px;background:var(--paper2);overflow:hidden;border-bottom:3px solid var(--ink)}
+  .hero::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,transparent 0 11px,rgba(141,132,115,.12) 11px 12px)}
+  .hero .hcap{position:absolute;left:16px;bottom:14px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--card);padding:4px 8px;border:1px solid var(--line)}
+  .hero .flag{position:absolute;left:0;top:18px;background:var(--okay);color:#23201a;font-family:var(--grotesk);font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:6px 13px;white-space:nowrap;box-shadow:3px 3px 0 rgba(35,32,26,.16)}
+  .hero .stamp{position:absolute;right:15px;top:15px;width:86px;height:86px;border-radius:50%;border:2px dashed var(--tactic);color:var(--tactic);display:flex;align-items:center;justify-content:center;text-align:center;transform:rotate(-9deg);background:rgba(253,251,244,.72)}
+  .hero .stamp span{font-family:var(--grotesk);font-weight:800;font-size:11px;letter-spacing:.08em;line-height:1.35;text-transform:uppercase}
+
+  .title{padding-top:20px}
+  .kicker{font-family:var(--grotesk);font-weight:700;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px}
+  .kicker::after{content:"";flex:1;height:1px;background:var(--line2)}
+  h1{margin:13px 0 0;line-height:1.03}
+  .h1jp{display:block;font-family:var(--jp);font-weight:800;font-size:48px;letter-spacing:.01em}
+  .h1jp mark{background:transparent;color:inherit;box-shadow:inset 0 -.32em 0 var(--sun);padding:0 .04em}
+  .dek{font-family:var(--jp);font-size:14px;color:var(--ink2);line-height:1.85;margin:15px 0 0;max-width:34em}
+
+  /* boarding-pass facts */
+  .facts{margin-top:22px;border:1.5px solid var(--ink);background:var(--card)}
+  .facts-h{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--paper);padding:8px 13px}
+  .facts-h .t{font-family:var(--grotesk);font-weight:800;font-size:10px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+  .facts-h .r{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:rgba(253,251,244,.72)}
+  .facts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .fact{background:var(--card);padding:11px 13px}
+  .fact .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  .fact .v{font-family:var(--jp);font-weight:700;font-size:14px;margin-top:3px}
+
+  /* ---------- Policy ---------- */
+  .policy{margin-top:22px;border-top:2px solid var(--ink);padding-top:14px}
+  .policy .lab{font-family:var(--grotesk);font-weight:700;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+  .policy p{margin:8px 0 0;font-size:13px;line-height:1.85;color:var(--ink2)}
+  .policy b{color:var(--ink);font-weight:700;border-bottom:1.5px solid var(--accent);padding-bottom:1px}
+
+  /* ---------- Legend (crowd meter) ---------- */
+  .legend{margin-top:22px;display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center;padding:13px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .lt{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .lg{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--ink2)}
+  .meter{display:inline-flex;gap:2px}
+  .meter i{width:4px;height:11px;background:var(--line2);display:block}
+  .meter.m1 i:nth-child(1){background:var(--quiet)}
+  .meter.m2 i:nth-child(1),.meter.m2 i:nth-child(2){background:var(--okay)}
+  .meter.m3 i{background:var(--busy)}
+
+  /* ---------- Day tabs ---------- */
+  .tabs{display:flex;margin-top:26px;border:1px solid var(--ink);}
+  .tab{flex:1;text-align:center;padding:9px 4px;font-family:var(--grotesk);font-weight:700;font-size:11px;letter-spacing:.08em;border-right:1px solid var(--ink);background:var(--paper2);color:var(--ink2);cursor:pointer}
+  .tab:last-child{border-right:0}
+  .tab small{display:block;font-family:var(--sans);font-weight:500;font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:0}
+  .tab.on{background:var(--accent);color:#fff}
+  .tab.on small{color:rgba(244,240,230,.7)}
+
+  /* ---------- Flow ---------- */
+  .flow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-family:var(--jp);font-weight:700;font-size:17px;margin:24px 0 4px}
+  .flow .arr{color:var(--accent);font-size:12px}
+  .flow .fd{font-family:var(--grotesk);font-weight:800;font-size:11px;letter-spacing:.14em;color:var(--muted);margin-right:4px}
+
+  /* ---------- Timeline ---------- */
+  .tl{margin-top:18px}
+  .node{display:grid;grid-template-columns:46px 1fr;column-gap:14px;position:relative;padding-bottom:26px}
+  .node::before{content:"";position:absolute;left:23px;top:6px;bottom:-4px;width:1px;background:var(--line2)}
+  .node:last-child::before{display:none}
+  .rail{position:relative;z-index:1}
+  .num{font-family:var(--grotesk);font-weight:800;font-size:15px;color:var(--accent);line-height:1}
+  .time{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.02em}
+  .dotmark{width:9px;height:9px;border-radius:50%;background:var(--card);border:1.5px solid var(--accent);margin-top:8px}
+
+  .card{background:var(--card);border:1px solid var(--line);padding:14px 15px;position:relative}
+  .chead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .name{font-family:var(--jp);font-weight:800;font-size:16px;line-height:1.4}
+  .name a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line2)}
+  .name a:hover{border-color:var(--accent);color:var(--accent)}
+  .name .pin{font-size:.7em;vertical-align:super;color:var(--muted);border:0;margin-left:1px}
+  .area{display:block;font-family:var(--grotesk);font-weight:500;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+  .tag{flex:none;display:inline-flex;align-items:center;gap:6px;font-family:var(--grotesk);font-weight:700;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border:1px solid currentColor;white-space:nowrap}
+  .tag.quiet{color:var(--quiet)}.tag.okay{color:var(--okay)}.tag.busy{color:var(--busy)}.tag.base{color:var(--muted)}.tag.tactic{color:var(--tactic)}
+  .tag .meter i{height:9px}
+  .tag.tactic .flag{font-size:10px;line-height:1}
+
+  .hours{font-size:12px;color:var(--ink2);margin-top:9px;line-height:1.7}
+  .hours b{color:var(--busy);font-weight:700}
+
+  .note{margin-top:11px;display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;font-size:12px;line-height:1.7;color:var(--ink2);border-top:1px dashed var(--line2);padding-top:10px}
+  .note .nl{font-family:var(--grotesk);font-weight:800;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tactic);border:1px solid var(--tactic);padding:2px 5px;white-space:nowrap;line-height:1.2;align-self:start}
+  .note.warm .nl{color:var(--busy);border-color:var(--busy)}
+  .note b{color:var(--ink)}
+
+  /* sub rows */
+  .sub{margin-top:13px;display:flex;flex-direction:column}
+  .srow{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+  .srow:first-child{border-top:1px solid var(--line2)}
+  .ph{position:relative;aspect-ratio:1;background:var(--paper2);border:1px solid var(--line2);overflow:hidden}
+  .ph::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,transparent 0 6px,rgba(141,132,115,.13) 6px 7px)}
+  .ph .cap{position:absolute;inset:0;display:flex;align-items:flex-end;padding:4px;font-family:var(--mono);font-size:7px;letter-spacing:.04em;color:var(--muted);line-height:1.1}
+  .ph.big{width:64px;height:64px;aspect-ratio:auto;flex:none}
+  .sname{font-family:var(--jp);font-weight:700;font-size:13.5px;line-height:1.45;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .sname a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line2)}
+  .sname a:hover{color:var(--accent);border-color:var(--accent)}
+  .sname .pin{font-size:.7em;vertical-align:super;color:var(--muted);border:0}
+  .smeta{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.6}
+  .smeta .x{color:var(--busy);font-weight:700}.smeta b{color:var(--ink2);font-weight:700}
+  .sm{display:inline-flex;align-items:center;gap:5px;font-family:var(--grotesk);font-weight:700;font-size:8px;letter-spacing:.06em;text-transform:uppercase}
+  .sm.quiet{color:var(--quiet)}.sm.okay{color:var(--okay)}.sm.busy{color:var(--busy)}
+  .sm .meter i{height:8px;width:3px}
+
+  .card.feature{padding:0;border:1px solid var(--line)}
+  .feat-img{height:140px;position:relative;background:var(--paper2);border-bottom:1px solid var(--line)}
+  .feat-img::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(135deg,transparent 0 9px,rgba(141,132,115,.12) 9px 10px)}
+  .feat-img .cap{position:absolute;left:12px;bottom:10px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--muted)}
+  .feat-body{padding:14px 15px}
+
+  .transit{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 22px 60px}
+  .transit::before{content:"";width:14px;height:1px;background:var(--line2)}
+
+  .slice-end{margin-top:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="mast">
+    <span class="brand">Taipei Food Crawl</span>
+    <span class="issue">Vol.01 — 2026</span>
+  </div>
+
+  <div class="hero">
+    <span class="flag">4 Days · 食べ歩き</span>
+    <span class="stamp"><span>Taipei<br>· 2026 ·<br>TW</span></span>
+    <span class="hcap">表紙写真 — 夜市の灯り / Hero photo</span>
+  </div>
+
+  <div class="title">
+    <div class="kicker">A Taipei Food Pilgrimage</div>
+    <h1>
+      <span class="h1jp">台湾 <mark>食べ歩き</mark></span>
+    </h1>
+    <p class="dek">並ばない動線設計。行列必至の名店を、曜日・開店直後・整理券の先取りでピークから外して巡る四日間。</p>
+  </div>
+
+  <div class="facts">
+    <div class="facts-h"><span class="t">Trip Card / 旅程</span><span class="r">TPE · 4D3N</span></div>
+    <div class="facts-grid">
+      <div class="fact"><div class="k">Dates</div><div class="v">6 / 18 (木) – 6 / 21 (日)</div></div>
+      <div class="fact"><div class="k">Arrival</div><div class="v">桃園 12:10 着</div></div>
+      <div class="fact"><div class="k">Base</div><div class="v">西門・北投・台北駅</div></div>
+      <div class="fact"><div class="k">Departure</div><div class="v">桃園 13:10 発</div></div>
+    </div>
+  </div>
+
+  <div class="policy">
+    <span class="lab">Crowd Strategy / 混雑回避の方針</span>
+    <p>行列必至の人気店は<b>平日（木・金）</b>に。土曜は<b>朝イチ・開店直後</b>、または<b>整理券（呼出制）の先取り</b>でピークを外す。</p>
+  </div>
+
+  <div class="legend">
+    <span class="lt">Crowd</span>
+    <span class="lg"><span class="meter m1"><i></i><i></i><i></i></span>空いてる</span>
+    <span class="lg"><span class="meter m2"><i></i><i></i><i></i></span>ふつう</span>
+    <span class="lg"><span class="meter m3"><i></i><i></i><i></i></span>行列・要対策</span>
+    <span class="lg" style="color:var(--tactic)">⚑ 段取りで回避</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on">DAY 1<small>木 · 萬華→中山</small></div>
+    <div class="tab">DAY 2<small>金 · 北投→士林</small></div>
+    <div class="tab">DAY 3<small>土 · 永康街</small></div>
+    <div class="tab">DAY 4<small>日 · 帰国</small></div>
+  </div>
+
+  <div class="flow"><span class="fd">Route</span>萬華<span class="arr">→</span>大稻埕<span class="arr">→</span>雙連<span class="arr">→</span>中山</div>
+
+  <div class="tl">
+
+    <!-- 01 -->
+    <div class="node">
+      <div class="rail"><div class="num">01</div><div class="time">14:15</div><div class="dotmark"></div></div>
+      <div class="card">
+        <div class="chead">
+          <div class="name"><a href="#">豪景大酒店<span class="pin">↗</span></a><span class="area">西門・萬華 — 拠点</span></div>
+          <span class="tag base">荷物預け</span>
+        </div>
+        <div class="hours">桃園着 → 空港MRT → 台北駅 → 紅線。チェックイン前に荷物だけ預けて出発。</div>
+      </div>
+    </div>
+
+    <!-- 02 -->
+    <div class="node">
+      <div class="rail"><div class="num">02</div><div class="time">14:45</div><div class="dotmark"></div></div>
+      <div class="card">
+        <div class="chead">
+          <div class="name">華西街 観光夜市で2軒<span class="area">龍山寺 — どちらも必比登</span></div>
+          <span class="tag okay"><span class="meter m2"><i></i><i></i><i></i></span>やや混</span>
+        </div>
+        <div class="sub">
+          <div class="srow">
+            <div class="ph"><span class="cap">GUA BAO</span></div>
+            <div>
+              <div class="sname"><a href="#">源芳刈包<span class="pin">↗</span></a><span class="sm okay"><span class="meter m2"><i></i><i></i><i></i></span>ふつう</span></div>
+              <div class="smeta">11:30–20:00／<span class="x">月休</span>（木OK）・<b>刈包はテイクアウト</b></div>
+            </div>
+          </div>
+          <div class="srow">
+            <div class="ph"><span class="cap">LU ROU FAN</span></div>
+            <div>
+              <div class="sname"><a href="#">小王煮瓜<span class="pin">↗</span></a><span class="sm okay"><span class="meter m2"><i></i><i></i><i></i></span>ふつう</span></div>
+              <div class="smeta">9:00–20:00／<span class="x">火休</span>（木OK）。黑金滷肉飯＋瓜仔肉湯を<b>ここで着席</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="transit">MRT 龍山寺 → 北門／大橋頭</div>
+
+    <!-- 03 -->
+    <div class="node">
+      <div class="rail"><div class="num">03</div><div class="time">15:45</div><div class="dotmark"></div></div>
+      <div class="card">
+        <div class="chead">
+          <div class="name">大稻埕・迪化街<span class="area">永楽市場周辺</span></div>
+          <span class="tag quiet"><span class="meter m1"><i></i><i></i><i></i></span>空いてる</span>
+        </div>
+        <div class="hours">平日午後は全体的に空いていて回りやすい。</div>
+        <div class="sub">
+          <div class="srow">
+            <div class="ph"><span class="cap">DESSERT</span></div>
+            <div>
+              <div class="sname"><a href="#">夏樹甜品<span class="pin">↗</span></a><span class="sm quiet"><span class="meter m1"><i></i><i></i><i></i></span>空いてる</span></div>
+              <div class="smeta">〜18:30｜伝統甜品</div>
+            </div>
+          </div>
+          <div class="srow">
+            <div class="ph"><span class="cap">SHAVE ICE</span></div>
+            <div>
+              <div class="sname"><a href="#">悠哉呷氷<span class="pin">↗</span></a><span class="sm okay"><span class="meter m2"><i></i><i></i><i></i></span>ふつう</span></div>
+              <div class="smeta">迪化街一段6號・10:30–18:00頃｜マンゴー雪花冰</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 — tactic feature -->
+    <div class="node">
+      <div class="rail"><div class="num">04</div><div class="time">17:00</div><div class="dotmark" style="border-color:var(--tactic)"></div></div>
+      <div class="card feature">
+        <div class="feat-img"><span class="cap">鼎泰豐 · XIAO LONG BAO</span></div>
+        <div class="feat-body">
+          <div class="chead">
+            <div class="name">鼎泰豐の整理番号を取得<span class="area">南西店</span></div>
+            <span class="tag tactic">⚑ 先取り</span>
+          </div>
+          <div class="note">
+            <span class="nl">Tactic</span>
+            <span>予約不可だが<b>ウェブ整理番号（叫号）</b>がある。番号を取り、雙連→中山を回って呼ばれた頃に戻る。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="slice-end">— 代表スライス／Day 1 冒頭 —</div>
+
+</div>
+</body>
+</html>

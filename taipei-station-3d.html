@@ -140,17 +140,6 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   background: rgba(255, 255, 255, .9); padding: 2px 9px; border-radius: 999px;
   border: 1.2px dashed var(--accent);
 }
-.lbl.floor-tag {
-  font-family: var(--grotesk);
-  font-weight: 800; font-size: 13px; letter-spacing: .1em;
-  padding: 4px 12px; border-radius: 8px;
-  background: #221f19; color: #fbf8f0;
-  box-shadow: 0 3px 10px rgba(60, 40, 25, .3);
-}
-.lbl.floor-tag small {
-  font-family: var(--sans); font-weight: 700; font-size: 10px;
-  letter-spacing: 0; margin-left: 7px; opacity: .75;
-}
 .lbl.mypin {
   font-family: var(--grotesk); font-weight: 800; font-size: 9.5px; letter-spacing: .08em;
   padding: 2.5px 8px; border-radius: 999px;
@@ -158,6 +147,9 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   box-shadow: 0 3px 10px rgba(0, 0, 0, .25);
 }
 .far .lbl.exit, .far .lbl.spot, .far .lbl.st { opacity: 0; }
+/* 明示的にONにしたレイヤーのラベルはズームアウトしても隠さない */
+.far.lyr-food .lbl.spot.cat-food, .far.lyr-shopping .lbl.spot.cat-shopping,
+.far.lyr-wc .lbl.spot.cat-wc, .far.lyr-locker .lbl.spot.cat-locker { opacity: 1; }
 
 /* ================= panels ================= */
 .panel {
@@ -212,6 +204,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   width: auto; padding: 0 10px; gap: 5px;
   font-weight: 800; font-size: 10.5px;
 }
+#langBtn [data-ic="globe"] { color: #38b6d8; }
 #langMenu {
   position: fixed; z-index: 22;
   display: flex; flex-direction: column; gap: 2px;
@@ -347,16 +340,39 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 }
 #rail hr { width: 26px; border: 0; border-top: 1px dashed var(--panel-line); margin: 3px 0; }
 
-/* ---- floor flag ---- */
+/* ---- floor flag（選択フロアの真横に出て2秒で自動消去） ---- */
 #floorFlag {
-  top: max(172px, calc(50% - 200px)); right: 70px;
+  top: 50%; right: 70px;
   display: flex; align-items: center; gap: 8px;
   padding: 8px 13px; pointer-events: none;
-  animation: flagin .25s cubic-bezier(.2, .9, .25, 1);
+  transform: translateY(-50%);
+  overflow: hidden;
+  transition: opacity .45s ease;
 }
-@keyframes flagin { from { opacity: 0; transform: translateX(6px); } }
+#floorFlag.pop { animation: flagin .25s cubic-bezier(.2, .9, .25, 1); }
+#floorFlag.fade { opacity: 0; }
+#floorFlag::after {
+  content: ''; position: absolute; left: 0; bottom: 0; height: 2px;
+  background: var(--accent); opacity: .55; width: 0;
+}
+#floorFlag.pop::after { animation: flagbar 2s linear forwards; }
+@keyframes flagin { from { opacity: 0; transform: translate(6px, -50%); } to { transform: translateY(-50%); } }
+@keyframes flagbar { from { width: 100%; } to { width: 0; } }
 #floorFlag b { font-family: var(--grotesk); font-weight: 800; font-size: 13px; color: var(--accent); letter-spacing: .04em; }
 #floorFlag span { font-size: 11px; font-weight: 700; color: var(--panel-fg2); max-width: 200px; }
+
+/* ---- 選択中フロアの説明（画面下部固定） ---- */
+#floorNow {
+  left: 50%; bottom: max(14px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 15px; pointer-events: none; z-index: 9;
+  animation: nowin .3s cubic-bezier(.2, .9, .25, 1);
+  max-width: calc(100vw - 24px);
+}
+@keyframes nowin { from { opacity: 0; transform: translate(-50%, 8px); } }
+#floorNow b { font-family: var(--grotesk); font-weight: 800; font-size: 13px; color: var(--accent); letter-spacing: .04em; flex: none; }
+#floorNow span { font-size: 11px; font-weight: 700; color: var(--panel-fg2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #rail .tool { width: 42px; height: 36px; }
 #rail .tool.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 #rail .cap {
@@ -599,6 +615,13 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 #gLang[hidden], #gTips[hidden] { display: none; }
 
 /* ---- custom route fields ---- */
+.rtfilter { display: flex; gap: 6px; flex-wrap: wrap; margin: 13px 0 0; }
+.rtfilter button {
+  border: 1px solid var(--panel-line); background: var(--paper);
+  color: var(--panel-fg2); font-size: 11px; font-weight: 700;
+  padding: 5px 11px; border-radius: 999px; cursor: pointer; min-height: 28px;
+}
+.rtfilter button.on { background: #221f19; color: #fbf8f0; border-color: #221f19; }
 .rtrows { display: flex; align-items: center; gap: 10px; margin: 14px 0 16px; }
 .rtcol { flex: 1; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
 .rtfield label {
@@ -668,7 +691,6 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 @media (max-height: 740px) {
   #rail { top: max(150px, calc(50% - 185px)); max-height: calc(100dvh - 200px); }
   #rail .flr, #rail .tool { height: 31px; }
-  #floorFlag { top: max(150px, calc(50% - 185px)); }
 }
 
 /* ---- a11y / motion ---- */
@@ -708,8 +730,9 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   #note { display: none; }
 
   #rail { right: 8px; top: max(124px, calc(47% - 185px)); max-height: calc(100dvh - 210px); padding: 6px 5px; }
-  #floorFlag { right: 74px; top: max(124px, calc(47% - 185px)); padding: 7px 11px; }
+  #floorFlag { right: 64px; padding: 7px 11px; }
   #floorFlag span { max-width: 40vw; }
+  #floorNow { bottom: max(12px, env(safe-area-inset-bottom)); padding: 7px 12px; }
   #rail .flr { width: 44px; height: 38px; font-size: 11.5px; }
   #rail .tool { width: 44px; height: 38px; }
 
@@ -747,7 +770,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
       <div class="bt">TAIPEI MAIN STATION 3D</div>
     </div>
   </div>
-  <script>setTimeout(function () { var b = document.getElementById('boot'); if (b) b.classList.add('off'); }, 12000);</script>
+  <script>window.__bootT0 = Date.now(); setTimeout(function () { var b = document.getElementById('boot'); if (b) b.classList.add('off'); }, 12000);</script>
 
   <div id="app"></div>
 
@@ -811,6 +834,8 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
         <button class="chip shop" data-s="food"><span data-ic="food" data-ic-size="13"></span><span data-i="oFood"></span></button>
         <button class="chip shop" data-s="shopping"><span data-ic="bag" data-ic-size="13"></span><span data-i="oShop"></span></button>
         <button class="chip shop" data-s="exitg"><span data-ic="exit" data-ic-size="13"></span><span data-i="oExit"></span></button>
+        <button class="chip shop" data-s="wc"><span data-ic="wc" data-ic-size="13"></span><span data-i="oWc"></span></button>
+        <button class="chip shop" data-s="locker"><span data-ic="locker" data-ic-size="13"></span><span data-i="oLocker"></span></button>
       </div>
 
       <div id="headNote" data-i="note"></div>
@@ -946,6 +971,13 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
     <div class="gcard" role="dialog" aria-modal="true">
       <h2><span data-ic="nav" data-ic-size="19"></span><span data-i="rtTitle"></span></h2>
       <div class="gsub" data-i="rtSub"></div>
+      <div class="rtfilter" id="rtFilter">
+        <button class="on" data-k="all" data-i="rtFAll"></button>
+        <button data-k="hall" data-i="rtFHall"></button>
+        <button data-k="exit" data-i="rtFExit"></button>
+        <button data-k="shop" data-i="rtFShop"></button>
+        <button data-k="plat" data-i="rtFPlat"></button>
+      </div>
       <div class="rtrows">
         <div class="rtcol">
           <div class="rtfield"><label for="rtFrom" data-i="rtFrom"></label><select id="rtFrom"></select></div>
@@ -958,6 +990,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   </div>
 
   <div id="toast"></div>
+  <div class="panel" id="floorNow" hidden></div>
   <div id="note" data-i="note"></div>
 
   <script type="module">
@@ -1001,7 +1034,7 @@ const UI = {
   title:    tx('台北車站地下街 3D地圖', '台北车站地下街 3D地图', '台北駅 地下街 3Dマップ', 'Taipei Main Station 3D Underground Map', '타이베이역 지하상가 3D 지도'),
   lgY:      tx('Y區 台北地下街', 'Y区 台北地下街', 'Y区 台北地下街', 'Y · Taipei Mall', 'Y구 타이베이 지하상가'),
   lgZ:      tx('Z區 站前', 'Z区 站前', 'Z区 站前', 'Z · Zhanqian', 'Z구 잔첸'),
-  lgK:      tx('K區 誠品', 'K区 诚品', 'K区 誠品', 'K · eslite', 'K구 청핀'),
+  lgK:      tx('K區 東森廣場', 'K区 东森广场', 'K区 東森廣場', 'K · Dong Sen Plaza', 'K구 둥썬광장'),
   lgR:      tx('R區 中山', 'R区 中山', 'R区 中山', 'R · Zhongshan', 'R구 중산'),
   lgBL:     tx('板南線', '板南线', 'BL線（板南線）', 'Blue Line', '반난선(블루)'),
   lgRL:     tx('淡水信義線', '淡水信义线', 'R線（淡水信義線）', 'Red Line', '단수이신이선(레드)'),
@@ -1020,6 +1053,8 @@ const UI = {
   oFood:    tx('美食', '美食', 'グルメ', 'Food', '맛집'),
   oShop:    tx('商店・書店', '商店・书店', 'ショップ・書店', 'Shops', '상점·서점'),
   oExit:    tx('出口地面位置', '出口地面位置', '出口の地上位置', 'Exit locations', '출구 지상 위치'),
+  oWc:      tx('廁所', '厕所', 'トイレ', 'Restrooms', '화장실'),
+  oLocker:  tx('寄物櫃', '寄存柜', 'コインロッカー', 'Lockers', '물품보관함'),
   tLang:    tx('語言', '语言', '言語', 'Language', '언어'),
   tHelp:    tx('使用說明', '使用说明', '使い方ガイド', 'How to use', '사용법'),
   tFold:    tx('收合面板', '收起面板', 'パネルを開閉', 'Toggle panel', '패널 접기'),
@@ -1059,6 +1094,11 @@ const UI = {
   rtFrom:   tx('出發地', '出发地', '出発地', 'From', '출발지'),
   rtTo:     tx('目的地', '目的地', '目的地', 'To', '목적지'),
   rtGo:     tx('開始導覽', '开始导览', '案内開始', 'Start guidance', '안내 시작'),
+  rtFAll:   tx('全部', '全部', 'すべて', 'All', '전체'),
+  rtFHall:  tx('樓層・大廳', '楼层・大厅', '階層・改札', 'Areas & gates', '구역·개찰'),
+  rtFExit:  tx('出口', '出口', '出口', 'Exits', '출구'),
+  rtFShop:  tx('商店', '商店', 'お店', 'Shops', '상점'),
+  rtFPlat:  tx('月台', '站台', '乗り場', 'Platforms', '승강장'),
   tSwap:    tx('交換出發與目的地', '交换出发与目的地', '出発と目的地を入れ替え', 'Swap start & destination', '출발·도착 바꾸기'),
   rtSame:   tx('出發地與目的地相同', '出发地与目的地相同', '出発地と目的地が同じです', 'Start and destination are the same', '출발지와 목적지가 같습니다'),
   /* ---- search ---- */
@@ -1105,7 +1145,9 @@ const TAG = {
   hist:   tx('古蹟', '古迹', '史跡', 'Historic site', '사적'),
   food:   tx('美食', '美食', 'グルメ', 'Food', '맛집'),
   shop:   tx('商店', '商店', 'ショップ', 'Shop', '상점'),
-  pin:    tx('釘選', '钉选', 'ピン', 'Pin', '핀')
+  pin:    tx('釘選', '钉选', 'ピン', 'Pin', '핀'),
+  wc:     tx('廁所', '厕所', 'トイレ', 'Restroom', '화장실'),
+  locker: tx('寄物櫃', '寄存柜', 'コインロッカー', 'Lockers', '물품보관함')
 };
 
 const RT_DESC = {
@@ -1150,7 +1192,9 @@ const P = {
   clock:   '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 1.8"/>',
   arrowR:  '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
   spark:   '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.6 2.6M15.4 15.4 18 18M6 18l2.6-2.6M15.4 8.6 18 6"/>',
-  train:   '<rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14"/><path d="M9.5 15h.01M14.5 15h.01"/><path d="m8 21 1.5-2.5M16 21l-1.5-2.5"/>'
+  train:   '<rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14"/><path d="M9.5 15h.01M14.5 15h.01"/><path d="m8 21 1.5-2.5M16 21l-1.5-2.5"/>',
+  wc:      '<circle cx="7" cy="4.8" r="1.8"/><path d="M7 7.4v5.4"/><path d="m7 12.8-1.9 5.4M7 12.8l1.9 5.4"/><path d="M4.7 9.2h4.6"/><path d="M12 3.5v17"/><circle cx="17" cy="4.8" r="1.8"/><path d="m17 7.4-2.4 6.2h4.8L17 7.4Z"/><path d="m15.9 13.8-.7 4.4M18.1 13.8l.7 4.4"/>',
+  locker:  '<rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M12 3.5v17"/><path d="M8.2 9v2.6M15.8 9v2.6"/>'
 };
 
 function ic(name, size = 18, sw = 2) {
@@ -1207,7 +1251,9 @@ const FKEY = Object.keys(FLOORS);
 
 const SHOP_CATS = {
   food:     { col: 0xd96a2e, tag: TAG.food },
-  shopping: { col: 0x7c5cdb, tag: TAG.shop }
+  shopping: { col: 0x7c5cdb, tag: TAG.shop },
+  wc:       { col: 0x2f86c9, tag: TAG.wc },
+  locker:   { col: 0x3f7d4e, tag: TAG.locker }
 };
 
 /* ============================================================ */
@@ -1299,7 +1345,7 @@ function buildWorld(scene) {
     gl.position.y = 5;
     disc.add(gl);
     scene.add(disc);
-    exitObjs.push({ fk, x, z, shaft, disc, label: gl });
+    exitObjs.push({ fk, x, z, id, shaft, disc, label: gl });
   }
   function updateExits() {
     for (const e of exitObjs) {
@@ -1378,9 +1424,6 @@ function buildWorld(scene) {
     edge.rotation.x = -Math.PI / 2;
     edge.position.copy(m.position);
     F[fk].add(edge);
-    const tag = makeLabel(mapTx(l => `${fk}<small>${FLOORS[fk].name[l]}</small>`), 'floor-tag');
-    tag.position.set(x1 + 4, 4, z1 + 14);
-    F[fk].add(tag);
   }
   ['F2', 'B1', 'B2', 'B3', 'B4'].forEach(slab);
 
@@ -1488,7 +1531,7 @@ function buildWorld(scene) {
   stLabel(243, -380, tx('中山北路', '中山北路', '中山北路', 'ZHONGSHAN N. RD.', '중산베이루'));
 
   // 台北車站 本屋
-  box('F1', -108, 108, -92, 22, 24, COL.bldg, {
+  const stationBox = box('F1', -108, 108, -92, 22, 24, COL.bldg, {
     opacity: .3,
     name: tx('台北車站（站體）', '台北车站（站体）', '台北車站（駅舎）', 'Taipei Main Station Building', '타이베이역 역사'),
     tag: '1F–2F', color: '#9a7b3f',
@@ -1500,7 +1543,7 @@ function buildWorld(scene) {
     label: tx('台北車站', '台北车站', '台北車站', 'Taipei Main Sta.', '타이베이역'),
     labelColor: '#23201a', ly: 18
   });
-  hipRoof('F1', 0, 24, -35, 222, 120, 15, 0xc69a84, .5);
+  const stationRoof = hipRoof('F1', 0, 24, -35, 222, 120, 15, 0xc69a84, .5);
 
   // 1F 大廳のチェック床
   const ck = document.createElement('canvas');
@@ -1528,6 +1571,8 @@ function buildWorld(scene) {
   };
   pickables.push(hall);
   F['F1'].add(hall);
+  // B階フォーカス時に丸ごと非表示にする地上駅舎パーツ
+  const stationParts = [stationBox, stationRoof, hall];
 
   // 京站・轉運站
   box('F1', 40, 125, -285, -160, 38, COL.bldg, {
@@ -1639,6 +1684,59 @@ function buildWorld(scene) {
   });
   hipRoof('F1', -566, 14, 18, 34, 26, 9, 0x6e2a22);
 
+  // 台北雙子星（機捷A1直上・建設中）
+  box('F1', -400, -300, -100, -40, 70, COL.bldg, {
+    opacity: .16,
+    name: tx('台北雙子星（興建中）', '台北双子星（在建）', '台北雙子星（建設中）', 'Taipei Twin Towers (under construction)', '타이베이 트윈타워(건설 중)'),
+    tag: '1F+', color: '#8246af',
+    desc: tx('機捷A1站正上方的雙塔開發案。C1棟53層預計2026年底、D1棟70層（全台第2高）預計2027年底完工，將有商場與飯店進駐。',
+             '机捷A1站正上方的双塔开发案。C1栋53层预计2026年底、D1栋70层（全台第2高）预计2027年底完工，将有商场与饭店进驻。',
+             '空港MRT A1駅の真上に建設中のツインタワー。C1棟53階は2026年末、D1棟70階（台湾第2の高さ）は2027年末完成予定。商業施設・ホテルが入る計画。',
+             'Twin-tower project rising directly above Airport MRT A1. C1 (53 floors) due late 2026, D1 (70 floors — Taiwan\'s 2nd tallest) due late 2027, with retail and hotels planned.',
+             '공항MRT A1역 바로 위에 건설 중인 트윈타워. C1동 53층은 2026년 말, D1동 70층(타이완 2위 높이)은 2027년 말 완공 예정.'),
+    label: tx('台北雙子星（施工中）', '台北双子星（施工中）', '台北雙子星（工事中）', 'Twin Towers (WIP)', '트윈타워(공사 중)'),
+    labelColor: '#8246af', ly: 12
+  });
+  // 三井ガーデンホテル台北忠孝
+  box('F1', 175, 215, 80, 125, 30, COL.bldg, {
+    opacity: .25,
+    name: tx('和苑三井花園飯店 台北忠孝', '和苑三井花园饭店 台北忠孝', '三井ガーデンホテル台北忠孝', 'MGH Mitsui Garden Hotel Taipei Zhongxiao', '미츠이가든호텔 타이베이 중샤오'),
+    tag: '1F+', color: '#9a9080',
+    desc: tx('忠孝西路一段15號的日系飯店，頂樓有大浴場。公園路口、M8出口方向。',
+             '忠孝西路一段15号的日系饭店，顶楼有大浴场。公园路口、M8出口方向。',
+             '忠孝西路一段15號の日系ホテル。最上階に大浴場があり日本人客に人気。公園路角・M8出口方面。',
+             'Japanese-run hotel at 15 Zhongxiao W. Rd. Sec. 1, with a top-floor public bath. Near Gongyuan Rd. and Exit M8.',
+             '중샤오시루 1단 15호의 일본계 호텔. 꼭대기층에 대욕장. 궁위안루 모퉁이, M8 출구 방면.'),
+    label: tx('三井花園飯店', '三井花园饭店', '三井ガーデン', 'Mitsui Garden', '미츠이가든'),
+    labelColor: '#5b5345', ly: 9
+  });
+  // 撫臺街洋樓
+  box('F1', -565, -540, 48, 72, 7, 0x8a6f4d, {
+    opacity: .85,
+    name: tx('撫臺街洋樓', '抚台街洋楼', '撫臺街洋樓', 'Futai Street Mansion', '푸타이제 양옥'),
+    tag: TAG.hist, color: '#8a6f4d',
+    desc: tx('1910年落成的石造洋樓（市定古蹟），北門旁邊，免費參觀。',
+             '1910年落成的石造洋楼（市定古迹），北门旁边，免费参观。',
+             '1910年築の石造洋館（市定古蹟）。北門のすぐそばで、無料で見学できる。',
+             'Stone-built 1910 mansion (city monument) right beside the North Gate; free to visit.',
+             '1910년 준공된 석조 양옥(시정고적). 베이먼 바로 옆, 무료 관람.'),
+    label: tx('撫臺街洋樓', '抚台街洋楼', '撫臺街洋樓', 'Futai Mansion', '푸타이제 양옥'),
+    labelColor: '#8a6f4d', ly: 7
+  });
+  // 華陰街問屋街
+  box('F1', -120, 30, -250, -200, 6, COL.bldg, {
+    opacity: .18,
+    name: tx('華陰街商圈（批發街）', '华阴街商圈（批发街）', '華陰街（問屋街）', 'Huayin St. wholesale district', '화인제 도매상가'),
+    tag: TAG.street, color: '#9a9080',
+    desc: tx('市民大道北側的批發商圈，包包、飾品、玩具、南北貨成排。從Y9出口上來。',
+             '市民大道北侧的批发商圈，包包、饰品、玩具、南北货成排。从Y9出口上来。',
+             '市民大道北側に広がる問屋街。バッグ・アクセサリー・玩具・乾物の卸問屋がずらり。Y9出口から地上へ。',
+             'Wholesale district north of Civic Blvd. — rows of bag, accessory, toy and dry-goods dealers. Surface via Exit Y9.',
+             '시민대도 북쪽의 도매상가. 가방·액세서리·완구·건어물 도매상이 줄지어 있음. Y9 출구로 지상 이동.'),
+    label: tx('華陰街商圈', '华阴街商圈', '華陰街（問屋街）', 'Huayin St.', '화인제'),
+    labelColor: '#5b5345', ly: 7
+  });
+
   /* ============================================================
      2F: 微風美食街
      ============================================================ */
@@ -1671,14 +1769,14 @@ function buildWorld(scene) {
 
   // ---- K区 ----
   box('B1', -100, 130, 24, 44, 6, COL.k, {
-    name: tx('台北車站K區地下街（誠品站前）', '台北车站K区地下街（诚品站前）', '台北車站 K区地下街（誠品站前店）', 'K Underground Mall (eslite Zhanqian)', 'K구 지하상가(청핀 잔첸점)'),
+    name: tx('K區地下街（東森廣場）', 'K区地下街（东森广场）', 'K区地下街（東森廣場）', 'K Underground Mall (Dong Sen Plaza)', 'K구 지하상가(둥썬광장)'),
     tag: 'B1', color: '#b0413e',
-    desc: tx('位於站前廣場正下方。B1以書店<b>誠品站前店</b>為核心，B2為停車場。出口K1〜K12，與捷運M4出口連通。',
-             '位于站前广场正下方。B1以书店<b>诚品站前店</b>为核心，B2为停车场。出口K1〜K12，与捷运M4出口连通。',
-             '台鉄駅舎と忠孝西路の間、<b>站前広場の真下</b>にある地下街。B1は書店<b>「誠品站前店」</b>を中心とした商店街、B2は駐車場。出口はK1〜K12。MRT M4出口とも連通。',
-             'Right beneath the station-front plaza. B1 centers on the <b>eslite Zhanqian bookstore</b>; B2 is parking. Exits K1–K12, linked with MRT Exit M4.',
+    desc: tx('位於站前廣場正下方，2023年起由<b>東森廣場</b>經營，餐飲、潮流、生活百貨齊全，B2為停車場。出口K1〜K12，與捷運M4出口連通。誠品則搬到諾貝爾廣場B1的「誠品生活站前店」。',
+             '位于站前广场正下方，2023年起由<b>东森广场</b>经营，餐饮、潮流、生活百货齐全，B2为停车场。出口K1〜K12，与捷运M4出口连通。诚品则搬到诺贝尔广场B1的“诚品生活站前店”。',
+             '台鉄駅舎と忠孝西路の間、<b>站前広場の真下</b>にある地下街。2023年から<b>「東森廣場」</b>としてグルメ・カルチャー・生活雑貨の店が並ぶ。B2は駐車場。出口はK1〜K12、MRT M4出口とも連通。なお誠品は忠孝西路の諾貝爾廣場B1「誠品生活站前店」へ移転。',
+             'Right beneath the station-front plaza — run as <b>Dong Sen Plaza</b> since 2023, with food, pop-culture and lifestyle shops; B2 is parking. Exits K1–K12, linked with MRT Exit M4. (eslite moved to Nobel Plaza B1 on Zhongxiao W. Rd.)',
              '역 앞 광장 바로 아래의 지하상가. B1은 서점 <b>청핀 잔첸점</b>이 중심, B2는 주차장. 출구 K1~K12, MRT M4 출구와 연결.'),
-    label: tx('K區 誠品站前', 'K区 诚品站前', 'K区 誠品站前', 'K · eslite', 'K구 청핀'), lx: -40, ly: 7
+    label: tx('K區 東森廣場', 'K区 东森广场', 'K区 東森廣場', 'K · Dong Sen Plaza', 'K구 둥썬광장'), lx: -40, ly: 7
   });
 
   // ---- Z区 ----
@@ -1789,7 +1887,7 @@ function buildWorld(scene) {
                '타이베이역 북단에서 중산역을 거쳐 솽롄역까지 <b>총 815m</b>(출구 R1~R11). 옛 단수이선 철길 부지로, 지상은 선형공원 "신중산". 중산역 쪽 구간은 서점거리 <b>청핀 R79</b>. 영업 11:00~22:00(서점가 11:30~21:30). <b>지상에 나가지 않고 중산 상권까지 도보 가능.</b>'),
       label: tx('R區 中山地下街', 'R区 中山地下街', 'R区 中山地下街', 'R · Zhongshan Mall', 'R구 중산 지하상가'), ly: 7
     });
-    dirLabel('B1', 190, 4, -492, tx('→ 中山站・誠品R79・雙連（步行約10分）', '→ 中山站・诚品R79・双连（步行约10分）', '→ 中山駅・誠品R79・雙連（徒歩約10分）', '→ Zhongshan Sta. / eslite R79 / Shuanglian (~10 min walk)', '→ 중산역·청핀R79·솽롄(도보 약 10분)'));
+    dirLabel('B1', 190, 4, -492, tx('中山站・誠品R79・雙連（步行約10分）', '中山站・诚品R79・双连（步行约10分）', '中山駅・誠品R79・雙連（徒歩約10分）', 'Zhongshan Sta. / eslite R79 / Shuanglian (~10 min walk)', '중산역·청핀R79·솽롄(도보 약 10분)'));
   }
 
   /* ---- 出口マーカー ---- */
@@ -1812,7 +1910,7 @@ function buildWorld(scene) {
   EX(-130, 76, COL.z, 'Z8', '南側，往重慶南路書店街。', '南侧，往重庆南路书店街。', '南側。重慶南路の書店街方面。', 'South side — Chongqing S. Rd. bookstore district.', '남측. 충칭난루 서점거리 방면.');
   EX(-182, 60, COL.z, 'Z10', 'Z區西端，往台北郵局、北門。', 'Z区西端，往台北邮局、北门。', 'Z区西端。<b>台北郵局・北門方面</b>。', 'West end — Post Office & North Gate.', 'Z구 서쪽 끝. 우체국·베이먼 방면.');
   // K区
-  EX(110, 46, COL.k, 'K1', 'K區東端，誠品站前店側出入口。', 'K区东端，诚品站前店侧出入口。', 'K区東端。<b>誠品站前店</b>側の出入口。', 'East end — entrance by eslite Zhanqian.', 'K구 동쪽 끝. 청핀 잔첸점 쪽 출입구.');
+  EX(110, 46, COL.k, 'K1', 'K區東端（東森廣場）。誠品生活站前店（諾貝爾廣場B1）也在附近。', 'K区东端（东森广场）。诚品生活站前店（诺贝尔广场B1）也在附近。', 'K区東端（東森廣場）。<b>誠品生活站前店</b>（諾貝爾廣場B1）も近く。', 'East end of K Mall (Dong Sen Plaza); the new eslite Zhanqian store (Nobel Plaza B1) is nearby.', 'K구 동쪽 끝(둥썬광장). 새 청핀 잔첸점(노벨광장 B1)도 근처.');
   EX(10, 22, COL.k, 'K5', '往站前廣場（車站正面）。', '往站前广场（车站正面）。', '站前広場（駅正面）へ。', 'To the station-front plaza.', '역 앞 광장으로.');
   EX(-90, 30, COL.k, 'K12', 'K區西端。', 'K区西端。', 'K区西端。', 'West end of K Mall.', 'K구 서쪽 끝.');
   // R区
@@ -1843,7 +1941,7 @@ function buildWorld(scene) {
   // M出口
   EX(-70, 85, COL.mrt, 'M2', '忠孝西路南側西段。', '忠孝西路南侧西段。', '忠孝西路南側・西寄り。', 'South side of Zhongxiao W. Rd., west section.', '중샤오시루 남측 서쪽.');
   EX(-20, 85, COL.mrt, 'M3', '忠孝西路南側，往重慶南路。', '忠孝西路南侧，往重庆南路。', '忠孝西路南側。重慶南路方面。', 'South side of Zhongxiao W. Rd. — toward Chongqing S. Rd.', '중샤오시루 남측. 충칭난루 방면.');
-  EX(105, 42, COL.mrt, 'M4', '與K區（誠品站前店）連通。', '与K区（诚品站前店）连通。', '<b>K区（誠品站前店）と連通</b>。', 'Connected with K Mall (eslite Zhanqian).', 'K구(청핀 잔첸점)와 연결.');
+  EX(105, 42, COL.mrt, 'M4', '與K區地下街（東森廣場）連通。', '与K区地下街（东森广场）连通。', '<b>K区地下街（東森廣場）と連通</b>。', 'Connected with K Underground Mall (Dong Sen Plaza).', 'K구 지하상가(둥썬광장)와 연결.');
   EX(125, 80, COL.mrt, 'M5', '公園路西側。', '公园路西侧。', '公園路西側。', 'West side of Gongyuan Rd.', '궁위안루 서쪽.');
   EX(36, 85, COL.mrt, 'M6', '館前路口。<b>走地面去新光三越、亞洲廣場、凱撒就從這裡</b>。', '馆前路口。<b>走地面去新光三越、亚洲广场、凯撒就从这里</b>。', '館前路口。<b>新光三越・亞洲廣場・凱撒大飯店へ地上で行くならここ</b>。', 'Guanqian Rd. corner — <b>surface route to Mitsukoshi, Asia Plaza and Caesar Park</b>.', '관첸루 입구. <b>지상으로 미츠코시·아시아 플라자·시저파크 가려면 여기</b>.');
   EX(158, 85, COL.mrt, 'M7', '公園路沿線南側。', '公园路沿线南侧。', '公園路沿い南側。', 'Along Gongyuan Rd., south side.', '궁위안루 남측.');
@@ -1867,9 +1965,9 @@ function buildWorld(scene) {
     tx('車站直結最好用的美食街，從小籠包到牛肉麵、豆花都有。雨天晚餐首選。', '车站直结最好用的美食街，从小笼包到牛肉面、豆花都有。雨天晚餐首选。', '駅直結で一番使いやすいフードコート。小籠包から牛肉麺・豆花まで。雨の日の夕食に最適。', 'The handiest station-linked food court — xiaolongbao, beef noodles, douhua and more. Perfect for rainy-day dinners.', '역 직결로 가장 편한 푸드코트. 샤오롱바오부터 우육면·더우화까지. 비 오는 날 저녁 최적.'),
     tx('京站B3美食', '京站B3美食', '京站B3フードコート', 'Q square B3 food', '큐스퀘어 B3'));
   poi('B1', 80, 34, COL.k,
-    tx('誠品站前店', '诚品站前店', '誠品站前店', 'eslite Zhanqian', '청핀 잔첸점'),
-    tx('K區核心的誠品書店。台灣設計文具雜貨適合當伴手禮。與M4出口連通。', 'K区核心的诚品书店。台湾设计文具杂货适合当伴手礼。与M4出口连通。', 'K区の核となる誠品書店。台湾デザインの文具・雑貨はおみやげにも。M4出口連通。', 'The eslite bookstore at the heart of K Mall — Taiwanese-designed stationery makes great souvenirs. Linked to Exit M4.', 'K구 중심의 청핀서점. 타이완 디자인 문구·잡화는 선물로도 좋음. M4 출구와 연결.'),
-    tx('誠品站前店', '诚品站前店', '誠品站前店', 'eslite', '청핀서점'));
+    tx('東森廣場（K區）', '东森广场（K区）', '東森廣場（K区）', 'Dong Sen Plaza (K Mall)', '둥썬광장(K구)'),
+    tx('2023年接替誠品經營的K區地下街，分餐飲美食、潮流文化、生活百貨三區。與M4出口連通。', '2023年接替诚品经营的K区地下街，分餐饮美食、潮流文化、生活百货三区。与M4出口连通。', '2023年に誠品から引き継いだK区地下街。グルメ・カルチャー・生活雑貨の3ゾーン構成。M4出口連通。', 'K Mall\'s operator since 2023 (after eslite left) — three zones of food, pop culture and lifestyle goods. Linked to Exit M4.', '2023년 청핀에 이어 K구를 운영. 음식·문화·생활잡화 3개 존. M4 출구와 연결.'),
+    tx('東森廣場', '东森广场', '東森廣場', 'Dong Sen Plaza', '둥썬광장'));
   poi('F1', 95, 250, 0x1fa15f,
     tx('國立台灣博物館', '国立台湾博物馆', '國立台灣博物館', 'National Taiwan Museum', '국립타이완박물관'),
     tx('1908年落成的舊總督府博物館（二二八公園內）。週一休，9:30〜17:00。', '1908年落成的旧总督府博物馆（二二八公园内）。周一休，9:30〜17:00。', '1908年築の旧総督府博物館（二二八公園内）。月休・9:30〜17:00。', 'Taiwan\'s oldest museum (1908), inside 228 Park. Closed Mondays; 9:30–17:00.', '1908년 건립된 타이완에서 가장 오래된 박물관(228공원 내). 월요일 휴관, 9:30~17:00.'),
@@ -1918,8 +2016,8 @@ function buildWorld(scene) {
     traL.position.set(-60, 9, -52);
     F['B2'].add(traL);
   }
-  dirLabel('B2', -110, 5, -25, tx('← 板橋・台中・左營（高鐵）', '← 板桥・台中・左营（高铁）', '← 板橋・台中・左営（高鉄）', '← Banqiao / Taichung / Zuoying (HSR)', '← 반차오·타이중·쭤잉(HSR)'));
-  dirLabel('B2', 110, 5, -60, tx('松山・基隆・宜蘭（台鐵）→', '松山・基隆・宜兰（台铁）→', '松山・基隆・宜蘭（台鉄）→', 'Songshan / Keelung / Yilan (TRA) →', '쑹산·지룽·이란(TRA) →'));
+  dirLabel('B2', -110, 5, -25, tx('板橋・台中・左營方面（高鐵）', '板桥・台中・左营方面（高铁）', '板橋・台中・左営方面（高鉄）', 'To Banqiao / Taichung / Zuoying (HSR)', '반차오·타이중·쭤잉 방면(HSR)'));
+  dirLabel('B2', 110, 5, -60, tx('松山・基隆・宜蘭方面（台鐵）', '松山・基隆・宜兰方面（台铁）', '松山・基隆・宜蘭方面（台鉄）', 'To Songshan / Keelung / Yilan (TRA)', '쑹산·지룽·이란 방면(TRA)'));
 
   box('B2', -410, -270, -85, -50, 4, COL.airDark, {
     opacity: .9,
@@ -1933,7 +2031,7 @@ function buildWorld(scene) {
     label: tx('機捷月台', '机捷站台', '空港MRTホーム', 'Airport MRT', '공항MRT 승강장'),
     labelColor: '#8246af', ly: 6
   });
-  dirLabel('B2', -425, 5, -67, tx('← 桃園機場 T1・T2（直達車約39分）', '← 桃园机场 T1・T2（直达车约39分）', '← 桃園空港 T1・T2（直達車 約39分）', '← Taoyuan Airport T1/T2 (Express ~39 min)', '← 타오위안공항 T1·T2(직달 약 39분)'));
+  dirLabel('B2', -425, 5, -67, tx('桃園機場 T1・T2方面（直達車約39分）', '桃园机场 T1・T2方面（直达车约39分）', '桃園空港 T1・T2方面（直達車 約39分）', 'To Taoyuan Airport T1/T2 (Express ~39 min)', '타오위안공항 T1·T2 방면(직달 약 39분)'));
 
   box('B3', -75, 60, 48, 68, 4, COL.platform, {
     name: tx('板南線月台（B3）', '板南线站台（B3）', 'BL線ホーム（板南線・B3）', 'Blue Line platform (B3)', '반난선 승강장(B3)'),
@@ -1948,8 +2046,8 @@ function buildWorld(scene) {
   });
   box('B3', -115, 100, 41, 48, 1.4, COL.track, { edges: false });
   box('B3', -115, 100, 68, 75, 1.4, COL.track, { edges: false });
-  dirLabel('B3', -125, 5, 58, tx('← 西門・龍山寺（往頂埔）', '← 西门・龙山寺（往顶埔）', '← 西門・龍山寺（頂埔行き）', '← Ximen / Longshan Temple (to Dingpu)', '← 시먼·룽산쓰(딩푸행)'));
-  dirLabel('B3', 112, 5, 58, tx('善導寺・市政府 →', '善导寺・市政府 →', '善導寺・市政府 →', 'Shandao Temple / City Hall →', '산다오쓰·시정부 →'));
+  dirLabel('B3', -125, 5, 58, tx('西門・龍山寺方面（往頂埔）', '西门・龙山寺方面（往顶埔）', '西門・龍山寺方面（頂埔行き）', 'To Ximen / Longshan Temple (Dingpu)', '시먼·룽산쓰 방면(딩푸행)'));
+  dirLabel('B3', 112, 5, 58, tx('善導寺・市政府方面', '善导寺・市政府方面', '善導寺・市政府方面', 'To Shandao Temple / City Hall', '산다오쓰·시정부 방면'));
 
   box('B3', 150, 176, -60, 40, 5, 0xd96a85, {
     opacity: .9,
@@ -1977,8 +2075,8 @@ function buildWorld(scene) {
   });
   box('B4', 144, 152, -70, 110, 1.4, COL.track, { edges: false });
   box('B4', 174, 182, -70, 110, 1.4, COL.track, { edges: false });
-  dirLabel('B4', 163, 5, -80, tx('↑ 中山・雙連・北投（往淡水）', '↑ 中山・双连・北投（往淡水）', '↑ 中山・雙連・北投（淡水行き）', '↑ Zhongshan / Shuanglian / Beitou (to Tamsui)', '↑ 중산·솽롄·베이터우(단수이행)'));
-  dirLabel('B4', 163, 5, 120, tx('↓ 台大醫院・中正紀念堂・東門（往象山）', '↓ 台大医院・中正纪念堂・东门（往象山）', '↓ 台大醫院・中正紀念堂・東門（象山行き）', '↓ NTU Hospital / CKS Memorial / Dongmen (to Xiangshan)', '↓ 타이다이위안·중정기념당·둥먼(샹산행)'));
+  dirLabel('B4', 163, 5, -80, tx('中山・雙連・北投方面（往淡水）', '中山・双连・北投方面（往淡水）', '中山・雙連・北投方面（淡水行き）', 'To Zhongshan / Shuanglian / Beitou (Tamsui)', '중산·솽롄·베이터우 방면(단수이행)'));
+  dirLabel('B4', 163, 5, 120, tx('台大醫院・中正紀念堂方面（往象山）', '台大医院・中正纪念堂方面（往象山）', '台大醫院・中正紀念堂方面（象山行き）', 'To NTU Hospital / CKS Memorial (Xiangshan)', '타이다이위안·중정기념당 방면(샹산행)'));
 
   /* ============================================================
      お店情報レイヤー
@@ -1994,6 +2092,7 @@ function buildWorld(scene) {
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(.45, .45, 9, 6), mat(c, .55));
     pole.position.set(x, 4.5, z);
     const l = makeLabel(labelText || name, 'spot', hex(c));
+    l.element.classList.add('cat-' + cat);
     l.position.y = 6;
     m.add(l);
     F[fk].add(m);
@@ -2039,7 +2138,7 @@ function buildWorld(scene) {
 
   /* ---- K区 ---- */
   shop('B1', 30, 34, 'food',
-    tx('上島珈琲店（誠品站前）', '上岛珈琲店（诚品站前）', '上島珈琲店 誠品站前店', 'Ueshima Coffee', '우에시마 커피'),
+    tx('上島珈琲店（站前店）', '上岛珈琲店（站前店）', '上島珈琲店 站前店（K区）', 'Ueshima Coffee (Zhanqian)', '우에시마 커피(잔첸점)'),
     tx('日系咖啡店，平日7:00開門，是車站地下少見的早餐選擇。', '日系咖啡店，平日7:00开门，是车站地下少见的早餐选择。', '日本でおなじみの上島珈琲。平日7:00〜22:00で、駅地下では貴重な朝モーニングが人気。', 'Japanese coffee chain opening at 7:00 on weekdays — a rare proper-breakfast option under the station.', '일본계 커피숍. 평일 7시 오픈으로 역 지하에서 드문 아침식사 선택지.'),
     tx('上島珈琲', '上岛珈琲', '上島珈琲', 'Ueshima Coffee', '우에시마커피'));
   shop('B1', -40, 34, 'food',
@@ -2082,6 +2181,36 @@ function buildWorld(scene) {
     tx('金子半之助', '金子半之助', '金子半之助（微風2F）', 'Kaneko Hannosuke', '가네코 한노스케'),
     tx('日本橋天丼名店的台灣店，微風2F的排隊常客。', '日本桥天丼名店的台湾店，微风2F的排队常客。', '日本橋の天丼専門店の台湾店。微風2Fの行列店常連。', 'Taiwan branch of the famed Nihonbashi tendon shop — a perennial Breeze 2F queue.', '니혼바시 텐동 명가의 타이완 지점. 브리즈 2층 줄서는 집.'),
     tx('金子半之助', '金子半之助', '金子半之助', 'Tendon', '텐동'));
+  shop('F2', -70, -8, 'food',
+    tx('點點心（微風2F）', '点点心（微风2F）', '點點心（微風2F）', 'Dim Dim Sum', '딤딤섬'),
+    tx('香港人氣點心專門店，造型可愛的流沙包是招牌。', '香港人气点心专门店，造型可爱的流沙包是招牌。', '香港発の人気点心専門店。カスタード流沙包など見た目もかわいい点心が看板。', 'Popular Hong Kong dim-sum chain — the cute custard buns are the signature.', '홍콩 인기 딤섬 전문점. 귀여운 커스터드 류사오바오가 간판.'),
+    tx('點點心', '点点心', '點點心', 'Dim Dim Sum', '딤딤섬'));
+  shop('F2', -25, -8, 'food',
+    tx('一風堂（微風2F）', '一风堂（微风2F）', '一風堂（微風2F）', 'Ippudo', '잇푸도'),
+    tx('博多豚骨拉麵名店的台灣分店。', '博多豚骨拉面名店的台湾分店。', '博多豚骨ラーメンの有名店。台湾でも安定の人気。', 'The famed Hakata tonkotsu ramen brand\'s Taiwan branch.', '하카타 돈코츠 라멘 명가의 타이완 지점.'),
+    tx('一風堂', '一风堂', '一風堂', 'Ippudo', '잇푸도'));
+  shop('F2', 20, -8, 'food',
+    tx('翰林茶館（微風2F）', '翰林茶馆（微风2F）', '翰林茶館（微風2F）', 'Hanlin Tea Room', '한린차관'),
+    tx('1986年創業、號稱珍珠奶茶發源店之一。可內用正餐與茶點。', '1986年创业、号称珍珠奶茶发源店之一。可内用正餐与茶点。', '1986年創業、タピオカミルクティー発祥を名乗る老舗のひとつ。食事メニューもある茶館。', 'Founded 1986 — one of the claimed birthplaces of bubble tea; serves full meals too.', '1986년 창업, 버블티 원조를 자처하는 노포 중 하나. 식사 메뉴도 있는 찻집.'),
+    tx('翰林茶館', '翰林茶馆', '翰林茶館', 'Hanlin Tea', '한린차관'));
+  shop('F2', 88, -66, 'food',
+    tx('大河屋（微風2F）', '大河屋（微风2F）', '大河屋（微風2F）', 'Okawaya', '오카와야'),
+    tx('燒肉丼與串燒的日式食堂，平價分量足。', '烧肉丼与串烧的日式食堂，平价分量足。', '焼肉丼と串焼きの日式食堂。手頃でボリュームあり。', 'Japanese-style grill-don and skewer joint — generous and affordable.', '야키니쿠동·꼬치구이 일식당. 저렴하고 양 많음.'),
+    tx('大河屋', '大河屋', '大河屋', 'Okawaya', '오카와야'));
+
+  /* ---- 1F 駅舎・Y区・Z区 ---- */
+  shop('F1', -55, -45, 'food',
+    tx('台鐵便當本舖（1F）', '台铁便当本铺（1F）', '台鉄弁当本舖（1F）', 'TRA Bento Shop (1F)', 'TRA 도시락 본점(1층)'),
+    tx('招牌排骨便當約NT$100，中午常排隊、賣完為止。1F大廳西側。', '招牌排骨便当约NT$100，中午常排队、卖完为止。1F大厅西侧。', '名物の排骨弁当は約NT$100。昼どきは行列、売り切れ次第終了。1Fホール西側。', 'The famous pork-chop bento (~NT$100). Queues at lunch; sells out daily. West side of the 1F hall.', '명물 파이구 도시락 약 NT$100. 점심엔 줄, 매진 시 종료. 1층 홀 서쪽.'),
+    tx('台鐵便當', '台铁便当', '台鉄弁当', 'TRA Bento', 'TRA도시락'));
+  shop('B1', -320, -130, 'shopping',
+    tx('Y區 動漫電玩區', 'Y区 动漫电玩区', 'Y区 アニメ・ガチャ・ゲームエリア', 'Y Mall anime & games zone', 'Y구 애니·게임 존'),
+    tx('被稱為「台北秋葉原」的次文化區：轉蛋、卡牌、模型、電玩店與機台聚集。', '被称为「台北秋叶原」的次文化区：扭蛋、卡牌、模型、电玩店与机台聚集。', '「台北の秋葉原」と呼ばれるサブカルゾーン。ガチャガチャ・カードゲーム・フィギュア・ゲーセンが集中。', 'Taipei\'s "Akihabara" — gacha machines, card games, figures and arcades cluster here.', '"타이베이의 아키하바라"로 불리는 서브컬처 존. 가챠·카드게임·피규어·오락실 밀집.'),
+    tx('動漫・ガチャ', '动漫电玩', 'アニメ・ガチャ', 'Anime & games', '애니·가챠'));
+  shop('B1', -150, 70, 'shopping',
+    tx('Z區 服飾雜貨區', 'Z区 服饰杂货区', 'Z区 ファッション・雑貨区', 'Z Mall fashion & goods', 'Z구 패션·잡화 존'),
+    tx('站前地下街以平價服飾、雜貨、藥妝為主，約11:00〜20:00。', '站前地下街以平价服饰、杂货、药妆为主，约11:00〜20:00。', '站前地下街は手頃な服飾・雑貨・コスメ中心。営業はおおむね11:00〜20:00。', 'Zhanqian Mall focuses on budget fashion, sundries and cosmetics; roughly 11:00–20:00.', '잔첸 지하상가는 저렴한 패션·잡화·코스메 중심. 약 11:00~20:00 영업.'),
+    tx('服飾・雑貨', '服饰杂货', 'ファッション雑貨', 'Fashion & goods', '패션·잡화'));
 
   /* ---- 京站 B3 ---- */
   shop('B1', 98, -185, 'food',
@@ -2096,6 +2225,48 @@ function buildWorld(scene) {
     tx('好丘 GOOD CHO\'s（京站B3）', '好丘 GOOD CHO\'s（京站B3）', '好丘 GOOD CHO\'s（京站B3）', 'GOOD CHO\'s bagels', '굿초스 베이글'),
     tx('台灣食材貝果與伴手禮的台灣生活品牌，買小禮物很方便。', '台湾食材贝果与伴手礼的台湾生活品牌，买小礼物很方便。', '台湾産食材のベーグルと土産菓子。台湾発ライフスタイルブランドで、ばらまき土産探しにも◎。', 'Taiwanese lifestyle brand selling local-ingredient bagels and gift snacks — handy for souvenirs.', '타이완 식재료 베이글과 선물 과자. 기념품 사기 좋은 로컬 브랜드.'),
     tx('好丘', '好丘', '好丘ベーグル', 'GOOD CHO\'s', '굿초스'));
+
+  /* ---- トイレ（おおよその位置） ---- */
+  const wcLbl = tx('廁所', '厕所', 'トイレ', 'WC', '화장실');
+  shop('B1', 50, -10, 'wc',
+    tx('廁所（台鐵高鐵閘門旁）', '厕所（台铁高铁检票口旁）', 'トイレ（台鉄・高鉄改札そば）', 'Restroom (by TRA/HSR gates)', '화장실(TRA/HSR 개찰구 옆)'),
+    tx('B1閘門層的免費公廁。趕車前先解決最方便。', 'B1检票层的免费公厕。赶车前先解决最方便。', 'B1改札フロアの無料トイレ。乗車前に済ませるならここが便利。', 'Free restrooms on the B1 gate level — handiest stop before boarding.', 'B1 개찰층의 무료 화장실. 탑승 전 이용하기 가장 편리.'),
+    wcLbl);
+  shop('B1', -300, -105, 'wc',
+    tx('廁所（台北地下街Y區）', '厕所（台北地下街Y区）', 'トイレ（台北地下街Y区）', 'Restroom (Taipei Mall Y)', '화장실(타이베이 지하상가 Y구)'),
+    tx('Y區中段的公廁。地下街沿線有數處。', 'Y区中段的公厕。地下街沿线有数处。', 'Y区中ほどの公衆トイレ。地下街沿いに数カ所あります。', 'Public restroom mid-way along the Y mall; several more dot the underground streets.', 'Y구 중간의 공중화장실. 지하상가를 따라 여러 곳 있음.'),
+    wcLbl);
+  shop('B1', -60, 70, 'wc',
+    tx('廁所（站前地下街Z區）', '厕所（站前地下街Z区）', 'トイレ（站前地下街Z区）', 'Restroom (Zhanqian Mall Z)', '화장실(잔첸 지하상가 Z구)'),
+    tx('Z區（站前地下街）內的公廁。', 'Z区（站前地下街）内的公厕。', 'Z区（站前地下街）内の公衆トイレ。', 'Public restroom inside the Zhanqian (Z) underground mall.', 'Z구(잔첸 지하상가) 내 공중화장실.'),
+    wcLbl);
+  shop('B2', 70, 60, 'wc',
+    tx('廁所（捷運大廳）', '厕所（捷运大厅）', 'トイレ（MRT改札フロア）', 'Restroom (MRT concourse)', '화장실(MRT 대합실)'),
+    tx('B2捷運大廳的公廁（閘門外）。', 'B2捷运大厅的公厕（检票口外）。', 'B2のMRT改札フロアにあるトイレ（改札の外側）。', 'Restrooms on the B2 MRT concourse, outside the fare gates.', 'B2 MRT 대합실의 화장실(개찰구 밖).'),
+    wcLbl);
+  shop('F2', 75, -35, 'wc',
+    tx('廁所（微風2F）', '厕所（微风2F）', 'トイレ（微風2F）', 'Restroom (Breeze 2F)', '화장실(브리즈 2F)'),
+    tx('微風美食街東側的化妝室。', '微风美食街东侧的化妆室。', '微風美食街・東側のトイレ。食事ついでに。', 'Restrooms on the east side of the Breeze 2F food court.', '브리즈 2층 푸드코트 동쪽 화장실.'),
+    wcLbl);
+
+  /* ---- コインロッカー（おおよその位置） ---- */
+  const lkLbl = tx('寄物櫃', '寄存柜', 'ロッカー', 'Lockers', '보관함');
+  shop('B1', -60, -10, 'locker',
+    tx('寄物櫃（台鐵高鐵閘門西側）', '寄存柜（台铁高铁检票口西侧）', 'コインロッカー（台鉄・高鉄改札 西側）', 'Lockers (west of TRA/HSR gates)', '물품보관함(TRA/HSR 개찰 서쪽)'),
+    tx('B1閘門層最大的一排電子寄物櫃。約NT$20〜70／3小時，可用悠遊卡。', 'B1检票层最大的一排电子寄存柜。约NT$20〜70／3小时，可用悠游卡。', 'B1改札フロアで一番大きいロッカー群。3時間 NT$20〜70目安、悠遊カード払い可。', 'The biggest bank of e-lockers on the B1 gate level. Roughly NT$20–70 per 3 h; EasyCard accepted.', 'B1 개찰층 최대 규모의 전자 보관함. 3시간 약 NT$20~70, 이지카드 사용 가능.'),
+    lkLbl);
+  shop('B1', 95, 8, 'locker',
+    tx('寄物櫃（東側・誠品方向）', '寄存柜（东侧・诚品方向）', 'コインロッカー（東側・誠品方面）', 'Lockers (east side, towards eslite)', '물품보관함(동쪽·청핀 방면)'),
+    tx('B1東側通道的寄物櫃。閘門旁滿櫃時可來這裡。', 'B1东侧通道的寄存柜。检票口旁满柜时可来这里。', 'B1東側通路のロッカー。改札横が満杯のときの代替に。', 'Lockers along the B1 east corridor — a good backup when the gate-side bank is full.', 'B1 동쪽 통로의 보관함. 개찰구 옆이 만석일 때 대안.'),
+    lkLbl);
+  shop('B2', 75, 40, 'locker',
+    tx('寄物櫃（捷運大廳）', '寄存柜（捷运大厅）', 'コインロッカー（MRT改札フロア）', 'Lockers (MRT concourse)', '물품보관함(MRT 대합실)'),
+    tx('B2捷運大廳的寄物櫃（閘門外）。', 'B2捷运大厅的寄存柜（检票口外）。', 'B2のMRT改札フロアのロッカー（改札の外側）。', 'Lockers on the B2 MRT concourse, outside the gates.', 'B2 MRT 대합실의 보관함(개찰구 밖).'),
+    lkLbl);
+  shop('B1', -340, -105, 'locker',
+    tx('寄物櫃（Y區西側・往機捷）', '寄存柜（Y区西侧・往机捷）', 'コインロッカー（Y区西側・空港MRT方面）', 'Lockers (Y mall west, towards Airport MRT)', '물품보관함(Y구 서쪽·공항MRT 방면)'),
+    tx('台北地下街西段的寄物櫃，去機捷A1前寄放方便。', '台北地下街西段的寄存柜，去机捷A1前寄放方便。', '台北地下街・西寄りのロッカー。空港MRT A1へ行く前の預け入れに便利。', 'Lockers in the west stretch of Taipei Mall — handy before heading to Airport MRT A1.', '타이베이 지하상가 서쪽 보관함. 공항MRT A1 가기 전에 편리.'),
+    lkLbl);
 
   /* ============================================================
      電車（アニメーション）
@@ -2181,7 +2352,7 @@ function buildWorld(scene) {
 
   return {
     F, gRoute, pickables, i18nLabels, exitObjs, shopObjs, connMeshes, trains,
-    updateConns, updateExits, makeLabel, mat
+    updateConns, updateExits, makeLabel, mat, stationParts, stationRoof
   };
 }
 
@@ -2204,21 +2375,21 @@ const ROUTES = [
    自由ルート: 歩行ネットワーク（name有り=選択可能な地点）
    ============================================================ */
 const NET_NODES = {
-  hall1f:  { p: [0, -35, 'F1'],     name: tx('1F 大廳・售票處', '1F 大厅・售票处', '1F ホール・切符売場', '1F Main hall & tickets', '1층 대합실·매표소') },
-  breeze:  { p: [-20, -40, 'F2'],   name: tx('2F 微風美食街', '2F 微风美食街', '2F 微風美食街', '2F Breeze food court', '2층 푸드코트') },
-  traGate: { p: [0, -40, 'B1'],     name: tx('台鐵高鐵 閘門', '台铁高铁 检票口', '台鉄・高鉄 改札', 'TRA / HSR gates', 'TRA/HSR 개찰구') },
-  traPlat: { p: [0, -50, 'B2'],     name: tx('台鐵高鐵 月台', '台铁高铁 站台', '台鉄・高鉄 ホーム', 'TRA / HSR platforms', 'TRA/HSR 승강장') },
-  mrtConc: { p: [20, 58, 'B2'],     name: tx('捷運大廳・閘門', '捷运大厅・检票', 'MRT改札フロア', 'MRT concourse & gates', 'MRT 개찰·대합실') },
-  blPlat:  { p: [-20, 58, 'B3'],    name: tx('板南線 月台', '板南线 站台', 'BL線（板南線）ホーム', 'Blue Line platform', '반난선 승강장') },
-  rPlat:   { p: [163, 40, 'B4'],    name: tx('淡水信義線 月台', '淡水信义线 站台', 'R線（淡水信義線）ホーム', 'Red Line platform', '단수이신이선 승강장') },
-  airA1:   { p: [-340, -66, 'B1'],  name: tx('機捷A1 報到大廳', '机捷A1 值机大厅', '空港MRT A1 チェックイン', 'Airport MRT A1 check-in', '공항MRT A1 체크인') },
-  yCenter: { p: [-260, -119, 'B1'], name: tx('Y區 台北地下街（中央）', 'Y区 台北地下街（中央）', 'Y区 台北地下街（中央）', 'Taipei Mall Y (center)', 'Y구 타이베이 지하상가(중앙)') },
-  qSquare: { p: [85, -205, 'B1'],   name: tx('京站・台北轉運站', '京站・台北转运站', '京站・台北轉運站（バスターミナル）', 'Q square & Bus Station', '큐스퀘어·버스터미널') },
-  zMall:   { p: [-60, 60, 'B1'],    name: tx('Z區 站前地下街', 'Z区 站前地下街', 'Z区 站前地下街', 'Zhanqian Mall (Z)', 'Z구 잔첸 지하상가') },
-  z2:      { p: [40, 74, 'B1'],     name: tx('Z2出口（新光三越）', 'Z2出口（新光三越）', 'Z2出口（新光三越前）', 'Exit Z2 (Mitsukoshi)', 'Z2 출구(미츠코시)') },
-  kMall:   { p: [60, 34, 'B1'],     name: tx('K區 誠品站前', 'K区 诚品站前', 'K区 誠品站前', 'K Mall (eslite)', 'K구 청핀') },
-  r79:     { p: [172, -395, 'B1'],  name: tx('R區 誠品R79書街', 'R区 诚品R79书街', 'R区 誠品R79（地下書街）', 'eslite R79 book street', 'R구 청핀R79') },
-  beimen:  { p: [-588, -65, 'B1'],  name: tx('北門站（綠線）', '北门站（绿线）', '北門駅（G線）・北門', 'Beimen Sta. (Green Line)', '베이먼역(그린)') },
+  hall1f:  { p: [0, -35, 'F1'],     kind: 'hall', name: tx('1F 大廳・售票處', '1F 大厅・售票处', '1F ホール・切符売場', '1F Main hall & tickets', '1층 대합실·매표소') },
+  breeze:  { p: [-20, -40, 'F2'],   kind: 'hall', name: tx('2F 微風美食街', '2F 微风美食街', '2F 微風美食街', '2F Breeze food court', '2층 푸드코트') },
+  traGate: { p: [0, -40, 'B1'],     kind: 'hall', name: tx('台鐵高鐵 閘門', '台铁高铁 检票口', '台鉄・高鉄 改札', 'TRA / HSR gates', 'TRA/HSR 개찰구') },
+  traPlat: { p: [0, -50, 'B2'],     kind: 'plat', name: tx('台鐵高鐵 月台', '台铁高铁 站台', '台鉄・高鉄 ホーム', 'TRA / HSR platforms', 'TRA/HSR 승강장') },
+  mrtConc: { p: [20, 58, 'B2'],     kind: 'hall', name: tx('捷運大廳・閘門', '捷运大厅・检票', 'MRT改札フロア', 'MRT concourse & gates', 'MRT 개찰·대합실') },
+  blPlat:  { p: [-20, 58, 'B3'],    kind: 'plat', name: tx('板南線 月台', '板南线 站台', 'BL線（板南線）ホーム', 'Blue Line platform', '반난선 승강장') },
+  rPlat:   { p: [163, 40, 'B4'],    kind: 'plat', name: tx('淡水信義線 月台', '淡水信义线 站台', 'R線（淡水信義線）ホーム', 'Red Line platform', '단수이신이선 승강장') },
+  airA1:   { p: [-340, -66, 'B1'],  kind: 'plat', name: tx('機捷A1 報到大廳', '机捷A1 值机大厅', '空港MRT A1 チェックイン', 'Airport MRT A1 check-in', '공항MRT A1 체크인') },
+  yCenter: { p: [-260, -119, 'B1'], kind: 'hall', name: tx('Y區 台北地下街（中央）', 'Y区 台北地下街（中央）', 'Y区 台北地下街（中央）', 'Taipei Mall Y (center)', 'Y구 타이베이 지하상가(중앙)') },
+  qSquare: { p: [85, -205, 'B1'],   kind: 'hall', name: tx('京站・台北轉運站', '京站・台北转运站', '京站・台北轉運站（バスターミナル）', 'Q square & Bus Station', '큐스퀘어·버스터미널') },
+  zMall:   { p: [-60, 60, 'B1'],    kind: 'hall', name: tx('Z區 站前地下街', 'Z区 站前地下街', 'Z区 站前地下街', 'Zhanqian Mall (Z)', 'Z구 잔첸 지하상가') },
+  z2:      { p: [40, 74, 'B1'],     kind: 'exit', name: tx('Z2出口（新光三越）', 'Z2出口（新光三越）', 'Z2出口（新光三越前）', 'Exit Z2 (Mitsukoshi)', 'Z2 출구(미츠코시)') },
+  kMall:   { p: [60, 34, 'B1'],     kind: 'hall', name: tx('K區 東森廣場', 'K区 东森广场', 'K区 東森廣場', 'K Mall (Dong Sen Plaza)', 'K구 둥썬광장') },
+  r79:     { p: [172, -395, 'B1'],  kind: 'hall', name: tx('R區 誠品R79書街', 'R区 诚品R79书街', 'R区 誠品R79（地下書街）', 'eslite R79 book street', 'R구 청핀R79') },
+  beimen:  { p: [-588, -65, 'B1'],  kind: 'plat', name: tx('北門站（綠線）', '北门站（绿线）', '北門駅（G線）・北門', 'Beimen Sta. (Green Line)', '베이먼역(그린)') },
   // 中継点
   jK4: { p: [-7, 0, 'B1'] }, jK3: { p: [-7, 34, 'B1'] }, jK2: { p: [-7, 46, 'B1'] }, jZ0: { p: [0, 60, 'B1'] },
   jZB1: { p: [20, 58, 'B1'] }, jB2a: { p: [-20, 58, 'B2'] },
@@ -2319,7 +2490,39 @@ scene.add(fill);
 
 /* ---------- world ---------- */
 const W = buildWorld(scene);
-const { F, gRoute, pickables, i18nLabels, exitObjs, shopObjs, connMeshes, trains, updateConns, updateExits } = W;
+const { F, gRoute, pickables, i18nLabels, exitObjs, shopObjs, connMeshes, trains, updateConns, updateExits, stationParts, stationRoof } = W;
+
+/* ---------- 出口・お店をルート網に組み込む（最寄りノードに接続） ---------- */
+function netLink(a, b) {
+  NET_EDGES.push([a, b]);
+  (NET_ADJ[a] = NET_ADJ[a] || []).push(b);
+  (NET_ADJ[b] = NET_ADJ[b] || []).push(a);
+}
+function nearestNetNode(x, z, fk, baseOnly) {
+  let best = null, bd = Infinity;
+  for (const k in NET_NODES) {
+    if (baseOnly && /^(x_|s_)/.test(k)) continue;
+    if (!NET_ADJ[k]) continue;
+    const p = NET_NODES[k].p;
+    if (p[2] !== fk) continue;
+    const d = (p[0] - x) * (p[0] - x) + (p[1] - z) * (p[1] - z);
+    if (d < bd) { bd = d; best = k; }
+  }
+  return best;
+}
+for (const e of exitObjs) {
+  const id = 'x_' + e.id;
+  NET_NODES[id] = { p: [e.x, e.z, e.fk], kind: 'exit', name: mapTx(l => TAG.exit[l] + ' ' + e.id) };
+  const n = nearestNetNode(e.x, e.z, e.fk, true);
+  if (n) netLink(id, n);
+}
+shopObjs.forEach((s, i) => {
+  const id = 's_' + i;
+  const p = s.mesh.position;
+  NET_NODES[id] = { p: [p.x, p.z, s.fk], kind: 'shop', name: s.mesh.userData.info.name };
+  const n = nearestNetNode(p.x, p.z, s.fk, true);
+  if (n) netLink(id, n);
+});
 
 /* ---------- settings ---------- */
 const SETTINGS = { theme: 'classic', accent: '#f15a35', trains: true, labelFar: 680 };
@@ -2360,11 +2563,11 @@ function toast(msg, ms = 3000) {
 
 /* ---------- camera fly ---------- */
 const VIEWS = {
-  all: { pos: [-130, 460, 520], tgt: [-110, -15, -20] },
-  mrt: { pos: [300, 180, 290], tgt: [70, -35, 50] },
-  y: { pos: [-220, 230, 160], tgt: [-210, -10, -120] },
-  z: { pos: [110, 190, 330], tgt: [-30, -10, 90] },
-  air: { pos: [-540, 210, 150], tgt: [-330, -14, -65] }
+  all: { pos: [-130, 460, 520], tgt: [-110, -15, -20], floor: null },
+  mrt: { pos: [300, 180, 290], tgt: [70, -35, 50], floor: 'B2' },
+  y: { pos: [-220, 230, 160], tgt: [-210, -10, -120], floor: 'B1' },
+  z: { pos: [110, 190, 330], tgt: [-30, -10, 90], floor: 'B1' },
+  air: { pos: [-540, 210, 150], tgt: [-330, -14, -65], floor: 'B1' }
 };
 let camAnim = null;
 function flyTo(v, dur = 1.4) {
@@ -2381,9 +2584,10 @@ function flyToPoint(p, dist = 170, dur = 1.2) {
 
 /* ---------- focus & layers ---------- */
 let FOCUS = null;
-const layersOn = { food: false, shopping: false, exitg: true };
+const layersOn = { food: false, shopping: false, exitg: true, wc: false, locker: false };
 
 function applyShopLayers() {
+  for (const c in layersOn) app.classList.toggle('lyr-' + c, !!layersOn[c]);
   for (const s of shopObjs) {
     const vis = layersOn[s.cat] && (!FOCUS || FOCUS === s.fk);
     s.mesh.visible = vis;
@@ -2397,15 +2601,39 @@ function applyShopLayers() {
     e.label.visible = vis;
   }
 }
+let flagTimer = null;
 function updateFloorFlag() {
   const flag = $('#floorFlag');
+  const now = $('#floorNow');
   if (FOCUS) {
-    flag.innerHTML = `<b>${FOCUS}</b><span>${t(FLOORS[FOCUS].name)}</span>`;
+    const html = `<b>${FOCUS}</b><span>${t(FLOORS[FOCUS].name)}</span>`;
+    flag.innerHTML = html;
+    now.innerHTML = html;
+    now.hidden = false;
+    // 選択したフロアボタンの真横に表示
+    const btn = document.querySelector(`#rail .flr[data-f="${FOCUS}"]`);
+    if (btn) {
+      const r = btn.getBoundingClientRect();
+      flag.style.top = (r.top + r.height / 2) + 'px';
+    }
     flag.hidden = false;
-  } else flag.hidden = true;
+    flag.classList.remove('fade', 'pop');
+    void flag.offsetWidth;
+    flag.classList.add('pop');
+    clearTimeout(flagTimer);
+    flagTimer = setTimeout(() => flag.classList.add('fade'), 2000);
+  } else {
+    flag.hidden = true;
+    now.hidden = true;
+    clearTimeout(flagTimer);
+  }
 }
 function applyFocus() {
   const dim = activeRouteObj ? .1 : .04;
+  // B階フォーカス中は地上駅舎（駅舎ボックス・屋根・1Fホール・2F全体）を完全非表示
+  const baseFocus = !!FOCUS && FOCUS[0] === 'B';
+  F.F2.visible = !baseFocus;
+  for (const p of stationParts) p.visible = !baseFocus;
   for (const k of FKEY) {
     const active = !FOCUS || FOCUS === k;
     const fdim = (k === 'F1' && layersOn.exitg) ? Math.max(dim, .18) : dim;
@@ -2441,7 +2669,8 @@ function flyToFloor(fk) {
   const cx = (b[0] + b[1]) / 2, cz = (b[2] + b[3]) / 2;
   const y = F[fk].position.y;
   const span = Math.max(b[1] - b[0], b[3] - b[2]);
-  const dist = THREE.MathUtils.clamp(span * .9, 220, 900);
+  let dist = THREE.MathUtils.clamp(span * .9, 220, 900);
+  if (camera.aspect < 1) dist = Math.min(dist / Math.max(camera.aspect, .6), 1250);
   flyTo({ pos: [cx, y + dist * .78, cz + dist * .72], tgt: [cx, y, cz] }, 1.1);
 }
 $('#rail').addEventListener('click', e => {
@@ -2472,7 +2701,10 @@ $('#views').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if (!b) return;
   document.querySelectorAll('#views .chip').forEach(c => c.classList.remove('on'));
   b.classList.add('on');
-  flyTo(VIEWS[b.dataset.v]);
+  const v = VIEWS[b.dataset.v];
+  FOCUS = v.floor || null;     // ビューに対応するフロアへ自動切替
+  applyFocus();
+  flyTo(v);
 });
 function zoomBy(f) {
   const v = camera.position.clone().sub(controls.target).multiplyScalar(f);
@@ -2509,9 +2741,11 @@ function buildRouteGeo(r) {
   routeCurve = new THREE.CatmullRomCurve3(routePts(r), false, 'catmullrom', .08);
   if (routeTube) { routeTube.geometry.dispose(); gRoute.remove(routeTube); }
   routeTube = new THREE.Mesh(
-    new THREE.TubeGeometry(routeCurve, 110, 1.5, 8),
-    new THREE.MeshBasicMaterial({ color: SETTINGS.accent, transparent: true, opacity: .92 })
+    new THREE.TubeGeometry(routeCurve, 110, 1.3, 8),
+    // 通路オブジェクトに埋もれないよう常に最前面に描く
+    new THREE.MeshBasicMaterial({ color: SETTINGS.accent, transparent: true, opacity: .85, depthTest: false })
   );
+  routeTube.renderOrder = 50;
   gRoute.add(routeTube);
 }
 function buildRouteFloors(r) {
@@ -2641,11 +2875,27 @@ function playRoute(r) {
   buildRouteGeo(r);
   buildRouteFloors(r);
   buildMilestones(r);
-  routeBall = new THREE.Mesh(new THREE.SphereGeometry(4, 16, 16),
-    new THREE.MeshBasicMaterial({ color: 0xffd24d }));
-  const halo = new THREE.Mesh(new THREE.SphereGeometry(6.5, 16, 16),
-    new THREE.MeshBasicMaterial({ color: 0xffd24d, transparent: true, opacity: .3 }));
-  routeBall.add(halo);
+  // 人型ウォーカー（常に最前面）
+  routeBall = new THREE.Group();
+  {
+    const wMat = o => new THREE.MeshBasicMaterial({ color: 0xffd24d, depthTest: false, ...(o || {}) });
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(1.6, 3.6, 4, 10), wMat());
+    body.position.y = 6.2;
+    const head = new THREE.Mesh(new THREE.SphereGeometry(1.7, 14, 14), wMat());
+    head.position.y = 10.6;
+    const legGeo = new THREE.CylinderGeometry(.55, .5, 3.8, 8);
+    const legL = new THREE.Group(), legR = new THREE.Group();
+    const lmesh = new THREE.Mesh(legGeo, wMat());
+    lmesh.position.y = -1.9;
+    legL.add(lmesh); legR.add(lmesh.clone());
+    legL.position.set(.85, 4.4, 0); legR.position.set(-.85, 4.4, 0);
+    const halo = new THREE.Mesh(new THREE.RingGeometry(3.4, 5.4, 26), wMat({ transparent: true, opacity: .35 }));
+    halo.rotation.x = -Math.PI / 2;
+    halo.position.y = .25;
+    routeBall.add(body, head, legL, legR, halo);
+    routeBall.traverse(o => { o.renderOrder = 60; });
+    routeBall.userData.legs = [legL, legR];
+  }
   routeT = 0;
   gRoute.add(routeBall);
   routeFollow = true;
@@ -2750,8 +3000,21 @@ const pinBtnEl = $('#pinBtn');
 function pinInfo() {
   return { name: UI.pinName, desc: UI.pinDesc, tag: TAG.pin, color: SETTINGS.accent, floor: pinState?.fk || 'B1', isPin: true };
 }
+function destroyPinGroup() {
+  if (!pinGroup) return;
+  // CSS2DRendererはオブジェクト除去時にDOM要素を消さないので明示的に破棄する
+  pinGroup.traverse(o => {
+    if (o.isCSS2DObject) {
+      const i = i18nLabels.findIndex(it => it.el === o.element);
+      if (i >= 0) i18nLabels.splice(i, 1);
+      o.element.remove();
+    }
+  });
+  pinGroup.parent?.remove(pinGroup);
+  pinGroup = null;
+}
 function buildPinMesh() {
-  if (pinGroup) { pinGroup.parent?.remove(pinGroup); pinGroup = null; }
+  destroyPinGroup();
   if (!pinState) return;
   const c = new THREE.Color(SETTINGS.accent);
   pinGroup = new THREE.Group();
@@ -2795,8 +3058,7 @@ function deletePin() {
     const head = pinGroup.children.find(o => o.isMesh && o.userData.info);
     const i = pickables.indexOf(head);
     if (i >= 0) pickables.splice(i, 1);
-    pinGroup.parent?.remove(pinGroup);
-    pinGroup = null;
+    destroyPinGroup();
   }
   pinState = null;
   localStorage.removeItem('tps3d.pin');
@@ -3045,20 +3307,44 @@ $('#helpBtn').onclick = () => showGuide(false);
 const rtModal = $('#rtModal');
 const rtFrom = $('#rtFrom');
 const rtTo = $('#rtTo');
-const DEST_IDS = Object.keys(NET_NODES).filter(k => NET_NODES[k].name);
+let rtKind = 'all';
+function destIds() {
+  const ids = Object.keys(NET_NODES).filter(k =>
+    NET_NODES[k].name && (rtKind === 'all' || NET_NODES[k].kind === rtKind));
+  const fo = k => FKEY.indexOf(NET_NODES[k].p[2]);
+  ids.sort((a, b) => fo(a) - fo(b));
+  return ids;
+}
+function rtOption(id) {
+  const o = document.createElement('option');
+  o.value = id;
+  o.textContent = id === '_pin'
+    ? (pinState ? pinState.fk + ' · ' + t(UI.pinName) : '')
+    : NET_NODES[id].p[2] + ' · ' + t(NET_NODES[id].name);
+  return o;
+}
 function fillRtSelects() {
+  const ids = destIds();
   for (const sel of [rtFrom, rtTo]) {
     const cur = sel.value;
     sel.innerHTML = '';
-    for (const id of DEST_IDS) {
-      const o = document.createElement('option');
-      o.value = id;
-      o.textContent = NET_NODES[id].p[2] + ' · ' + t(NET_NODES[id].name);
-      sel.appendChild(o);
+    if (pinState) sel.appendChild(rtOption('_pin'));   // マイピンの位置から/へ
+    for (const id of ids) sel.appendChild(rtOption(id));
+    if (cur === '_pin' && pinState) sel.value = '_pin';
+    else if (cur && ids.includes(cur)) sel.value = cur;
+    else if (cur && NET_NODES[cur]) {
+      // 絞り込み対象外でも選択中の行き先は先頭に残す
+      sel.insertBefore(rtOption(cur), sel.firstChild);
+      sel.value = cur;
     }
-    if (cur) sel.value = cur;
   }
 }
+$('#rtFilter').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  rtKind = b.dataset.k;
+  document.querySelectorAll('#rtFilter button').forEach(x => x.classList.toggle('on', x === b));
+  fillRtSelects();
+});
 $('#rtOpen').onclick = () => {
   fillRtSelects();
   if (!rtFrom.value) rtFrom.value = 'traGate';
@@ -3072,16 +3358,42 @@ $('#rtSwap').onclick = () => {
   rtTo.value = a;
 };
 $('#rtGo').onclick = () => {
-  const a = rtFrom.value, b = rtTo.value;
+  let a = rtFrom.value, b = rtTo.value;
   if (a === b) { toast(t(UI.rtSame), 2000); return; }
-  const path = findPath(a, b);
-  if (!path) return;
-  const mins = Math.max(1, Math.round(path.len / 70));
-  const nm = id => l => NET_NODES[id].name[l] ?? NET_NODES[id].name.en;
+  const nmOf = id => id === '_pin'
+    ? (l => UI.pinName[l] ?? UI.pinName.en)
+    : (l => NET_NODES[id].name[l] ?? NET_NODES[id].name.en);
+  const nmA = nmOf(a), nmB = nmOf(b);
+  // マイピン発着はピン位置の最寄りノードに接続して経路を引く
+  let pre = null, post = null;
+  if (a === '_pin') {
+    if (!pinState) return;
+    pre = [pinState.x, pinState.z, pinState.fk];
+    a = nearestNetNode(pinState.x, pinState.z, pinState.fk, false) || 'traGate';
+  }
+  if (b === '_pin') {
+    if (!pinState) return;
+    post = [pinState.x, pinState.z, pinState.fk];
+    b = nearestNetNode(pinState.x, pinState.z, pinState.fk, false) || 'traGate';
+  }
+  let pts, len;
+  if (a === b) {
+    pts = [NET_NODES[a].p];
+    len = 0;
+  } else {
+    const path = findPath(a, b);
+    if (!path) return;
+    pts = path.ids.map(id => NET_NODES[id].p).slice();
+    len = path.len;
+  }
+  if (pre) { pts.unshift(pre); len += Math.hypot(pre[0] - pts[1][0], pre[1] - pts[1][1]); }
+  if (post) { len += Math.hypot(post[0] - pts[pts.length - 1][0], post[1] - pts[pts.length - 1][1]); pts.push(post); }
+  if (pts.length < 2) { toast(t(UI.rtSame), 2000); return; }
+  const mins = Math.max(1, Math.round(len / 70));
   playRoute({
-    name: mapTx(l => nm(a)(l) + ' → ' + nm(b)(l)),
-    desc: mapTx(l => RT_DESC[l](nm(a)(l), nm(b)(l), mins)),
-    pts: path.ids.map(id => NET_NODES[id].p)
+    name: mapTx(l => nmA(l) + ' → ' + nmB(l)),
+    desc: mapTx(l => RT_DESC[l](nmA(l), nmB(l), mins)),
+    pts
   });
   activeRoute = -2;
   rtModal.classList.remove('show');
@@ -3232,6 +3544,14 @@ function tick() {
       F[k].position.y = next;
       if (Math.abs(target - next) > .15) done = false; else F[k].position.y = target;
     }
+    {
+      // 駅舎の屋根はF1の子なので、分解時はF2より上へ逃がす（2Fの突き抜け防止）
+      const rTarget = exploded ? 130 : 24;
+      const rCur = stationRoof.position.y;
+      const rNext = rCur + (rTarget - rCur) * Math.min(1, dt * 5);
+      stationRoof.position.y = rNext;
+      if (Math.abs(rTarget - rNext) > .15) done = false; else stationRoof.position.y = rTarget;
+    }
     updateConns();
     updateExits();
     if (activeRouteObj) buildRouteGeo(activeRouteObj);
@@ -3275,6 +3595,18 @@ function tick() {
     const p = routeCurve.getPointAt(Math.min(routeT, 1));
     routeBall.position.copy(p);
     const guiding = !routeDone && (!routePaused || seekDrag);
+    // 進行方向を向き、歩行モーション（足の振り＋上下のバウンス）
+    const tan = routeCurve.getTangentAt(Math.min(routeT, 1));
+    routeBall.rotation.y = Math.atan2(tan.x, tan.z);
+    const legs = routeBall.userData.legs;
+    if (legs) {
+      const walking = !routePaused && !routeDone;
+      const ph = performance.now() / 1000 * 8;
+      const sw = walking ? Math.sin(ph) * .55 : 0;
+      legs[0].rotation.x = sw;
+      legs[1].rotation.x = -sw;
+      if (walking) routeBall.position.y += Math.abs(Math.sin(ph)) * .5;
+    }
     if (routeFloorsU && guiding) setRouteFloor(floorAtT(routeT));
     updateMilestoneUI();
     if (routeFollow && !camAnim && guiding) {
@@ -3292,7 +3624,7 @@ function tick() {
   }
 
   const dist = camera.position.distanceTo(controls.target);
-  app.classList.toggle('far', dist > SETTINGS.labelFar);
+  app.classList.toggle('far', dist > SETTINGS.labelFar && !FOCUS);
 
   controls.update();
   renderer.render(scene, camera);
@@ -3301,17 +3633,17 @@ function tick() {
 tick();
 
 /* ---------- intro ---------- */
-requestAnimationFrame(() => {
+const bootWait = Math.max(0, 4000 - (Date.now() - (window.__bootT0 || Date.now())));
+setTimeout(() => {
   const boot = $('#boot');
-  boot.classList.add('off');
-  setTimeout(() => boot.remove(), 700);
-});
+  if (boot) { boot.classList.add('off'); setTimeout(() => boot.remove(), 700); }
+}, bootWait);
 flyTo(VIEWS.all, 2.2);
 $('#views .chip[data-v="all"]').classList.add('on');
 if (!localStorage.getItem('tps3d.guided')) {
-  setTimeout(() => showGuide(true), 700);
+  setTimeout(() => showGuide(true), bootWait + 700);
 } else {
-  setTimeout(() => toast(t(TX.intro), 5200), 800);
+  setTimeout(() => toast(t(TX.intro), 5200), bootWait + 800);
 }
 
 addEventListener('resize', () => {

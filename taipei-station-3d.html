@@ -2581,8 +2581,9 @@ const NET_NODES = {
   // MRT B1通路（忠孝西路沿い・M出口のぶら下がる通路）のスパイン
   jMa: { p: [-70, 87, 'B1'] }, jMb: { p: [-20, 87, 'B1'] }, jMc: { p: [36, 87, 'B1'] },
   jMd: { p: [125, 87, 'B1'] }, jMe: { p: [158, 87, 'B1'] }, jMf: { p: [187, 82, 'B1'] },
-  // Y区西側の中間点（長区間の直線吸着を防ぐ）
+  // Y区の中間点（長区間の直線吸着を防ぐ）
   yW2: { p: [-430, -119, 'B1'] },
+  yC1: { p: [-150, -119, 'B1'] },
   // Z区西側（Z8/Z10出口の吸着先）
   jZw: { p: [-160, 60, 'B1'] }
 };
@@ -2595,7 +2596,7 @@ const NET_EDGES = [
   ['jB3a', 'jB3c'], ['jB3c', 'jB2d'], ['jB2d', 'traPlat'],
   ['traGate', 'jNP'], ['jNP', 'jY1'], ['jY1', 'yEast'], ['yEast', 'jYE'], ['jYE', 'rS'], ['rS', 'rM'], ['rM', 'r79'],
   ['yEast', 'jQ'], ['jQ', 'qSquare'],
-  ['jY1', 'yCenter'], ['yCenter', 'y14'], ['y14', 'yW2'], ['yW2', 'yWest'], ['yWest', 'jBM'], ['jBM', 'beimen'],
+  ['jY1', 'yC1'], ['yC1', 'yCenter'], ['yCenter', 'y14'], ['y14', 'yW2'], ['yW2', 'yWest'], ['yWest', 'jBM'], ['jBM', 'beimen'],
   ['traGate', 'jW1'], ['jW1', 'jW2'], ['jW2', 'jW3'], ['jW3', 'airA1'],
   ['y14', 'jA'], ['jA', 'airA1'],
   // MRT B1通路のスパインとZ区からの接続（M出口はここに自動接続される）
@@ -2728,6 +2729,67 @@ shopObjs.forEach((s, i) => {
   const n = nearestNetNode(p.x, p.z, s.fk, true);
   if (n) netLink(id, n);
 });
+
+/* ---------- 自由地点（ピン/タップ位置）の経路端点解決 ---------- */
+// 地上(F1)から地下網へは必ず「出入口」(出口マーカー・駅舎・北門站・機捷A1・京站)を
+// 経由する。出入口の真上で垂直に潜る/浮上する経由点(via)を返す
+const STREET_ENTRANCE_IDS = ['hall1f', 'beimen', 'airA1', 'qSquare'];
+function resolveEndpoint(x, z, fk) {
+  if (fk === 'F1') {
+    let best = null, bd = Infinity;
+    for (const k in NET_NODES) {
+      if (!NET_ADJ[k]) continue;
+      if (!/^x_/.test(k) && !STREET_ENTRANCE_IDS.includes(k)) continue;
+      const p = NET_NODES[k].p;
+      const d = Math.hypot(p[0] - x, p[1] - z);
+      if (d < bd) { bd = d; best = k; }
+    }
+    if (best) {
+      const p = NET_NODES[best].p;
+      return { node: best, via: p[2] === 'F1' ? [] : [[p[0], p[1], 'F1']] };
+    }
+  }
+  return { node: nearestNetNode(x, z, fk, false), via: [] };
+}
+
+/* 出発・到着（ノードID {id} または自由地点 {x,z,fk}）から経路を組み立てて再生する共通処理 */
+function runNetRoute(A, B, nmA, nmB) {
+  const resolve = E => E.id
+    ? { node: E.id, pre: null, via: [] }
+    : Object.assign({ pre: [E.x, E.z, E.fk] }, resolveEndpoint(E.x, E.z, E.fk));
+  const ea = resolve(A), eb = resolve(B);
+  if (!ea.node || !eb.node) return false;
+  let pts;
+  if (ea.node === eb.node) {
+    // 両端が同じノードに解決: 地上同士なら直接結ぶ、それ以外はノード経由
+    pts = (ea.pre && eb.pre && ea.pre[2] === 'F1' && eb.pre[2] === 'F1')
+      ? [] : [NET_NODES[ea.node].p];
+  } else {
+    const path = findPath(ea.node, eb.node);
+    if (!path) return false;
+    pts = path.ids.map(id => NET_NODES[id].p).slice();
+  }
+  for (let i = ea.via.length - 1; i >= 0; i--) pts.unshift(ea.via[i]);
+  for (const v of eb.via) pts.push(v);
+  // ほぼ同一点の重複は曲線が壊れるので追加しない
+  const distinct = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]) > 2 || p[2] !== q[2];
+  if (ea.pre && (!pts.length || distinct(ea.pre, pts[0]))) pts.unshift(ea.pre);
+  if (eb.pre && (!pts.length || distinct(eb.pre, pts[pts.length - 1]))) pts.push(eb.pre);
+  if (pts.length < 2) { toast(t(UI.rtSame), 2000); return false; }
+  // 所要時間は最終的な点列から計算（フロア移動は+40相当）
+  let len = 0;
+  for (let i = 1; i < pts.length; i++) {
+    len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    if (pts[i][2] !== pts[i - 1][2]) len += 40;
+  }
+  const mins = Math.max(1, Math.round(len / 70));
+  playRoute({
+    name: mapTx(l => nmA(l) + ' → ' + nmB(l)),
+    desc: mapTx(l => RT_DESC[l](nmA(l), nmB(l), mins)),
+    pts
+  });
+  return true;
+}
 
 /* ---------- settings ---------- */
 const SETTINGS = { theme: 'classic', accent: '#f15a35', trains: true, labelFar: 680 };
@@ -3367,38 +3429,14 @@ $('#iRoute').onclick = () => {
   ensureLayerOn(curInfo.cat);   // 目的地のレイヤーがOFFなら自動ON
   let fk = curFk;
   if (!fk || !FLOORS[fk]) fk = floorFromY(curAnchor.y);
-  const a = nearestNetNode(pinState.x, pinState.z, pinState.fk, false);
-  const b = nearestNetNode(curAnchor.x, curAnchor.z, fk, false);
-  if (!a || !b) return;
-  const pre = [pinState.x, pinState.z, pinState.fk];
-  const post = [curAnchor.x, curAnchor.z, fk];
-  let pts, len;
-  if (a === b) {
-    pts = [NET_NODES[a].p];
-    len = 0;
-  } else {
-    const path = findPath(a, b);
-    if (!path) return;
-    pts = path.ids.map(id => NET_NODES[id].p).slice();
-    len = path.len;
-  }
-  {
-    const d0 = Math.hypot(pre[0] - pts[0][0], pre[1] - pts[0][1]);
-    if (d0 > 2) { pts.unshift(pre); len += d0; }   // ほぼ同一点は曲線が壊れるので追加しない
-    const d1 = Math.hypot(post[0] - pts[pts.length - 1][0], post[1] - pts[pts.length - 1][1]);
-    if (d1 > 2) { pts.push(post); len += d1; }
-  }
-  if (pts.length < 2) { toast(t(UI.rtSame), 2000); return; }
   const destName = curInfo.name;
-  const nmA = l => UI.pinName[l] ?? UI.pinName.en;
-  const nmB = l => (typeof destName === 'string') ? destName : (destName[l] ?? destName.en ?? '');
-  const mins = Math.max(1, Math.round(len / 70));
-  playRoute({
-    name: mapTx(l => nmA(l) + ' → ' + nmB(l)),
-    desc: mapTx(l => RT_DESC[l](nmA(l), nmB(l), mins)),
-    pts
-  });
-  activeRoute = -2;
+  const ok = runNetRoute(
+    { x: pinState.x, z: pinState.z, fk: pinState.fk },
+    { x: curAnchor.x, z: curAnchor.z, fk },
+    l => UI.pinName[l] ?? UI.pinName.en,
+    l => (typeof destName === 'string') ? destName : (destName[l] ?? destName.en ?? '')
+  );
+  if (ok) activeRoute = -2;
 };
 
 function floorFromY(y) {
@@ -3649,54 +3687,23 @@ $('#rtSwap').onclick = () => {
   rtTo.value = a;
 };
 $('#rtGo').onclick = () => {
-  let a = rtFrom.value, b = rtTo.value;
-  if (a === b) { toast(t(UI.rtSame), 2000); return; }
+  const av = rtFrom.value, bv = rtTo.value;
+  if (av === bv) { toast(t(UI.rtSame), 2000); return; }
   // 発着地がトイレ/ロッカー/お店/出口なら該当レイヤーを自動ON
-  ensureLayerOn(NET_NODES[a]?.cat);
-  ensureLayerOn(NET_NODES[b]?.cat);
-  const nmOf = id => id === '_pin'
+  ensureLayerOn(NET_NODES[av]?.cat);
+  ensureLayerOn(NET_NODES[bv]?.cat);
+  const mk = v => v === '_pin'
+    ? (pinState ? { x: pinState.x, z: pinState.z, fk: pinState.fk } : null)
+    : { id: v };
+  const A = mk(av), B = mk(bv);
+  if (!A || !B) return;
+  const nmOf = v => v === '_pin'
     ? (l => UI.pinName[l] ?? UI.pinName.en)
-    : (l => NET_NODES[id].name[l] ?? NET_NODES[id].name.en);
-  const nmA = nmOf(a), nmB = nmOf(b);
-  // マイピン発着はピン位置の最寄りノードに接続して経路を引く
-  let pre = null, post = null;
-  if (a === '_pin') {
-    if (!pinState) return;
-    pre = [pinState.x, pinState.z, pinState.fk];
-    a = nearestNetNode(pinState.x, pinState.z, pinState.fk, false) || 'traGate';
+    : (l => NET_NODES[v].name[l] ?? NET_NODES[v].name.en);
+  if (runNetRoute(A, B, nmOf(av), nmOf(bv))) {
+    activeRoute = -2;
+    rtModal.classList.remove('show');
   }
-  if (b === '_pin') {
-    if (!pinState) return;
-    post = [pinState.x, pinState.z, pinState.fk];
-    b = nearestNetNode(pinState.x, pinState.z, pinState.fk, false) || 'traGate';
-  }
-  let pts, len;
-  if (a === b) {
-    pts = [NET_NODES[a].p];
-    len = 0;
-  } else {
-    const path = findPath(a, b);
-    if (!path) return;
-    pts = path.ids.map(id => NET_NODES[id].p).slice();
-    len = path.len;
-  }
-  if (pre) {
-    const d0 = Math.hypot(pre[0] - pts[0][0], pre[1] - pts[0][1]);
-    if (d0 > 2) { pts.unshift(pre); len += d0; }   // ほぼ同一点は曲線が壊れるので追加しない
-  }
-  if (post) {
-    const d1 = Math.hypot(post[0] - pts[pts.length - 1][0], post[1] - pts[pts.length - 1][1]);
-    if (d1 > 2) { pts.push(post); len += d1; }
-  }
-  if (pts.length < 2) { toast(t(UI.rtSame), 2000); return; }
-  const mins = Math.max(1, Math.round(len / 70));
-  playRoute({
-    name: mapTx(l => nmA(l) + ' → ' + nmB(l)),
-    desc: mapTx(l => RT_DESC[l](nmA(l), nmB(l), mins)),
-    pts
-  });
-  activeRoute = -2;
-  rtModal.classList.remove('show');
 };
 
 /* ============================================================

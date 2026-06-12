@@ -4133,7 +4133,13 @@ setTimeout(() => {
 // 初期表示はB1（地下街・台鉄高鉄改札）を選択した状態で開始
 FOCUS = 'B1';
 applyFocus();
-flyToFloor('B1');
+if (mq.matches) {
+  // SPは台北駅駅舎（台鉄・高鉄改札まわり）を中心に
+  const dist = 390;
+  flyTo({ pos: [0, -12 + dist * .78, -35 + dist * .72], tgt: [0, -12, -35] }, 1.1);
+} else {
+  flyToFloor('B1');
+}
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;

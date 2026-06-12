@@ -1634,6 +1634,7 @@ function buildWorld(scene) {
     const tex = new THREE.CanvasTexture(c);
     const pm = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
     pm.userData.baseOp = 1;
+    pm.userData.noDepthWrite = true;   // 深度を書くと地下が深度テストで消える
     const plate = new THREE.Mesh(new THREE.PlaneGeometry(1560, 1360), pm);
     plate.rotation.x = -Math.PI / 2;
     plate.position.set(-150, -1.4, -50);
@@ -3015,7 +3016,7 @@ function applyFocus() {
         if (mt && mt.userData) {
           const b = mt.userData.baseOp ?? 1;
           mt.opacity = active ? b * ghost : b * fdim;
-          mt.depthWrite = active;
+          mt.depthWrite = active && !mt.userData.noDepthWrite;
         }
       }
       if (o.isCSS2DObject) {

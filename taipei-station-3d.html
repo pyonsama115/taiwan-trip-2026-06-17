@@ -544,9 +544,6 @@
       <div class="chips" id="routes">
         <button class="chip rt" id="rtOpen" data-i="rtOpen"></button>
         <button class="chip route" data-r="0" data-i="r0"></button>
-        <button class="chip route" data-r="1" data-i="r1"></button>
-        <button class="chip route" data-r="2" data-i="r2"></button>
-        <button class="chip route" data-r="3" data-i="r3"></button>
       </div>
 
       <div class="sec" data-i="secOpt"></div>
@@ -702,18 +699,15 @@
       lgBL:     tx('板南線', '板南线', 'BL線（板南線）', 'Blue Line', '반난선(블루)'),
       lgRL:     tx('淡水信義線', '淡水信义线', 'R線（淡水信義線）', 'Red Line', '단수이신이선(레드)'),
       lgTRA:    tx('台鐵・高鐵', '台铁・高铁', '台鉄・高鉄', 'TRA · HSR', '타이완철도·고속철도'),
-      lgAIR:    tx('機場捷運', '机场捷运', '機捷（空港MRT）', 'Airport MRT', '공항 MRT'),
+      lgAIR:    tx('機場捷運', '机场捷运', '空港MRT', 'Airport MRT', '공항 MRT'),
       secView:  tx('快速前往', '快速前往', '見たい場所へジャンプ', 'Jump to area', '바로 이동'),
       vAll:     tx('全部', '全部', '全体', 'Overview', '전체'),
       vMrt:     tx('捷運轉乘', '捷运换乘', 'MRT乗換', 'MRT transfer', 'MRT 환승'),
       vY:       tx('Y區・京站', 'Y区・京站', 'Y区・京站', 'Y · Q square', 'Y구·큐스퀘어'),
       vZ:       tx('Z區・站前', 'Z区・站前', 'Z区・站前', 'Z · Zhanqian', 'Z구·역앞'),
-      vAir:     tx('機捷A1', '机捷A1', '機捷A1', 'Airport MRT A1', '공항MRT A1'),
+      vAir:     tx('機捷A1', '机捷A1', '空港MRT A1', 'Airport MRT A1', '공항MRT A1'),
       secRoute: tx('路線導覽 — 自動帶你走一遍', '路线导览 — 自动带你走一遍', 'ルート案内 — カメラが自動で道案内', 'Guided routes — the camera walks you through', '경로 안내 — 카메라가 자동으로 안내'),
-      r0:       tx('BL→R線 轉乘', 'BL→R线 换乘', 'BL→R線 乗換', 'BL→Red transfer', 'BL→R선 환승'),
-      r1:       tx('台鐵→Y區→京站', '台铁→Y区→京站', '台鉄→Y区→京站', 'TRA→Y→Q square', '타이완철도→Y→큐스퀘어'),
-      r2:       tx('捷運→Z區→新光三越', '捷运→Z区→新光三越', 'MRT→Z区→新光三越', 'MRT→Z→Mitsukoshi', 'MRT→Z→신광미츠코시'),
-      r3:       tx('Z區→機捷A1', 'Z区→机捷A1', 'Z区→機捷A1', 'Z→Airport MRT A1', 'Z→공항MRT A1'),
+      r0:       tx('機捷A1 → 台北車站', '机场捷运A1 → 台北车站', '空港MRT A1 → 駅舎', 'Airport MRT → Station hall', '공항MRT A1 → 역사'),
       secOpt:   tx('在地圖上顯示', '在地图上显示', '地図に表示するもの', 'Show on map', '지도에 표시'),
       oFood:    tx('🍜 美食', '🍜 美食', '🍜 グルメ', '🍜 Food', '🍜 맛집'),
       oShop:    tx('🛍 商店・書店', '🛍 商店・书店', '🛍 ショップ・書店', '🛍 Shops & books', '🛍 상점·서점'),
@@ -754,7 +748,7 @@
       rtSame:   tx('出發地與目的地相同', '出发地与目的地相同', '出発地と目的地が同じです', 'Start and destination are the same', '출발지와 목적지가 같습니다'),
       note:     tx('依台北捷運・台鐵・桃園捷運及各地下街官方資訊繪製之示意圖<br>位置與比例經簡化，請以現場標示為準',
                    '依台北捷运・台铁・桃园捷运及各地下街官方信息绘制的示意图<br>位置与比例经简化，请以现场标示为准',
-                   '公式情報（台北捷運・台鉄・桃園捷運・各地下街）を元にした概略図<br>位置・縮尺は模式化しています。現地の案内表示を優先してください',
+                   '公式情報（台北MRT・台鉄・桃園MRT・各地下街）を元にした概略図<br>位置・縮尺は模式化しています。現地の案内表示を優先してください',
                    'Schematic map based on official sources (Metro Taipei, TRA, TYMC, mall operators)<br>Positions &amp; scale are simplified — follow on-site signage',
                    '공식 정보(타이베이 첩운·타이완철도·타오위안 첩운·각 지하상가) 기반의 모식도<br>위치와 축척은 단순화되어 있으므로 현장 안내를 우선하세요')
     };
@@ -813,9 +807,9 @@
       B1: { y: -12, ey: -30,  bounds: [-665, 270, -500, 120],
             name: tx('地下街・台鐵高鐵閘門', '地下街・台铁高铁检票', '地下街・台鉄高鉄改札', 'Malls & TRA/HSR gates', '지하상가·TRA/HSR 개찰') },
       B2: { y: -24, ey: -105, bounds: [-445, 165, -105, 100],
-            name: tx('台鐵高鐵月台・捷運大廳', '台铁高铁站台・捷运大厅', '台鉄・高鉄ホーム／捷運大廳', 'TRA/HSR platforms · MRT concourse', 'TRA/HSR 승강장·MRT 대합실') },
+            name: tx('台鐵高鐵月台・捷運大廳', '台铁高铁站台・捷运大厅', '台鉄・高鉄ホーム／MRT改札フロア', 'TRA/HSR platforms · MRT concourse', 'TRA/HSR 승강장·MRT 대합실') },
       B3: { y: -34, ey: -170, bounds: [-130, 200, -80, 95],
-            name: tx('板南線月台・淡水信義線大廳', '板南线站台・淡水信义线大厅', 'BL線ホーム／R線大廳', 'Blue Line platform · Red Line concourse', '반난선 승강장·R선 대합실') },
+            name: tx('板南線月台・淡水信義線大廳', '板南线站台・淡水信义线大厅', 'BL線ホーム／R線改札フロア', 'Blue Line platform · Red Line concourse', '반난선 승강장·R선 대합실') },
       B4: { y: -44, ey: -235, bounds: [130, 200, -75, 115],
             name: tx('淡水信義線月台', '淡水信义线站台', 'R線（淡水信義線）ホーム', 'Red Line platform', '단수이신이선 승강장') }
     };
@@ -1047,7 +1041,7 @@
       tx('忠孝西路', '忠孝西路', '忠孝西路', 'Zhongxiao W. Rd.', '중샤오시루(忠孝西路)'),
       tx('車站前的大馬路。正下方由上而下疊著站前地下街(B1)、捷運大廳(B2)、板南線月台(B3)三層。',
          '车站前的大马路。正下方由上而下叠着站前地下街(B1)、捷运大厅(B2)、板南线站台(B3)三层。',
-         '駅前の大通り。この真下にZ区站前地下街（B1）・捷運大廳（B2）・板南線ホーム（B3）が3層に重なる。',
+         '駅前の大通り。この真下にZ区站前地下街（B1）・MRT改札フロア（B2）・板南線ホーム（B3）が3層に重なる。',
          'The main road in front of the station. Stacked beneath it: Zhanqian Mall (B1), the MRT concourse (B2) and the Blue Line platform (B3).',
          '역 앞 대로. 바로 아래에 잔첸 지하상가(B1)·MRT 대합실(B2)·반난선 승강장(B3)이 3층으로 겹쳐 있습니다.'));
     ST(-720, 440, -138, -102,
@@ -1075,7 +1069,7 @@
       tx('公園路', '公园路', '公園路', 'Gongyuan Rd.', '궁위안루(公園路)'),
       tx('正下方是淡水信義線車站（B3大廳・B4月台），南北向延伸。',
          '正下方是淡水信义线车站（B3大厅・B4站台），南北向延伸。',
-         'この真下に淡水信義線の駅（B3大廳・B4ホーム）が南北に伸びる。',
+         'この真下に淡水信義線の駅（B3改札フロア・B4ホーム）が南北に伸びる。',
          'The Red Line station (B3 concourse, B4 platform) lies directly beneath, running north–south.',
          '바로 아래에 단수이신이선 역(B3 대합실·B4 승강장)이 남북으로 뻗어 있습니다.'));
     ST(-210, -182, -400, 400,
@@ -1120,7 +1114,7 @@
       tag: '1F–2F', color: '#9a7b3f',
       desc: tx('台鐵、高鐵、捷運、機捷交會的台灣最大轉運樞紐。1F是棋盤格大廳與售票處，2F是微風美食街。<b>所有閘門都在地下</b>（台鐵高鐵B1／捷運B2）。',
                '台铁、高铁、捷运、机捷交会的台湾最大枢纽。1F是棋盘格大厅与售票处，2F是微风美食街。<b>所有检票口都在地下</b>（台铁高铁B1／捷运B2）。',
-               '台鉄・高鉄・MRT・機捷が集まる台湾最大のターミナル。1Fは黒白チェック床の大広間と切符売場、2Fは微風美食街。<b>改札はすべて地下</b>（台鉄・高鉄B1／捷運B2）。',
+               '台鉄・高鉄・MRT・空港MRTが集まる台湾最大のターミナル。1Fは黒白チェック床の大広間と切符売場、2Fは微風美食街。<b>改札はすべて地下</b>（台鉄・高鉄B1／MRT B2）。',
                'Taiwan\'s biggest rail hub — TRA, HSR, MRT and Airport MRT. Checkerboard ticket hall on 1F, Breeze food court on 2F. <b>All fare gates are underground</b> (TRA/HSR on B1, MRT on B2).',
                'TRA·HSR·MRT·공항MRT가 모이는 타이완 최대 터미널. 1층은 체커보드 대합실과 매표소, 2층은 푸드코트. <b>개찰구는 모두 지하</b>(TRA/HSR은 B1, MRT는 B2).'),
       label: tx('台北車站', '台北车站', '台北車站', 'Taipei Main Sta.', '타이베이역'),
@@ -1144,7 +1138,7 @@
     hall.position.set(0, .8, -35);
     hall.userData.floor = 'F1';
     hall.userData.info = {
-      name: tx('1F 大廳（棋盤格地板）', '1F 大厅（棋盘格地板）', '1F 大廳（チェック柄の床）', '1F Hall (checkerboard floor)', '1층 대합실(체커보드 바닥)'),
+      name: tx('1F 大廳（棋盤格地板）', '1F 大厅（棋盘格地板）', '1F ホール（チェック柄の床）', '1F Hall (checkerboard floor)', '1층 대합실(체커보드 바닥)'),
       tag: '1F', color: '#9a7b3f', floor: '1F',
       desc: tx('黑白棋盤地板是著名的候車地標，席地而坐等車的人群是台北名景。台鐵與高鐵售票處、台鐵便當本舖（排骨便當約NT$100）都在這層。',
                '黑白棋盘地板是著名的候车地标，席地而坐等车的人群是台北名景。台铁与高铁售票处、台铁便当本铺（排骨便当约NT$100）都在这层。',
@@ -1274,7 +1268,7 @@
       tag: '2F', color: '#e8a33d',
       desc: tx('環繞車站2樓的美食街，匯集台灣各地名店，能俯瞰1F大廳的吧台座位最受歡迎。上車前用餐的定番。',
                '环绕车站2楼的美食街，汇集台湾各地名店，能俯瞰1F大厅的吧台座位最受欢迎。上车前用餐的定番。',
-               '駅舎2Fを回廊状に囲むフードコート「Breeze 台北車站」。台湾各地の名店が集まり、1F大廳を見下ろすカウンター席が人気。<b>列車に乗る前の食事はここが定番</b>。',
+               '駅舎2Fを回廊状に囲むフードコート「Breeze 台北車站」。台湾各地の名店が集まり、1Fホールを見下ろすカウンター席が人気。<b>列車に乗る前の食事はここが定番</b>。',
                'Food court wrapping around the station\'s 2nd floor, gathering famous eateries from all over Taiwan. Counter seats overlooking the main hall are the most popular — the classic pre-departure meal spot.',
                '역 2층을 회랑처럼 둘러싼 푸드코트. 타이완 각지의 유명 맛집이 모여 있고, 1층 대합실이 내려다보이는 카운터석이 인기. 기차 타기 전 식사 장소의 정석.'),
       label: tx('2F 微風美食街', '2F 微风美食街', '2F 微風美食街', '2F Breeze Food Court', '2층 푸드코트'),
@@ -1290,7 +1284,7 @@
       tag: 'B1', color: '#9a7b3f',
       desc: tx('台鐵與高鐵的閘門層，是通往四方地下街（Y・Z・K・R區）與機捷A1的地下城樞紐。進閘後下到B2月台。',
                '台铁与高铁的检票层，是通往四方地下街（Y・Z・K・R区）与机捷A1的地下城枢纽。进闸后下到B2站台。',
-               '台鉄・高鉄の改札フロア。ここを起点に四方の地下街（Y・Z・K・R区）と機捷A1へつながる地下都市のハブ。改札を入るとB2ホームへ降りる。',
+               '台鉄・高鉄の改札フロア。ここを起点に四方の地下街（Y・Z・K・R区）と空港MRT A1へつながる地下都市のハブ。改札を入るとB2ホームへ降りる。',
                'Fare-gate level for TRA and HSR — the hub of the underground city, linking to all four metro malls (Y, Z, K, R) and Airport MRT A1. Platforms are one level down on B2.',
                'TRA·HSR 개찰층. 사방의 지하상가(Y·Z·K·R구)와 공항MRT A1로 이어지는 지하도시의 허브. 개찰을 지나면 B2 승강장으로 내려갑니다.'),
       label: tx('台鐵・高鐵 閘門', '台铁・高铁 检票', '台鉄・高鉄 改札', 'TRA/HSR gates', 'TRA/HSR 개찰'), ly: 7
@@ -1302,7 +1296,7 @@
       tag: 'B1', color: '#b0413e',
       desc: tx('位於站前廣場正下方。B1以書店<b>誠品站前店</b>為核心，B2為停車場。出口K1〜K12，與捷運M4出口連通。',
                '位于站前广场正下方。B1以书店<b>诚品站前店</b>为核心，B2为停车场。出口K1〜K12，与捷运M4出口连通。',
-               '台鉄駅舎と忠孝西路の間、<b>站前広場の真下</b>にある地下街。B1は書店<b>「誠品站前店」</b>を中心とした商店街、B2は駐車場。出口はK1〜K12。捷運M4出口とも連通。',
+               '台鉄駅舎と忠孝西路の間、<b>站前広場の真下</b>にある地下街。B1は書店<b>「誠品站前店」</b>を中心とした商店街、B2は駐車場。出口はK1〜K12。MRT M4出口とも連通。',
                'Right beneath the station-front plaza. B1 centers on the <b>eslite Zhanqian bookstore</b>; B2 is parking. Exits K1–K12, linked with MRT Exit M4.',
                '역 앞 광장 바로 아래의 지하상가. B1은 서점 <b>청핀 잔첸점</b>이 중심, B2는 주차장. 출구 K1~K12, MRT M4 출구와 연결.'),
       label: tx('K區 誠品站前', 'K区 诚品站前', 'K区 誠品站前', 'K · eslite', 'K구 청핀'), lx: -40, ly: 7
@@ -1340,7 +1334,7 @@
       tag: 'B1', color: '#f2a517',
       desc: tx('市民大道下方<b>東西825公尺</b>、187家店的台灣最長級地下街。電玩、轉蛋、動漫、卡牌店密集，有「<b>台北秋葉原</b>」之稱。平日11:00〜21:30／週末〜22:00。南側出口往台鐵高鐵機捷，北側往京站、轉運站。',
                '市民大道下方<b>东西825米</b>、187家店的台湾最长级地下街。电玩、扭蛋、动漫、卡牌店密集，有“<b>台北秋叶原</b>”之称。平日11:00〜21:30／周末〜22:00。南侧出口往台铁高铁机捷，北侧往京站、转运站。',
-               '市民大道（鄭州路）の下を<b>東西825m</b>、店舗187店の台湾最長級地下街。ゲーセン・ガチャ・アニメ・カードショップが密集する<b>「台北のアキバ」</b>。営業は平日11:00〜21:30／土日〜22:00。南側出口は台鉄・高鉄・機捷、北側出口は京站・轉運站方面。',
+               '市民大道（鄭州路）の下を<b>東西825m</b>、店舗187店の台湾最長級地下街。ゲーセン・ガチャ・アニメ・カードショップが密集する<b>「台北のアキバ」</b>。営業は平日11:00〜21:30／土日〜22:00。南側出口は台鉄・高鉄・空港MRT、北側出口は京站（Qスクエア）・バスターミナル方面。',
                'Taiwan\'s longest-class underground mall: <b>825 m east–west</b> under Civic Blvd. with 187 shops. Dense with arcades, gacha, anime and card shops — nicknamed "<b>Taipei\'s Akihabara</b>". Open 11:00–21:30 weekdays / until 22:00 weekends. South exits serve TRA/HSR/Airport MRT, north exits Q square and the bus station.',
                '시민대도 아래 <b>동서 825m</b>, 187개 점포의 타이완 최장급 지하상가. 오락실·가챠·애니·카드숍이 밀집해 "<b>타이베이의 아키바</b>"로 불립니다. 평일 11:00~21:30/주말 ~22:00. 남측 출구는 TRA·HSR·공항MRT, 북측은 큐스퀘어·버스터미널 방면.'),
       label: tx('Y區 台北地下街', 'Y区 台北地下街', 'Y区 台北地下街', 'Y · Taipei Mall', 'Y구 타이베이 지하상가'), lx: -150, ly: 7
@@ -1376,7 +1370,7 @@
 
     // ---- 機捷 A1 ----
     box('B1', -420, -260, -95, -40, 6, COL.air, {
-      name: tx('機場捷運 台北車站（A1）B1大廳', '机场捷运 台北车站（A1）B1大厅', '機捷 台北車站（A1）B1ホール', 'Airport MRT Taipei Main (A1) B1 hall', '공항MRT 타이베이역(A1) B1 홀'),
+      name: tx('機場捷運 台北車站（A1）B1大廳', '机场捷运 台北车站（A1）B1大厅', '空港MRT 台北車站（A1）B1ホール', 'Airport MRT Taipei Main (A1) B1 hall', '공항MRT 타이베이역(A1) B1 홀'),
       tag: 'B1', color: '#8246af',
       desc: tx('桃園機場捷運的起點站。<b>B1可市區預辦登機</b>（辦理報到＋托運行李）：06:00〜21:30、限當日航班、<b>起飛前3小時截止</b>。適用：中華、華信、長榮、立榮、國泰、星宇、台灣虎航（依官方最新公告為準）。直達車到機場<b>約39分</b>、每15分一班。',
                '桃园机场捷运的起点站。<b>B1可市区预办登机</b>（办理值机＋托运行李）：06:00〜21:30、限当日航班、<b>起飞前3小时截止</b>。适用：中华、华信、长荣、立荣、国泰、星宇、台湾虎航（以官方最新公告为准）。直达车到机场<b>约39分</b>、每15分一班。',
@@ -1392,7 +1386,7 @@
       tag: 'B1', color: '#9a9080',
       desc: tx('連接台鐵B1大廳與機捷A1的通道，有電動步道，步行4〜5分。也可從Y區南側（Y14附近）進入。',
                '连接台铁B1大厅与机捷A1的通道，有自动步道，步行4〜5分。也可从Y区南侧（Y14附近）进入。',
-               '台鉄B1コンコースと機捷A1を結ぶ連絡通路。動く歩道あり、徒歩4〜5分。Y区南側（Y14前後）からも入れる。',
+               '台鉄B1コンコースと空港MRT A1を結ぶ連絡通路。動く歩道あり、徒歩4〜5分。Y区南側（Y14前後）からも入れる。',
                'Passage linking the TRA B1 concourse with Airport MRT A1 — moving walkways, 4–5 min on foot. Also accessible from the south side of Y Mall (near Y14).',
                'TRA B1 대합실과 공항MRT A1을 잇는 통로. 무빙워크 있음, 도보 4~5분. Y구 남측(Y14 부근)에서도 진입 가능.')
     });
@@ -1427,7 +1421,7 @@
     EX(60, -132, COL.y, 'Y5', '北側，往京站時尚廣場、台北轉運站。', '北侧，往京站时尚广场、台北转运站。', '北側。<b>京站・台北轉運站方面</b>。', 'North side — Q square mall & Taipei Bus Station.', '북측. 큐스퀘어·버스터미널 방면.');
     EX(-100, -132, COL.y, 'Y9', '北側，往華陰街批發商圈。', '北侧，往华阴街批发商圈。', '北側。華陰街（問屋街）方面。', 'North side — Huayin St. wholesale district.', '북측. 화인제 도매상가 방면.');
     EX(-250, -132, COL.y, 'Y13', 'Y區中央。', 'Y区中央。', 'Y区中央。', 'Central Y Mall.', 'Y구 중앙.');
-    EX(-300, -106, COL.y, 'Y14', '南側，<b>機捷A1連絡口</b>。', '南侧，<b>机捷A1连络口</b>。', '南側。<b>機捷A1への連絡口</b>。', 'South side — <b>link to Airport MRT A1</b>.', '남측. <b>공항MRT A1 연결구</b>.');
+    EX(-300, -106, COL.y, 'Y14', '南側，<b>機捷A1連絡口</b>。', '南侧，<b>机捷A1连络口</b>。', '南側。<b>空港MRT A1への連絡口</b>。', 'South side — <b>link to Airport MRT A1</b>.', '남측. <b>공항MRT A1 연결구</b>.');
     EX(-400, -132, COL.y, 'Y19', '北側，往大稻埕方向。', '北侧，往大稻埕方向。', '北側。大稻埕方面。', 'North side — toward Dadaocheng.', '북측. 다다오청 방면.');
     EX(-500, -106, COL.y, 'Y26', '南側，往台北郵局。', '南侧，往台北邮局。', '南側。台北郵局方面。', 'South side — Taipei Post Office.', '남측. 타이베이 우체국 방면.');
     EX(-552, -125, COL.y, 'Y28', 'Y區西端，<b>直通北門站（綠線）</b>，上來就是北門。一號廣場（Cosplay攝影勝地）就在附近。', 'Y区西端，<b>直通北门站（绿线）</b>，上来就是北门。一号广场（Cosplay摄影胜地）就在附近。', 'Y区西端。<b>北門駅（G線）直結</b>・北門へ地上すぐ。一號廣場（コスプレ撮影で有名）近く。', 'West end — <b>direct link to Beimen Station (Green Line)</b>; the North Gate is right above. Plaza One (famous cosplay-photo spot) nearby.', 'Y구 서쪽 끝. <b>베이먼역(그린라인) 직결</b>, 지상으로 나가면 바로 베이먼. 코스프레 촬영 명소 1호광장 근처.');
@@ -1451,14 +1445,14 @@
     // ---- 捷運B1連絡通路（M出口がぶら下がる通路） ----
     box('B1', -90, 200, 80, 94, 6, COL.mrt, {
       opacity: .8,
-      name: tx('捷運B1通道（M出口連絡通路）', '捷运B1通道（M出口连络通路）', '捷運B1通路（M出口の連絡通路）', 'MRT B1 walkway (M exits)', 'MRT B1 통로(M출구 연결)'),
+      name: tx('捷運B1通道（M出口連絡通路）', '捷运B1通道（M出口连络通路）', 'MRT B1通路（M出口の連絡通路）', 'MRT B1 walkway (M exits)', 'MRT B1 통로(M출구 연결)'),
       tag: 'B1', color: '#0e9fb3',
       desc: tx('沿忠孝西路南側的捷運站B1通道，M2〜M8出口都從這裡上地面。與站前地下街（Z區）相通，往下是捷運大廳（B2）。',
                '沿忠孝西路南侧的捷运站B1通道，M2〜M8出口都从这里上地面。与站前地下街（Z区）相通，往下是捷运大厅（B2）。',
-               '忠孝西路南側に伸びる捷運（MRT）駅のB1通路。M2〜M8出口はここから地上へ出る。Z区站前地下街とつながり、この下がB2捷運大廳。',
+               '忠孝西路南側に伸びるMRT駅のB1通路。M2〜M8出口はここから地上へ出る。Z区站前地下街とつながり、この下がB2のMRT改札フロア。',
                'The MRT station\'s B1 walkway along the south side of Zhongxiao W. Rd. — exits M2–M8 surface from here. It links to Zhanqian Mall (Z) and down to the B2 MRT concourse.',
                '중샤오시루 남측을 따라 뻗은 MRT역 B1 통로. M2~M8 출구가 여기서 지상으로 이어집니다. 잔첸 지하상가(Z구)와 연결되며 아래는 B2 MRT 대합실.'),
-      label: tx('捷運B1通道（M出口）', '捷运B1通道（M出口）', '捷運B1通路（M出口）', 'MRT B1 walkway', 'MRT B1 통로'),
+      label: tx('捷運B1通道（M出口）', '捷运B1通道（M出口）', 'MRT B1通路（M出口）', 'MRT B1 walkway', 'MRT B1 통로'),
       labelColor: '#0e9fb3', lx: 60, ly: 6
     });
     // Z区・公園路側への接続部
@@ -1507,20 +1501,20 @@
        ============================================================ */
 
     box('B2', -58, 95, 36, 80, 5, COL.mrt, {
-      name: tx('捷運大廳（板南線閘門・B2）', '捷运大厅（板南线检票・B2）', '捷運大廳（板南線改札・B2）', 'MRT concourse (Blue Line gates, B2)', 'MRT 대합실(반난선 개찰, B2)'),
+      name: tx('捷運大廳（板南線閘門・B2）', '捷运大厅（板南线检票・B2）', 'MRT改札フロア（板南線・B2）', 'MRT concourse (Blue Line gates, B2)', 'MRT 대합실(반난선 개찰, B2)'),
       tag: 'B2', color: '#0e9fb3',
       desc: tx('捷運閘門與售票層。<b>板南線⇄淡水信義線轉乘須經過這層</b>（兩線月台不直接相通）。悠遊卡加值機很多。M出口從這裡上去。',
                '捷运检票与售票层。<b>板南线⇄淡水信义线换乘须经过这层</b>（两线站台不直接相通）。悠游卡充值机很多。M出口从这里上去。',
-               '捷運（MRT）の改札・きっぷ売場フロア。<b>BL線⇄R線の乗換はこの階を経由</b>する（両線のホームは直接つながっていない）。悠遊卡（EasyCard）チャージ機多数。M出口へはここから上がる。',
+               'MRTの改札・きっぷ売場フロア。<b>BL線⇄R線の乗換はこの階を経由</b>する（両線のホームは直接つながっていない）。悠遊卡（EasyCard）チャージ機多数。M出口へはここから上がる。',
                'MRT fare-gate and ticketing level. <b>Blue↔Red Line transfers pass through this floor</b> (the platforms aren\'t directly connected). Plenty of EasyCard top-up machines; M exits are up from here.',
                'MRT 개찰·매표층. <b>블루↔레드라인 환승은 이 층을 경유</b>(두 노선 승강장은 직접 연결되지 않음). 이지카드 충전기 다수. M 출구는 여기서 올라갑니다.'),
-      label: tx('捷運大廳（閘門）', '捷运大厅（检票）', '捷運大廳（改札）', 'MRT concourse', 'MRT 대합실'), ly: 6
+      label: tx('捷運大廳（閘門）', '捷运大厅（检票）', 'MRT改札フロア', 'MRT concourse', 'MRT 대합실'), ly: 6
     });
     box('B2', 95, 150, 40, 70, 5, COL.mrt, {
       opacity: .8, edges: false,
-      name: tx('捷運連絡通路（B2）', '捷运连络通路（B2）', '捷運連絡通路（B2）', 'MRT link passage (B2)', 'MRT 연결통로(B2)'),
+      name: tx('捷運連絡通路（B2）', '捷运连络通路（B2）', 'MRT連絡通路（B2）', 'MRT link passage (B2)', 'MRT 연결통로(B2)'),
       tag: 'B2', color: '#0e9fb3',
-      desc: tx('從捷運大廳往東，通往淡水信義線（公園路下）的通路。', '从捷运大厅往东，通往淡水信义线（公园路下）的通路。', '捷運大廳から東へ、淡水信義線（公園路下）方面への連絡通路。', 'Eastbound passage from the MRT concourse toward the Red Line (under Gongyuan Rd.).', 'MRT 대합실에서 동쪽으로, 레드라인(궁위안루 아래) 방면 통로.')
+      desc: tx('從捷運大廳往東，通往淡水信義線（公園路下）的通路。', '从捷运大厅往东，通往淡水信义线（公园路下）的通路。', 'MRT改札フロアから東へ、淡水信義線（公園路下）方面への連絡通路。', 'Eastbound passage from the MRT concourse toward the Red Line (under Gongyuan Rd.).', 'MRT 대합실에서 동쪽으로, 레드라인(궁위안루 아래) 방면 통로.')
     });
 
     const traP = (z1, z2, name, desc, color) => box('B2', -95, 95, z1, z2, 4, COL.platform, {
@@ -1551,14 +1545,14 @@
 
     box('B2', -410, -270, -85, -50, 4, COL.airDark, {
       opacity: .9,
-      name: tx('機捷月台（桃園機場捷運）', '机捷站台（桃园机场捷运）', '機捷ホーム（桃園空港MRT）', 'Airport MRT platform', '공항MRT 승강장'),
+      name: tx('機捷月台（桃園機場捷運）', '机捷站台（桃园机场捷运）', '空港MRTホーム', 'Airport MRT platform', '공항MRT 승강장'),
       tag: 'B2', color: '#8246af',
       desc: tx('<b>紫色直達車</b>與藍色普通車交替發車（各15分一班）。直達車停靠A1→新北產業園區→長庚醫院→<b>機場T1→T2（約39分）</b>。座位寬敞附Wi-Fi與行李架。',
                '<b>紫色直达车</b>与蓝色普通车交替发车（各15分一班）。直达车停靠A1→新北产业园区→长庚医院→<b>机场T1→T2（约39分）</b>。座位宽敞附Wi-Fi与行李架。',
                '<b>紫の直達車（快速）</b>と青の普通車が交互に発車（各15分間隔）。直達車の停車駅はA1→新北產業園區→長庚醫院→<b>空港T1→T2（約39分）</b>。座席は新幹線型でWi-Fi・荷物置き場つき。',
                '<b>Purple Express</b> and blue Commuter trains alternate (every 15 min each). Express stops: A1 → New Taipei Industrial Park → Chang Gung Memorial Hospital → <b>Airport T1 → T2 (~39 min)</b>. Comfortable seats with Wi-Fi and luggage racks.',
                '<b>보라색 직달열차</b>와 파란색 보통열차가 번갈아 출발(각 15분 간격). 직달 정차역: A1→신베이산업단지→창궁병원→<b>공항 T1→T2(약 39분)</b>. 좌석형 차량에 Wi-Fi·짐 선반 완비.'),
-      label: tx('機捷月台', '机捷站台', '機捷ホーム', 'Airport MRT', '공항MRT 승강장'),
+      label: tx('機捷月台', '机捷站台', '空港MRTホーム', 'Airport MRT', '공항MRT 승강장'),
       labelColor: '#8246af', ly: 6
     });
     dirLabel('B2', -425, 5, -67, tx('← 桃園機場 T1・T2（直達車約39分）', '← 桃园机场 T1・T2（直达车约39分）', '← 桃園空港 T1・T2（直達車 約39分）', '← Taoyuan Airport T1/T2 (Express ~39 min)', '← 타오위안공항 T1·T2(직달 약 39분)'));
@@ -1568,7 +1562,7 @@
       tag: 'B3', color: '#0070bd',
       desc: tx('忠孝西路正下方的東西向島式月台。<b>東行往南港</b>（善導寺、忠孝復興），<b>西行往頂埔</b>（西門、龍山寺）。轉乘淡水信義線請上B2大廳往東。',
                '忠孝西路正下方的东西向岛式站台。<b>东行往南港</b>（善导寺、忠孝复兴），<b>西行往顶埔</b>（西门、龙山寺）。换乘淡水信义线请上B2大厅往东。',
-               '忠孝西路の真下・東西方向の島式ホーム。<b>東行＝南港方面</b>（善導寺・忠孝復興へ）、<b>西行＝頂埔方面</b>（西門・龍山寺へ）。R線への乗換はB2大廳へ上がって東へ。',
+               '忠孝西路の真下・東西方向の島式ホーム。<b>東行＝南港方面</b>（善導寺・忠孝復興へ）、<b>西行＝頂埔方面</b>（西門・龍山寺へ）。R線への乗換はB2のMRT改札フロアへ上がって東へ。',
                'Island platform running east–west under Zhongxiao W. Rd. <b>Eastbound for Nangang</b> (Shandao Temple, Zhongxiao Fuxing); <b>westbound for Dingpu</b> (Ximen, Longshan Temple). For the Red Line, go up to the B2 concourse and head east.',
                '중샤오시루 바로 아래 동서 방향 섬식 승강장. <b>동행=난강 방면</b>(산다오쓰·중샤오푸싱), <b>서행=딩푸 방면</b>(시먼·룽산쓰). 레드라인 환승은 B2 대합실로 올라가 동쪽으로.'),
       label: tx('板南線月台', '板南线站台', 'BL線ホーム', 'Blue Line', '반난선 승강장'),
@@ -1581,14 +1575,14 @@
 
     box('B3', 150, 176, -60, 40, 5, 0xd96a85, {
       opacity: .9,
-      name: tx('淡水信義線大廳（B3）', '淡水信义线大厅（B3）', 'R線大廳（淡水信義線改札・B3）', 'Red Line concourse (B3)', '레드라인 대합실(B3)'),
+      name: tx('淡水信義線大廳（B3）', '淡水信义线大厅（B3）', 'R線改札フロア（淡水信義線・B3）', 'Red Line concourse (B3)', '레드라인 대합실(B3)'),
       tag: 'B3', color: '#e3002c',
       desc: tx('公園路下方的淡水信義線閘門層。<b>北端通道與台鐵高鐵區直通</b>，紅線⇄台鐵高鐵轉乘走這裡最近。',
                '公园路下方的淡水信义线检票层。<b>北端通道与台铁高铁区直通</b>，红线⇄台铁高铁换乘走这里最近。',
                '公園路の下にある淡水信義線の改札階。<b>北端の通路は台鉄・高鉄エリアと直結</b>していて、R線⇄台鉄/高鉄の乗換はここが最短。',
                'Red Line fare-gate level under Gongyuan Rd. <b>Its north passage links directly to the TRA/HSR area</b> — the shortest Red Line ↔ TRA/HSR transfer.',
                '궁위안루 아래 레드라인 개찰층. <b>북쪽 통로가 TRA/HSR 구역과 직결</b>되어 레드라인↔TRA/HSR 환승 최단 경로.'),
-      label: tx('淡水信義線大廳', '淡水信义线大厅', 'R線大廳', 'Red Line concourse', '레드라인 대합실'),
+      label: tx('淡水信義線大廳', '淡水信义线大厅', 'R線改札フロア', 'Red Line concourse', '레드라인 대합실'),
       labelColor: '#e3002c', ly: 6
     });
 
@@ -1762,10 +1756,10 @@
     const CONNS = [
       { x: 0, z: -40, a: 'F1', b: 'B1',
         name: tx('往台鐵閘門的電扶梯', '往台铁检票口的扶梯', '台鉄改札へのエスカレーター', 'Escalator to TRA gates', 'TRA 개찰로 가는 에스컬레이터'),
-        desc: tx('1F大廳→B1閘門層。', '1F大厅→B1检票层。', '1F大廳からB1改札階へ。', 'From the 1F hall down to the B1 gate level.', '1층 대합실에서 B1 개찰층으로.') },
+        desc: tx('1F大廳→B1閘門層。', '1F大厅→B1检票层。', '1FホールからB1改札階へ。', 'From the 1F hall down to the B1 gate level.', '1층 대합실에서 B1 개찰층으로.') },
       { x: -35, z: -40, a: 'F1', b: 'F2',
         name: tx('往微風美食街的電扶梯', '往微风美食街的扶梯', '微風美食街へのエスカレーター', 'Escalator to Breeze food court', '푸드코트행 에스컬레이터'),
-        desc: tx('1F大廳→2F美食街。', '1F大厅→2F美食街。', '1F大廳から2Fフードコートへ。', 'From the 1F hall up to the 2F food court.', '1층 대합실에서 2층 푸드코트로.') },
+        desc: tx('1F大廳→2F美食街。', '1F大厅→2F美食街。', '1Fホールから2Fフードコートへ。', 'From the 1F hall up to the 2F food court.', '1층 대합실에서 2층 푸드코트로.') },
       { x: -50, z: -55, a: 'B1', b: 'B2',
         name: tx('往台鐵高鐵月台（西）', '往台铁高铁站台（西）', '台鉄・高鉄ホームへ（西）', 'To TRA/HSR platforms (west)', 'TRA/HSR 승강장(서)'),
         desc: tx('B1閘門→B2月台。', 'B1检票→B2站台。', 'B1改札からB2ホームへ。', 'From B1 gates down to the B2 platforms.', 'B1 개찰에서 B2 승강장으로.') },
@@ -1773,22 +1767,22 @@
         name: tx('往台鐵高鐵月台（東）', '往台铁高铁站台（东）', '台鉄・高鉄ホームへ（東）', 'To TRA/HSR platforms (east)', 'TRA/HSR 승강장(동)'),
         desc: tx('B1閘門→B2月台。', 'B1检票→B2站台。', 'B1改札からB2ホームへ。', 'From B1 gates down to the B2 platforms.', 'B1 개찰에서 B2 승강장으로.') },
       { x: 20, z: 58, a: 'B1', b: 'B2',
-        name: tx('往捷運大廳', '往捷运大厅', '捷運大廳へ', 'To the MRT concourse', 'MRT 대합실로'),
-        desc: tx('B1（Z・K區、M出口層）→B2捷運閘門。', 'B1（Z・K区、M出口层）→B2捷运检票。', 'B1（Z区・K区・M出口レベル）からB2の捷運改札へ。', 'From B1 (Z/K malls, M-exit level) down to the B2 MRT gates.', 'B1(Z·K구, M출구층)에서 B2 MRT 개찰로.') },
+        name: tx('往捷運大廳', '往捷运大厅', 'MRT改札フロアへ', 'To the MRT concourse', 'MRT 대합실로'),
+        desc: tx('B1（Z・K區、M出口層）→B2捷運閘門。', 'B1（Z・K区、M出口层）→B2捷运检票。', 'B1（Z区・K区・M出口レベル）からB2のMRT改札へ。', 'From B1 (Z/K malls, M-exit level) down to the B2 MRT gates.', 'B1(Z·K구, M출구층)에서 B2 MRT 개찰로.') },
       { x: -20, z: 58, a: 'B2', b: 'B3',
         name: tx('往板南線月台', '往板南线站台', 'BL線ホームへ', 'To the Blue Line platform', '반난선 승강장으로'),
-        desc: tx('B2捷運大廳→B3板南線月台。', 'B2捷运大厅→B3板南线站台。', 'B2捷運大廳からB3板南線ホームへ。', 'From the B2 concourse down to the B3 Blue Line platform.', 'B2 대합실에서 B3 반난선 승강장으로.') },
+        desc: tx('B2捷運大廳→B3板南線月台。', 'B2捷运大厅→B3板南线站台。', 'B2のMRT改札フロアからB3板南線ホームへ。', 'From the B2 concourse down to the B3 Blue Line platform.', 'B2 대합실에서 B3 반난선 승강장으로.') },
       { x: 160, z: 30, a: 'B2', b: 'B3',
-        name: tx('往淡水信義線大廳', '往淡水信义线大厅', 'R線大廳へ', 'To the Red Line concourse', '레드라인 대합실로'),
-        desc: tx('B2連絡通路→B3淡水信義線大廳。', 'B2连络通路→B3淡水信义线大厅。', 'B2連絡通路からB3淡水信義線大廳へ。', 'From the B2 link passage down to the B3 Red Line concourse.', 'B2 연결통로에서 B3 레드라인 대합실로.') },
+        name: tx('往淡水信義線大廳', '往淡水信义线大厅', 'R線改札フロアへ', 'To the Red Line concourse', '레드라인 대합실로'),
+        desc: tx('B2連絡通路→B3淡水信義線大廳。', 'B2连络通路→B3淡水信义线大厅。', 'B2連絡通路からB3のR線改札フロアへ。', 'From the B2 link passage down to the B3 Red Line concourse.', 'B2 연결통로에서 B3 레드라인 대합실로.') },
       { x: 163, z: 0, a: 'B3', b: 'B4',
         name: tx('往淡水信義線月台', '往淡水信义线站台', 'R線ホームへ', 'To the Red Line platform', '레드라인 승강장으로'),
-        desc: tx('B3大廳→最深的B4月台。', 'B3大厅→最深的B4站台。', 'B3 R線大廳から最深部B4ホームへ。', 'From the B3 concourse down to the deepest level, the B4 platform.', 'B3 대합실에서 최심부 B4 승강장으로.') },
+        desc: tx('B3大廳→最深的B4月台。', 'B3大厅→最深的B4站台。', 'B3のR線改札フロアから最深部B4ホームへ。', 'From the B3 concourse down to the deepest level, the B4 platform.', 'B3 대합실에서 최심부 B4 승강장으로.') },
       { x: 160, z: -52, a: 'B3', b: 'B2',
         name: tx('紅線⇄台鐵高鐵 連絡', '红线⇄台铁高铁 连络', 'R線⇄台鉄・高鉄 連絡', 'Red Line ⇄ TRA/HSR link', '레드라인⇄TRA/HSR 연결'),
-        desc: tx('淡水信義線大廳北端直通台鐵高鐵月台層，<b>紅線⇄台鐵高鐵轉乘最短路徑</b>。', '淡水信义线大厅北端直通台铁高铁站台层，<b>红线⇄台铁高铁换乘最短路径</b>。', 'R線大廳北端の通路から台鉄・高鉄ホーム階へ直結。<b>R線⇄台鉄/高鉄乗換の最短ルート</b>。', 'The north end of the Red Line concourse links straight to the TRA/HSR platform level — <b>the shortest Red Line ⇄ TRA/HSR transfer</b>.', '레드라인 대합실 북단에서 TRA/HSR 승강장층으로 직결. <b>레드라인⇄TRA/HSR 환승 최단 경로</b>.') },
+        desc: tx('淡水信義線大廳北端直通台鐵高鐵月台層，<b>紅線⇄台鐵高鐵轉乘最短路徑</b>。', '淡水信义线大厅北端直通台铁高铁站台层，<b>红线⇄台铁高铁换乘最短路径</b>。', 'R線改札フロア北端の通路から台鉄・高鉄ホーム階へ直結。<b>R線⇄台鉄/高鉄乗換の最短ルート</b>。', 'The north end of the Red Line concourse links straight to the TRA/HSR platform level — <b>the shortest Red Line ⇄ TRA/HSR transfer</b>.', '레드라인 대합실 북단에서 TRA/HSR 승강장층으로 직결. <b>레드라인⇄TRA/HSR 환승 최단 경로</b>.') },
       { x: -340, z: -66, a: 'B1', b: 'B2',
-        name: tx('往機捷月台', '往机捷站台', '機捷ホームへ', 'To the Airport MRT platform', '공항MRT 승강장으로'),
+        name: tx('往機捷月台', '往机捷站台', '空港MRTホームへ', 'To the Airport MRT platform', '공항MRT 승강장으로'),
         desc: tx('A1大廳（報到層）→月台。', 'A1大厅（值机层）→站台。', 'A1ホール（チェックイン階）からホームへ。', 'From the A1 hall (check-in level) down to the platform.', 'A1 홀(체크인층)에서 승강장으로.') },
       { x: 85, z: -205, a: 'B1', b: 'F1',
         name: tx('京站館內電扶梯', '京站馆内扶梯', '京站館内エスカレーター', 'Q square in-mall escalators', '큐스퀘어 관내 에스컬레이터'),
@@ -1820,40 +1814,13 @@
        ============================================================ */
     const ROUTES = [
       {
-        name: tx('板南線 → 淡水信義線 轉乘', '板南线 → 淡水信义线 换乘', 'BL線 → R線 乗換（台北車站の駅構内）', 'Blue Line → Red Line transfer', '반난선 → 단수이신이선 환승'),
-        desc: tx('B3板南線月台 → 上B2捷運大廳 → 閘內往東（公園路方向） → B3淡水信義線大廳 → 下B4月台。<b>約4〜6分</b>。跟著紅色「淡水信義線」指標走。',
-                 'B3板南线站台 → 上B2捷运大厅 → 闸内往东（公园路方向） → B3淡水信义线大厅 → 下B4站台。<b>约4〜6分</b>。跟着红色“淡水信义线”指标走。',
-                 'B3のBL線ホーム → B2の捷運大廳へ上がる → 改札内を東へ（公園路方面） → B3のR線大廳 → B4のR線ホームへ。<b>約4〜6分</b>。<b>「淡水信義線」の赤いサイン</b>を追えばOK。',
-                 'From the Blue Line platform (B3) go up to the B2 concourse, head east inside the gates toward Gongyuan Rd., reach the Red Line concourse (B3) and descend to the B4 platform. <b>4–6 min.</b> Just follow the red "Tamsui–Xinyi Line" signs.',
-                 'B3 반난선 승강장 → B2 대합실로 → 개찰 안쪽을 동쪽(궁위안루 방향)으로 → B3 레드라인 대합실 → B4 승강장. <b>약 4~6분.</b> 빨간 "단수이신이선" 표지판을 따라가세요.'),
-        pts: [[-50, 58, 'B3'], [-20, 58, 'B3'], [-20, 58, 'B2'], [60, 58, 'B2'], [120, 55, 'B2'], [160, 30, 'B2'], [160, 30, 'B3'], [163, 0, 'B3'], [163, 0, 'B4'], [163, 60, 'B4']]
-      },
-      {
-        name: tx('台鐵閘門 → Y區 → 京站（不淋雨）', '台铁检票 → Y区 → 京站（不淋雨）', '台鉄改札 → Y区 → 京站（雨に濡れないルート）', 'TRA gates → Y Mall → Q square (rain-free)', 'TRA 개찰 → Y구 → 큐스퀘어(비 안 맞는 길)'),
-        desc: tx('從台鐵B1大廳走北側連絡通道進入台北地下街（Y區），往東走到Y5附近，<b>直通京站時尚廣場與台北轉運站</b>（往基隆、宜蘭等客運）。約5〜7分。',
-                 '从台铁B1大厅走北侧连络通道进入台北地下街（Y区），往东走到Y5附近，<b>直通京站时尚广场与台北转运站</b>（往基隆、宜兰等客运）。约5〜7分。',
-                 '台鉄B1コンコースから北の連絡通路でY区（台北地下街）へ。東端方向に歩き、北側のY5付近から<b>京站時尚廣場・台北轉運站へ直結</b>。約5〜7分。基隆・宜蘭方面のバスに乗る日もこのルート。',
-                 'From the TRA B1 concourse take the north passage into Taipei Mall (Y), walk east to around Y5, then <b>straight into Q square mall and Taipei Bus Station</b> (buses to Keelung, Yilan, etc.). 5–7 min, fully indoors.',
-                 'TRA B1 대합실에서 북쪽 통로로 타이베이 지하상가(Y구)에 진입, 동쪽으로 걸어 Y5 부근에서 <b>큐스퀘어·타이베이 버스터미널로 직결</b>(지룽·이란행 버스). 약 5~7분.'),
-        pts: [[0, -40, 'B1'], [-46, -75, 'B1'], [-46, -119, 'B1'], [80, -119, 'B1'], [85, -150, 'B1'], [85, -205, 'B1']]
-      },
-      {
-        name: tx('捷運大廳 → Z區 → 新光三越（Z2）', '捷运大厅 → Z区 → 新光三越（Z2）', '捷運大廳 → Z区 → 新光三越（Z2）', 'MRT concourse → Z Mall → Mitsukoshi (Z2)', 'MRT 대합실 → Z구 → 미츠코시(Z2)'),
-        desc: tx('從B2捷運大廳出閘上B1，沿站前地下街（Z區）往東，<b>Z2出口上去就是新光三越站前店</b>。約4分。南陽街平價美食也從Z2。',
-                 '从B2捷运大厅出闸上B1，沿站前地下街（Z区）往东，<b>Z2出口上去就是新光三越站前店</b>。约4分。南阳街平价美食也从Z2。',
-                 'B2の捷運大廳から改札を出てB1へ上がり、Z区（站前地下街）を東へ。<b>Z2出口を上がれば新光三越站前店の目の前</b>。約4分。南陽街の安うまグルメもZ2から。',
-                 'Exit the B2 MRT concourse, go up to B1 and walk east through Zhanqian Mall (Z); <b>up Exit Z2 you\'re right at Shin Kong Mitsukoshi</b>. ~4 min. Nanyang St. cheap eats are via Z2 too.',
-                 'B2 MRT 대합실에서 개찰을 나와 B1로 올라가 잔첸 지하상가(Z구)를 동쪽으로. <b>Z2 출구로 올라가면 바로 신광미츠코시</b>. 약 4분. 난양제 저렴 맛집도 Z2에서.'),
-        pts: [[20, 58, 'B2'], [20, 58, 'B1'], [0, 60, 'B1'], [38, 62, 'B1'], [40, 74, 'B1']]
-      },
-      {
-        name: tx('Z區 → 機捷A1（全程地下去機場報到）', 'Z区 → 机捷A1（全程地下去机场值机）', 'Z区 → 機捷A1（地下だけで空港チェックイン）', 'Z Mall → Airport MRT A1 (all underground)', 'Z구 → 공항MRT A1(전 구간 지하)'),
-        desc: tx('從站前地下街（Z2附近）經K區、台鐵B1大廳，走西側連絡通道（電動步道）到機捷A1。<b>全程地下、步行10〜12分</b>，雨天拖行李也OK。A1的B1可市區預辦登機（06:00〜21:30、起飛3小時前截止），直達車到機場約39分。',
-                 '从站前地下街（Z2附近）经K区、台铁B1大厅，走西侧连络通道（自动步道）到机捷A1。<b>全程地下、步行10〜12分</b>，雨天拖行李也OK。A1的B1可市区预办登机（06:00〜21:30、起飞3小时前截止），直达车到机场约39分。',
-                 '站前地下街（Z2付近）からK区→台鉄B1コンコース→西の連絡通道（動く歩道）で機捷A1へ。<b>全行程地下・徒歩10〜12分</b>・雨でもスーツケースOK。A1のB1でインタウンチェックイン（06:00〜21:30・離陸3時間前まで）→直達車で桃園空港まで約39分。',
-                 'From Zhanqian Mall (near Z2) via K Mall and the TRA B1 concourse, take the west passage (moving walkways) to Airport MRT A1. <b>10–12 min, fully underground</b> — fine with luggage in the rain. In-town check-in at A1\'s B1 (06:00–21:30, closes 3 h before departure); the Express reaches the airport in ~39 min.',
-                 '잔첸 지하상가(Z2 부근)에서 K구→TRA B1 대합실→서쪽 연결통로(무빙워크)로 공항MRT A1까지. <b>전 구간 지하, 도보 10~12분</b>. 비 와도 캐리어 OK. A1의 B1에서 시내 사전 체크인(06:00~21:30, 출발 3시간 전 마감), 직달열차로 공항까지 약 39분.'),
-        pts: [[44, 74, 'B1'], [54, 60, 'B1'], [0, 60, 'B1'], [-7, 46, 'B1'], [-7, 34, 'B1'], [-7, 19, 'B1'], [-7, 0, 'B1'], [0, -40, 'B1'], [-46, -61, 'B1'], [-150, -61, 'B1'], [-250, -62, 'B1'], [-340, -66, 'B1'], [-340, -66, 'B2'], [-380, -67, 'B2']]
+        name: tx('機場捷運A1 → 台北車站（車站大廳）', '机场捷运A1 → 台北车站（车站大厅）', '桃園空港MRT A1 → 台北駅（駅舎1Fホール）', 'Airport MRT A1 → Taipei Main Station hall', '공항MRT A1 → 타이베이역(역사 1층)'),
+        desc: tx('機捷A1抵達後：從B2月台上到B1大廳 → 東側連絡通道（電動步道，4〜5分） → 台鐵高鐵B1閘門層 → 手扶梯上1F大廳（棋盤格地板）。<b>全程地下、約8〜10分</b>。',
+                 '机场捷运A1抵达后：从B2站台上到B1大厅 → 东侧连络通道（自动步道，4〜5分） → 台铁高铁B1检票层 → 扶梯上1F大厅（棋盘格地板）。<b>全程地下、约8〜10分</b>。',
+                 '空港MRTでA1駅に着いたら：B2ホームからB1のA1ホールへ → 東の連絡通路（動く歩道・4〜5分） → 台鉄・高鉄改札のあるB1コンコース → エスカレーターで1Fホール（黒白チェックの床）へ。<b>全行程地下・約8〜10分</b>。',
+                 'Arriving by Airport MRT: from the B2 platform go up to the A1 hall (B1), take the east walkway (moving walkways, 4–5 min) to the TRA/HSR B1 concourse, then escalators up to the 1F main hall with the checkerboard floor. <b>All underground, ~8–10 min.</b>',
+                 '공항MRT A1 도착 후: B2 승강장에서 B1 A1홀로 → 동쪽 연결통로(무빙워크, 4~5분) → TRA/HSR B1 개찰층 → 에스컬레이터로 1층 홀(체커보드 바닥). <b>전 구간 지하, 약 8~10분.</b>'),
+        pts: [[-380, -67, 'B2'], [-340, -66, 'B2'], [-340, -66, 'B1'], [-250, -62, 'B1'], [-150, -61, 'B1'], [-46, -61, 'B1'], [0, -40, 'B1'], [0, -35, 'F1']]
       }
     ];
 
@@ -1861,14 +1828,14 @@
        自由ルート: 歩行ネットワーク（name有り=選択可能な地点 / 無し=通路の中継点）
        ============================================================ */
     const NET_NODES = {
-      hall1f:  { p: [0, -35, 'F1'],     name: tx('1F 大廳・售票處', '1F 大厅・售票处', '1F 大廳・切符売場', '1F Main hall & tickets', '1층 대합실·매표소') },
+      hall1f:  { p: [0, -35, 'F1'],     name: tx('1F 大廳・售票處', '1F 大厅・售票处', '1F ホール・切符売場', '1F Main hall & tickets', '1층 대합실·매표소') },
       breeze:  { p: [-20, -40, 'F2'],   name: tx('2F 微風美食街', '2F 微风美食街', '2F 微風美食街', '2F Breeze food court', '2층 푸드코트') },
       traGate: { p: [0, -40, 'B1'],     name: tx('台鐵高鐵 閘門', '台铁高铁 检票口', '台鉄・高鉄 改札', 'TRA / HSR gates', 'TRA/HSR 개찰구') },
       traPlat: { p: [0, -50, 'B2'],     name: tx('台鐵高鐵 月台', '台铁高铁 站台', '台鉄・高鉄 ホーム', 'TRA / HSR platforms', 'TRA/HSR 승강장') },
-      mrtConc: { p: [20, 58, 'B2'],     name: tx('捷運大廳・閘門', '捷运大厅・检票', 'MRT改札・大廳', 'MRT concourse & gates', 'MRT 개찰·대합실') },
+      mrtConc: { p: [20, 58, 'B2'],     name: tx('捷運大廳・閘門', '捷运大厅・检票', 'MRT改札フロア', 'MRT concourse & gates', 'MRT 개찰·대합실') },
       blPlat:  { p: [-20, 58, 'B3'],    name: tx('板南線 月台', '板南线 站台', 'BL線（板南線）ホーム', 'Blue Line platform', '반난선 승강장') },
       rPlat:   { p: [163, 40, 'B4'],    name: tx('淡水信義線 月台', '淡水信义线 站台', 'R線（淡水信義線）ホーム', 'Red Line platform', '단수이신이선 승강장') },
-      airA1:   { p: [-340, -66, 'B1'],  name: tx('機捷A1 報到大廳', '机捷A1 值机大厅', '機捷A1 チェックイン', 'Airport MRT A1 check-in', '공항MRT A1 체크인') },
+      airA1:   { p: [-340, -66, 'B1'],  name: tx('機捷A1 報到大廳', '机捷A1 值机大厅', '空港MRT A1 チェックイン', 'Airport MRT A1 check-in', '공항MRT A1 체크인') },
       yCenter: { p: [-260, -119, 'B1'], name: tx('Y區 台北地下街（中央）', 'Y区 台北地下街（中央）', 'Y区 台北地下街（中央）', 'Taipei Mall Y (center)', 'Y구 타이베이 지하상가(중앙)') },
       qSquare: { p: [85, -205, 'B1'],   name: tx('京站・台北轉運站', '京站・台北转运站', '京站・台北轉運站（バスターミナル）', 'Q square & Bus Station', '큐스퀘어·버스터미널') },
       zMall:   { p: [-60, 60, 'B1'],    name: tx('Z區 站前地下街', 'Z区 站前地下街', 'Z区 站前地下街', 'Zhanqian Mall (Z)', 'Z구 잔첸 지하상가') },

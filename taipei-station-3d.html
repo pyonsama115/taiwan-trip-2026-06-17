@@ -741,6 +741,8 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   #rail { right: 8px; top: max(124px, calc(47% - 185px)); max-height: calc(100dvh - 210px); padding: 6px 5px; }
   /* カメラ操作中はレールをふわっと退避 */
   .cam-moving #rail, .cam-moving #floorFlag { opacity: 0; pointer-events: none; }
+  /* SPでは「見たい場所へ」(ビュー切替)は出さない（フロアレールで代替） */
+  #stripChips #views { display: none; }
   #floorFlag { right: 64px; padding: 7px 11px; }
   #floorFlag span { max-width: 40vw; }
   #floorNow { bottom: max(12px, env(safe-area-inset-bottom)); padding: 7px 12px; }

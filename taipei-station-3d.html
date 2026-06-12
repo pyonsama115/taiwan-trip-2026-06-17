@@ -234,6 +234,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 #head .hrow { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 #head .brand { display: flex; gap: 10px; align-items: center; min-width: 0; }
 #head .btxt { min-width: 0; }
+#head .blogo { width: 31px; height: 31px; flex: none; filter: drop-shadow(0 2px 5px rgba(60, 40, 25, .22)); }
 .mark-sm {
   flex: none; width: 34px; height: 34px; border-radius: 10px;
   background: var(--on-bg); color: var(--on-fg);
@@ -884,6 +885,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   <div class="panel" id="head">
     <div class="hrow">
       <div class="brand">
+        <img class="blogo" src="assets/favicon.svg" alt="">
         <div class="btxt">
           <div class="kicker">Taipei Main Station</div>
           <h1 data-i="title"></h1>

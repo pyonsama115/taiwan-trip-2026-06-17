@@ -122,11 +122,12 @@
       letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
     }
     #head h1 { margin: 2px 0 0; font-size: 17px; font-weight: 900; letter-spacing: .01em; }
-    #fold {
+    #fold, #helpBtn {
       flex: none; appearance: none; cursor: pointer;
-      width: 26px; height: 26px; border-radius: 8px;
+      width: 32px; height: 32px; border-radius: 10px;
       border: 1px solid var(--line2); background: var(--paper);
-      color: var(--ink2); font-size: 12px; line-height: 1;
+      color: var(--ink2); font-size: 13px; line-height: 1;
+      font-weight: 800;
       transition: transform .25s;
     }
     #head.folded #fold { transform: rotate(180deg); }
@@ -164,6 +165,50 @@
     .chip.view.on { background: var(--accent); border-color: var(--accent); color: #fff; }
     .chip.route { border-style: dashed; }
     .chip.route.on { background: var(--tactic); border-color: var(--tactic); border-style: solid; color: #fff; }
+    .chip.shop.on { background: #b0413e; border-color: #b0413e; color: #fff; }
+
+    /* ---- route player (route playback) ---- */
+    #player {
+      bottom: 12px; left: 50%;
+      width: min(470px, calc(100vw - 24px));
+      transform: translate(-50%, 140%);
+      transition: transform .3s cubic-bezier(.2, .9, .25, 1);
+      padding: 10px 12px 9px;
+    }
+    #player.show { transform: translate(-50%, 0); }
+    #player .prow { display: flex; align-items: center; gap: 9px; }
+    #player .pplay {
+      flex: none; appearance: none; cursor: pointer;
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 0; background: var(--tactic); color: #fff; font-size: 15px;
+      box-shadow: 0 5px 14px -4px rgba(14, 159, 179, .65);
+    }
+    #player .pmeta { flex: 1; min-width: 0; }
+    #player .ptitle {
+      font-weight: 900; font-size: 12px; line-height: 1.35;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    #player input[type=range] {
+      width: 100%; height: 20px; margin: 1px 0 0; display: block;
+      accent-color: var(--tactic); cursor: pointer;
+    }
+    #player .pbtn {
+      flex: none; appearance: none; cursor: pointer;
+      width: 38px; height: 38px; border-radius: 11px;
+      border: 1.5px solid var(--line2); background: var(--paper);
+      font-size: 14px; color: var(--ink2); transition: all .15s;
+    }
+    #player .pbtn.on { background: var(--tactic); border-color: var(--tactic); color: #fff; }
+    #player .pflow { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 7px; }
+    #player .pflow .sep { color: var(--muted); font-size: 9px; }
+    #player .pflow .pf {
+      appearance: none; cursor: pointer;
+      font-family: var(--grotesk); font-weight: 800; font-size: 10px;
+      padding: 3px 9px; border-radius: 999px;
+      border: 1.5px solid var(--line2); background: var(--paper); color: var(--ink2);
+      transition: all .15s;
+    }
+    #player .pflow .pf.on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 
     #head .back {
       display: inline-block; margin-top: 11px;
@@ -215,11 +260,12 @@
       position: fixed; z-index: 10;
       top: 12px; right: 12px;
       width: 44px; height: 44px; border-radius: 50%;
+      appearance: none; cursor: pointer; padding: 0;
       background: rgba(255, 255, 255, .92);
       border: 1px solid var(--line2);
       box-shadow: var(--shadow);
       display: grid; place-items: center;
-      pointer-events: none;
+      transition: opacity .25s;
     }
     #needle { width: 30px; height: 30px; }
 
@@ -274,14 +320,134 @@
       text-align: right; line-height: 1.5;
     }
 
+    /* ---- info sheet extras ---- */
+    #info .grip { width: 44px; height: 5px; border-radius: 99px; background: var(--line2); margin: 8px auto 0; }
+    #info .idesc { max-height: 34vh; overflow-y: auto; touch-action: pan-y; }
+    #info.lifted { bottom: 140px; }
+
+    /* ---- zoom tools ---- */
+    #viewTools {
+      position: fixed; z-index: 10;
+      top: 66px; right: 12px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    #viewTools button {
+      appearance: none; cursor: pointer;
+      width: 44px; height: 44px; border-radius: 13px;
+      border: 1px solid var(--line2);
+      background: rgba(255, 255, 255, .94);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      color: var(--ink2); font-size: 19px; font-weight: 800;
+      font-family: var(--grotesk);
+      box-shadow: var(--shadow); transition: all .15s;
+    }
+    #viewTools button:hover { color: var(--ink); border-color: var(--muted); }
+
+    .hbtns { display: flex; gap: 6px; flex: none; }
+
+    /* ---- boot screen ---- */
+    #boot {
+      position: fixed; inset: 0; z-index: 40;
+      background: var(--paper);
+      display: grid; place-items: center;
+      transition: opacity .45s;
+    }
+    #boot.off { opacity: 0; pointer-events: none; }
+    #boot .bx {
+      text-align: center; font-family: var(--grotesk);
+      font-weight: 800; font-size: 11px; letter-spacing: .18em; color: var(--muted);
+    }
+    #boot .spin {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 3px solid var(--line2); border-top-color: var(--accent);
+      margin: 0 auto 12px; animation: bspin .9s linear infinite;
+    }
+    @keyframes bspin { to { transform: rotate(360deg); } }
+
+    /* ---- modal overlays (guide / custom route) ---- */
+    #guide, #rtModal {
+      position: fixed; inset: 0; z-index: 30;
+      background: rgba(35, 32, 26, .42);
+      backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+      display: grid; place-items: center; padding: 18px;
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    #guide.show, #rtModal.show { opacity: 1; pointer-events: auto; }
+    .gcard {
+      width: min(420px, 100%);
+      background: var(--card); border-radius: 22px;
+      box-shadow: 0 30px 70px -18px rgba(35, 32, 26, .5);
+      padding: 22px 20px 16px;
+      transform: translateY(14px); transition: transform .3s cubic-bezier(.2, .9, .25, 1);
+    }
+    #guide.show .gcard, #rtModal.show .gcard { transform: none; }
+
+    /* ---- custom route fields ---- */
+    .rtrows { display: flex; align-items: center; gap: 10px; margin: 14px 0 16px; }
+    .rtcol { flex: 1; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+    .rtfield label {
+      display: block; margin-bottom: 4px;
+      font-family: var(--grotesk); font-size: 9px; font-weight: 800;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+    }
+    .rtfield select {
+      width: 100%; padding: 11px 12px; border-radius: 12px;
+      border: 1.5px solid var(--line2); background: var(--paper);
+      font-family: var(--sans); font-weight: 700; font-size: 13px; color: var(--ink);
+    }
+    #rtSwap {
+      flex: none; appearance: none; cursor: pointer;
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1.5px solid var(--line2); background: var(--paper);
+      font-size: 15px; color: var(--ink2); transition: all .15s;
+    }
+    #rtSwap:hover { color: var(--ink); border-color: var(--muted); }
+    .chip.rt {
+      border-style: solid; border-color: var(--accent);
+      color: var(--accent); font-weight: 800; background: #fff;
+    }
+    .chip.rt:hover { background: var(--accent); color: #fff; }
+    .gcard h2 { margin: 0; font-size: 17px; font-weight: 900; }
+    .gcard .gsub { margin-top: 3px; font-size: 11px; font-weight: 700; color: var(--muted); }
+    .gtips { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+    .gtip {
+      display: flex; gap: 11px; align-items: center;
+      padding: 10px 12px; border-radius: 14px;
+      background: var(--paper); border: 1px solid var(--line);
+    }
+    .gtip .gi {
+      flex: none; width: 38px; height: 38px; border-radius: 12px;
+      display: grid; place-items: center; font-size: 18px;
+      background: #fff; border: 1px solid var(--line2);
+    }
+    .gtip b { display: block; font-size: 12.5px; }
+    .gtip span { font-size: 10.5px; color: var(--ink2); line-height: 1.55; display: block; margin-top: 1px; }
+    .gbtn {
+      width: 100%; appearance: none; cursor: pointer;
+      border: 0; border-radius: 999px; padding: 13px;
+      background: var(--accent); color: #fff;
+      font-family: var(--sans); font-weight: 900; font-size: 14px;
+      box-shadow: 0 8px 20px -8px rgba(241, 90, 53, .6);
+    }
+
+    /* ---- a11y ---- */
+    :focus-visible { outline: 2.5px solid var(--tactic); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation-duration: .01s !important; }
+    }
+
     @media (max-width: 640px) {
-      #head { width: calc(100vw - 86px); }
+      #head { width: calc(100vw - 88px); }
       #rail { right: 8px; padding: 6px 5px; }
-      #rail .flr { width: 36px; height: 31px; font-size: 11px; }
-      #rail .tool { width: 36px; height: 31px; }
-      #compass { top: auto; bottom: 64px; right: 8px; width: 38px; height: 38px; }
+      #rail .flr { width: 42px; height: 37px; font-size: 11px; }
+      #rail .tool { width: 42px; height: 37px; }
+      #compass { top: auto; bottom: 70px; right: 8px; width: 40px; height: 40px; }
+      body:has(#info.show) #compass, body:has(#player.show) #compass { opacity: 0; pointer-events: none; }
+      #viewTools { display: none; }
       #note { display: none; }
-      #info { bottom: 8px; }
+      #info { bottom: max(8px, env(safe-area-inset-bottom)); }
+      #player { bottom: max(8px, env(safe-area-inset-bottom)); padding: 9px 10px 8px; }
+      #info.lifted { bottom: calc(max(8px, env(safe-area-inset-bottom)) + 128px); }
     }
   </style>
   <script type="importmap">
@@ -295,6 +461,8 @@
 </head>
 
 <body>
+  <div id="boot"><div class="bx"><div class="spin"></div>TAIPEI MAIN STATION 3D</div></div>
+  <script>setTimeout(function () { var b = document.getElementById('boot'); if (b) b.classList.add('off'); }, 12000);</script>
   <div id="app"></div>
 
   <!-- header -->
@@ -304,7 +472,10 @@
         <div class="kicker">Taipei Main Station — Underground City</div>
         <h1>台北駅 地下街 3Dマップ</h1>
       </div>
-      <button id="fold" title="折りたたみ">▴</button>
+      <div class="hbtns">
+        <button id="helpBtn" title="使い方ガイド" aria-label="使い方ガイド">?</button>
+        <button id="fold" title="パネルを開閉" aria-label="パネルを開閉">▴</button>
+      </div>
     </div>
     <div class="body">
       <div class="legend">
@@ -318,7 +489,7 @@
         <span><i style="--c:#8246af"></i>機捷(空港)</span>
       </div>
 
-      <div class="sec">View / 視点</div>
+      <div class="sec">見たい場所へジャンプ</div>
       <div class="chips" id="views">
         <button class="chip view" data-v="all">全体</button>
         <button class="chip view" data-v="mrt">MRT乗換</button>
@@ -327,12 +498,20 @@
         <button class="chip view" data-v="air">機捷A1</button>
       </div>
 
-      <div class="sec">Route / 歩行ルート再生</div>
+      <div class="sec">ルート案内 — カメラが自動で道案内</div>
       <div class="chips" id="routes">
+        <button class="chip rt" id="rtOpen">🧭 出発→到着を指定</button>
         <button class="chip route" data-r="0">BL→R線 乗換</button>
         <button class="chip route" data-r="1">台鉄→Y区→京站</button>
         <button class="chip route" data-r="2">Z区→新光三越</button>
         <button class="chip route" data-r="3">帰国日: 宿→機捷A1</button>
+      </div>
+
+      <div class="sec">地図に表示するもの</div>
+      <div class="chips" id="shops">
+        <button class="chip shop" data-s="food">🍜 グルメ</button>
+        <button class="chip shop" data-s="shopping">🛍 ショップ・書店</button>
+        <button class="chip shop" data-s="exitg">🚪 出口の地上位置</button>
       </div>
 
       <a class="back" href="index.html">← しおりに戻る</a>
@@ -353,29 +532,82 @@
     <div class="cap">FLOOR</div>
   </div>
 
-  <!-- compass -->
-  <div id="compass">
+  <!-- compass (tap = face north) -->
+  <button id="compass" title="タップで北を上に" aria-label="タップで北を上に">
     <svg id="needle" viewBox="0 0 40 40">
       <polygon points="20,5 25,22 20,19 15,22" fill="#f15a35" />
       <polygon points="20,35 25,18 20,21 15,18" fill="#c9bda4" />
       <text x="20" y="14" text-anchor="middle" font-size="7" font-weight="800" fill="#23201a"
         font-family="Archivo,sans-serif">N</text>
     </svg>
+  </button>
+
+  <!-- zoom -->
+  <div id="viewTools">
+    <button id="zin" title="拡大" aria-label="拡大">＋</button>
+    <button id="zout" title="縮小" aria-label="縮小">−</button>
   </div>
 
   <!-- info sheet -->
   <div class="panel" id="info">
     <div class="bar" id="ibar"></div>
+    <div class="grip" aria-hidden="true"></div>
     <div class="inner">
-      <button class="iclose" id="iclose">✕</button>
+      <button class="iclose" id="iclose" title="閉じる" aria-label="閉じる">✕</button>
       <div class="iname" id="iname"></div>
       <div class="badges" id="ibadges"></div>
       <div class="idesc" id="idesc"></div>
     </div>
   </div>
 
+  <!-- route player -->
+  <div class="panel" id="player">
+    <div class="prow">
+      <button class="pplay" id="pPlay" title="再生" aria-label="再生">▶</button>
+      <div class="pmeta">
+        <div class="ptitle" id="pTitle"></div>
+        <input type="range" id="pSeek" min="0" max="1000" value="0" step="1" title="再生位置" aria-label="再生位置">
+      </div>
+      <button class="pbtn" id="pFollow" title="カメラ追従" aria-label="カメラ追従">🎥</button>
+      <button class="pbtn" id="pInfo" title="ルートの説明" aria-label="ルートの説明">ⓘ</button>
+      <button class="pbtn" id="pClose" title="閉じる" aria-label="閉じる">✕</button>
+    </div>
+    <div class="pflow" id="pFlow"></div>
+  </div>
+
+  <!-- first-run guide -->
+  <div id="guide">
+    <div class="gcard" role="dialog" aria-modal="true">
+      <h2>台北駅 地下街 3Dマップ</h2>
+      <div class="gsub">使い方はこの4つだけ</div>
+      <div class="gtips">
+        <div class="gtip"><div class="gi">🔄</div><div><b>回す・ズーム</b><span>ドラッグで回転、ピンチ／ホイールでズーム。</span></div></div>
+        <div class="gtip"><div class="gi">🏢</div><div><b>フロアを選ぶ</b><span>右の 2F〜B4 でその階だけ表示。⇕ で6層を分解。</span></div></div>
+        <div class="gtip"><div class="gi">🎬</div><div><b>ルート自動案内</b><span>ルートを選ぶとカメラとフロアが自動で道案内します。</span></div></div>
+        <div class="gtip"><div class="gi">👆</div><div><b>タップで詳細</b><span>お店・出口・ホームはすべてタップで解説カードが出ます。</span></div></div>
+      </div>
+      <button class="gbtn" id="gStart">はじめる</button>
+    </div>
+  </div>
+
+  <!-- custom route modal -->
+  <div id="rtModal">
+    <div class="gcard" role="dialog" aria-modal="true">
+      <h2>ルートを作る</h2>
+      <div class="gsub">出発地と目的地を選ぶと、カメラが自動で道案内します</div>
+      <div class="rtrows">
+        <div class="rtcol">
+          <div class="rtfield"><label for="rtFrom">出発地</label><select id="rtFrom"></select></div>
+          <div class="rtfield"><label for="rtTo">目的地</label><select id="rtTo"></select></div>
+        </div>
+        <button id="rtSwap" title="出発と目的地を入れ替え" aria-label="出発と目的地を入れ替え">⇅</button>
+      </div>
+      <button class="gbtn" id="rtGo">案内開始</button>
+    </div>
+  </div>
+
   <div id="toast"></div>
-  <div id="note">公式情報（台北捷運・台鉄・桃園捷運・各地下街）を元にした概略図<br>位置・縮尺は模式化しています。現地の案内表示を優先してください。</div>
+  <div id="note">公式情報（台北捷運・台鉄・桃園捷運・各地下街）＋台湾現地の公式サイト・グルメ記事を元にした概略図<br>位置・縮尺は模式化しています。現地の案内表示を優先してください。</div>
 
   <script type="module">
     import * as THREE from 'three';
@@ -509,16 +741,44 @@
       return m;
     }
 
+    /* 出口: B1のピン＋地上(F1)に出る位置のマーカー＋両者を結ぶシャフト */
+    const exitObjs = [];
     function exitMarker(fk, x, z, color, id, desc) {
+      const info = { name: '出口 ' + id, desc, tag: '出口', color: hex(color), floor: fk + '→地上' };
       const m = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 15, 10), mat(color));
       m.position.set(x, 7.5, z);
       m.userData.floor = fk;
-      m.userData.info = { name: '出口 ' + id, desc, tag: '出口', color: hex(color), floor: fk };
+      m.userData.info = info;
       pickables.push(m);
       const l = makeLabel(id, 'exit');
       l.position.y = 10;
       m.add(l);
       F[fk].add(m);
+
+      // 地上側（scene直下に置き、フロア分解時も追従させる）
+      const shaftM = mat(color, .45);
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(.9, .9, 1, 8), shaftM);
+      shaft.userData.floor = '_exit';
+      scene.add(shaft);
+      const disc = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.2, 1.4, 12), mat(color, .95));
+      disc.userData.floor = '_exit';
+      disc.userData.info = info;
+      pickables.push(disc);
+      const gl = makeLabel(id, 'exit');
+      gl.element.style.opacity = '.92';
+      gl.position.y = 5;
+      disc.add(gl);
+      scene.add(disc);
+      exitObjs.push({ fk, x, z, shaft, disc, label: gl, b1pin: m });
+    }
+    function updateExits() {
+      for (const e of exitObjs) {
+        const yb = F[e.fk].position.y + 15;   // B1ピンの頭
+        const yg = F['F1'].position.y + .9;   // 地上面
+        e.shaft.position.set(e.x, (yb + yg) / 2, e.z);
+        e.shaft.scale.y = Math.max(Math.abs(yg - yb), 2);
+        e.disc.position.set(e.x, yg, e.z);
+      }
     }
 
     function poi(fk, x, z, color, name, desc, labelText) {
@@ -543,7 +803,7 @@
     }
 
     /* 寄棟屋根（ヒップルーフ）: 底面 w×d・高さ h・棟は長辺方向 */
-    function hipRoof(fk, cx, cy, cz, w, d, h, color) {
+    function hipRoof(fk, cx, cy, cz, w, d, h, color, op = .95) {
       const hw = w / 2, hd = d / 2, r = Math.max(w - d, 0) / 2;
       const verts = [
         -hw, 0, -hd, hw, 0, -hd, hw, 0, hd, -hw, 0, hd,   // 底面 0-3
@@ -555,14 +815,14 @@
       geo.setIndex(idx);
       geo.computeVertexNormals();
       const rm = new THREE.MeshLambertMaterial({
-        color, transparent: true, opacity: .95, side: THREE.DoubleSide
+        color, transparent: true, opacity: op, side: THREE.DoubleSide
       });
-      rm.userData.baseOp = .95;
+      rm.userData.baseOp = op;
       const mesh = new THREE.Mesh(geo, rm);
       mesh.position.set(cx, cy, cz);
       mesh.userData.floor = fk;
-      const eMat = new THREE.LineBasicMaterial({ color: 0x4a2018, transparent: true, opacity: .35 });
-      eMat.userData.baseOp = .35;
+      const eMat = new THREE.LineBasicMaterial({ color: 0x4a2018, transparent: true, opacity: .2 });
+      eMat.userData.baseOp = .2;
       mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 12), eMat));
       F[fk].add(mesh);
       return mesh;
@@ -635,7 +895,7 @@
       label: '台北車站', labelColor: '#23201a', ly: 18
     });
     // 特徴的な赤茶の寄棟屋根
-    hipRoof('F1', 0, 24, -35, 222, 120, 15, 0x8a3b2c);
+    hipRoof('F1', 0, 24, -35, 222, 120, 15, 0xc69a84, .5);
 
     // 1F 大廳のチェック床
     const ck = document.createElement('canvas');
@@ -669,7 +929,7 @@
     box('F1', 165, 255, -285, -150, 30, COL.bldg, {
       opacity: .25,
       name: '台北轉運站（バスターミナル）', tag: '1F〜', color: '#9a9080',
-      desc: '長距離バスターミナル（承徳路一段1號）。<b>九份・基隆方面のバスはここ発</b>。R区中山地下街のR1出口前。',
+      desc: '長距離バスターミナル（承徳路一段1號）。<b>基隆・宜蘭・台中方面のバスはここ発</b>。九份へはここではなく北門バス停から965番。R区中山地下街のR1出口前。',
       label: '台北轉運站', labelColor: '#5b5345', ly: 10
     });
 
@@ -780,7 +1040,7 @@
     box('B1', 50, 120, -250, -168, 6, 0xf15a35, {
       opacity: .85,
       name: '京站 B1（Y区直結）', tag: 'B1', color: '#f15a35',
-      desc: 'Y区東端の北側からそのまま入れる。<b>B3フードコート</b>と映画館・君品酒店へ。台北轉運站（九份・基隆方面バス）もこの建物群。'
+      desc: 'Y区東端の北側からそのまま入れる。<b>B3フードコート</b>と映画館・君品酒店へ。台北轉運站（基隆・宜蘭方面バス）もこの建物群。'
     });
 
     // 北門駅（G線）
@@ -795,7 +1055,7 @@
     // ---- 機捷 A1（桃園空港MRT） ----
     box('B1', -420, -260, -95, -40, 6, COL.air, {
       name: '機捷 台北車站（A1）B1ホール', tag: 'B1', color: '#8246af',
-      desc: '桃園空港MRTのターミナル。<b>B1で市區預辦登機（インタウンチェックイン）</b>＝搭乗手続き＋荷物預けが可能。受付06:00〜21:30・<b>離陸3時間前まで</b>・当日便のみ。対象：中華航空・華信・長榮（エバー）・立榮・國泰・星宇。直達車（快速）で桃園空港まで<b>約39分</b>、15分間隔。',
+      desc: '桃園空港MRTのターミナル。<b>B1で市區預辦登機（インタウンチェックイン）</b>＝搭乗手続き＋荷物預けが可能。受付06:00〜21:30・<b>離陸3時間前まで</b>・当日便のみ。対象：中華航空・華信・長榮（エバー）・立榮・國泰・星宇・台灣虎航（最新の対象は公式発表を確認）。直達車（快速）で桃園空港まで<b>約39分</b>、15分間隔。',
       label: '機捷 A1（空港MRT）', labelColor: '#8246af', ly: 7
     });
     box('B1', -260, -100, -72, -50, 6, 0xc9bda4, {
@@ -824,7 +1084,7 @@
     /* ---- 出口マーカー ---- */
     // Y区（東→西に番号増・南側＝台鉄/機捷側・北側＝京站側）
     exitMarker('B1', 160, -132, COL.y, 'Y1', 'Y区東端・北側。市民大道北側へ。');
-    exitMarker('B1', 145, -106, COL.y, 'Y2', 'Y区東端・南側。<b>捷運M1と共用階段</b>、台鉄・高鉄改札方面。');
+    exitMarker('B1', 145, -106, COL.y, 'Y2', 'Y区東端・南側。台鉄・高鉄改札方面。');
     exitMarker('B1', 60, -132, COL.y, 'Y5', '北側。<b>京站・台北轉運站方面</b>。');
     exitMarker('B1', -100, -132, COL.y, 'Y9', '北側。華陰街（問屋街）方面。');
     exitMarker('B1', -250, -132, COL.y, 'Y13', 'Y区中央。');
@@ -849,6 +1109,21 @@
     exitMarker('B1', 158, -240, COL.r, 'R4', '長安西路方面。');
     exitMarker('B1', 182, -330, COL.r, 'R7', '<b>赤峰街</b>（リノベカフェ・古着の人気エリア）方面。');
     exitMarker('B1', 168, -425, COL.r, 'R9', '中山駅寄り。台北當代藝術館近く。');
+    // ---- 捷運B1連絡通路（M出口がぶら下がる通路） ----
+    box('B1', -90, 200, 80, 94, 6, COL.mrt, {
+      opacity: .8,
+      name: '捷運B1通路（M出口の連絡通路）',
+      tag: 'B1', color: '#0e9fb3',
+      desc: '忠孝西路南側に伸びる捷運（MRT）駅のB1通路。M2〜M8出口はここから地上へ出る。Z区站前地下街とつながり、この下がB2捷運大廳。',
+      label: '捷運B1通路（M出口）',
+      labelColor: '#0e9fb3', lx: 60, ly: 6
+    });
+    // Z区・公園路側への接続部
+    box('B1', -76, -64, 72, 80, 6, COL.mrt, { opacity: .6, edges: false });
+    box('B1', -26, -14, 72, 80, 6, COL.mrt, { opacity: .6, edges: false });
+    box('B1', 30, 42, 72, 80, 6, COL.mrt, { opacity: .6, edges: false });
+    box('B1', 180, 194, 56, 80, 6, COL.mrt, { opacity: .6, edges: false });
+
     // M出口（捷運）
     exitMarker('B1', -70, 85, COL.mrt, 'M2', '忠孝西路南側・西寄り。');
     exitMarker('B1', -20, 85, COL.mrt, 'M3', '忠孝西路南側。重慶南路方面。');
@@ -890,9 +1165,9 @@
     box('B2', -95, 95, -38, -32, 1.4, COL.track, { edges: false });
     traP(-48, -38, '高鉄 第2月台', '台湾高速鉄道（南側ホーム）。乗車券があれば台鉄側と行き来できる中間改札あり。', '#c47a2e');
     box('B2', -95, 95, -56, -50, 1.4, COL.track, { edges: false });
-    traP(-66, -56, '台鉄 第3月台', '台湾鉄路（北側ホーム）。基隆・宜蘭・花蓮方面など東部幹線。');
+    traP(-66, -56, '台鉄 第3月台', '台湾鉄路（北側ホーム）。<b>発車ホームは列車ごとに異なる</b>ため、コンコースの電光掲示板で確認を。');
     box('B2', -95, 95, -74, -68, 1.4, COL.track, { edges: false });
-    traP(-84, -74, '台鉄 第4月台', '台湾鉄路（北側ホーム）。桃園・新竹・台中方面など西部幹線。');
+    traP(-84, -74, '台鉄 第4月台', '台湾鉄路（北側ホーム）。東部幹線（基隆・宜蘭・花蓮）も西部幹線（桃園・台中）もここから発着するため、掲示板の確認が必須。');
     const traL = makeLabel('台鉄・高鉄ホーム（B2）', 'zone', '#9a7b3f');
     traL.position.set(-60, 9, -52);
     F['B2'].add(traL);
@@ -941,6 +1216,88 @@
     box('B4', 174, 182, -70, 110, 1.4, COL.track, { edges: false });
     dirLabel('B4', 163, 5, -80, '↑ 中山・雙連・北投（淡水行き）');
     dirLabel('B4', 163, 5, 120, '↓ 台大醫院・中正紀念堂・東門（象山行き）');
+
+    /* ============================================================
+       お店情報レイヤー（台湾側の公式サイト・現地グルメ記事より）
+       出典: 台北地下街官網 / 站前地下街(sfmm.org.tw) / Q square京站官網 /
+             誠品R79 / 愛食記 / 食尚玩家 / TripMoment ほか
+       ============================================================ */
+    const SHOP_CATS = {
+      food:     { col: 0xd96a2e, jp: 'グルメ' },
+      shopping: { col: 0x7c5cdb, jp: 'ショップ' }
+    };
+    const layersOn = { food: false, shopping: false, exitg: true };
+    const shopObjs = [];
+
+    function shop(fk, x, z, cat, name, desc, labelText) {
+      const c = SHOP_CATS[cat].col;
+      const m = new THREE.Mesh(new THREE.OctahedronGeometry(3.4), mat(c));
+      m.position.set(x, 9, z);
+      m.userData.floor = fk;
+      m.userData.shopCat = cat;
+      m.userData.info = { name, desc, tag: (cat === 'food' ? '🍜 ' : '🛍 ') + SHOP_CATS[cat].jp, color: hex(c), floor: fk };
+      pickables.push(m);
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(.45, .45, 9, 6), mat(c, .55));
+      pole.position.set(x, 4.5, z);
+      const l = makeLabel(labelText || name, 'spot', hex(c));
+      l.position.y = 6;
+      m.add(l);
+      F[fk].add(m);
+      F[fk].add(pole);
+      shopObjs.push({ mesh: m, pole, label: l, fk, cat });
+    }
+
+    /* ---- Y区 台北地下街（美食區は西寄り） ---- */
+    shop('B1', -350, -119, 'food', '30 ice cream（台北地下街）',
+      '2球でNT$35の巨大アイスが現地で話題の激安アイス店。口味多数。15:00〜21:00・月木休。', '30 ice cream');
+    shop('B1', -415, -119, 'food', '麵屋武藏（Y区美食區）',
+      '台湾のグルメサイト「愛食記」の台北地下街人気店リスト常連のラーメン店。Y区西側の美食區エリア。', '麵屋武藏');
+    shop('B1', -450, -119, 'food', 'Lingos美食屋（店號20・Y21付近）',
+      'NT$200以下でスープ・ドリンク付きの焗烤（グラタン）＆ピザが現地でコスパ最強と人気。12:00〜20:30。', 'Lingos焗烤');
+    shop('B1', -480, -119, 'food', '脆皮鮮奶甜甜圈',
+      '揚げたてサクサクの生乳ドーナツ。台湾メディアの「台北地下街美食」記事で必ず名前が挙がる定番行列店。', '鮮奶甜甜圈');
+    shop('B1', -225, -119, 'shopping', '湯姆熊歡樂世界（Tom\'s World）',
+      '台湾最大手ゲーセンチェーンの大型店。Y区中央の電玩・ガチャ・カード店密集エリアの核。', '湯姆熊');
+
+    /* ---- Z区 站前地下街 ---- */
+    shop('B1', -100, 60, 'shopping', 'Z区 服飾・雑貨エリア',
+      '站前地下街（公式: sfmm.org.tw）はプチプラ服・靴・スマホ雑貨が中心で学生向け価格。雨の日のぶらぶら歩きに最適。', '服飾・雑貨街');
+    shop('B1', 12, 90, 'food', '藍象廷泰式火鍋（新光三越站前店）',
+      '新光三越站前店のレストランフロアのタイ式しゃぶしゃぶ。北海道昆布・レモングラスなど湯頭7種。Z2/Z4出口からすぐ。', '藍象廷');
+
+    /* ---- K区 誠品站前 ---- */
+    shop('B1', 30, 34, 'food', '上島珈琲店 誠品站前店',
+      '日本でおなじみの上島珈琲。平日7:00〜22:00で、駅地下では貴重な朝モーニングが現地記事で推されている。', '上島珈琲');
+    shop('B1', -40, 34, 'food', '這一小鍋（K区地下街）',
+      'ひとり鍋専門店（忠孝西路一段47號B1）。鍋底5種・低消NT$268・11:00〜22:00。', '這一小鍋');
+
+    /* ---- R区 中山地下街・誠品R79 ---- */
+    shop('B1', 162, -230, 'shopping', '五春一番街（中山地下街）',
+      '中山地下街の南寄り区間。コンビニ・パン屋・ドリンクスタンド・雑貨と生活密着の店が並ぶ。', '五春一番街');
+    shop('B1', 172, -395, 'shopping', '誠品R79（中山地下書街）',
+      '全長270m超「台湾最長の地下書街」（2017年開業）。本のほか文創雑貨・活版鉛字・レコードも。11:30〜21:30。R7〜R9出口区間。', '誠品R79');
+    shop('B1', 166, -360, 'food', '嘰咕帕紅豆餅 GIGUPA',
+      '誠品R79内の「爆漿」今川焼き。あんが溢れる断面が台湾女性誌Marie Claireでも紹介された人気店。', 'GIGUPA紅豆餅');
+    shop('B1', 170, -432, 'food', '學堂豆花圓（誠品R79）',
+      '書街の中の豆花（トウファ）店。本を選んだあとの一服にちょうどいい。', '學堂豆花圓');
+
+    /* ---- 2F 微風台北車站 ---- */
+    shop('F2', -70, -40, 'food', '老董牛肉麵（微風2F）',
+      '台北牛肉麺コンテスト受賞歴のある老舗。微風台北車站2Fの牛肉麺代表格。', '老董牛肉麵');
+    shop('F2', -30, -72, 'food', '銷魂麵舖（微風2F）',
+      '麻辣まぜ麺の人気店。現地レビューでは清燉牛肉湯（あっさり牛肉スープ）が絶賛されている。', '銷魂麵舖');
+    shop('F2', 10, -72, 'food', '大心新泰式麵食（微風2F）',
+      'タイ風ヌードルの人気チェーン。酸辣麵と清燉牛肉河粉が定番。', '大心泰式麵');
+    shop('F2', 50, -70, 'food', '金子半之助（微風2F）',
+      '日本橋の天丼専門店の台湾店。微風2Fの行列店常連。', '金子半之助');
+
+    /* ---- 京站 B3美食大道（モール内） ---- */
+    shop('B1', 98, -185, 'food', '段純貞牛肉麵（京站B3）',
+      '四川風の紅焼牛肉麺で行列必至。京站B3美食大道の筆頭格。', '段純貞牛肉麵');
+    shop('B1', 68, -192, 'food', '京都勝牛（京站B3）',
+      '京都発・炸牛排（牛カツ）専門店。サクサクの低温揚げをだし醤油や山椒塩で。', '京都勝牛');
+    shop('B1', 72, -235, 'food', '好丘 GOOD CHO\'s（京站B3）',
+      '台湾産食材のベーグルと土産菓子。台湾発ライフスタイルブランドで、ばらまき土産探しにも◎。', '好丘ベーグル');
 
     /* ============================================================
        電車（アニメーション）
@@ -1012,7 +1369,7 @@
       },
       {
         name: '台鉄改札 → Y区 → 京站（雨に濡れないルート）',
-        desc: '台鉄B1コンコースから北の連絡通路でY区（台北地下街）へ。東端方向に歩き、北側のY5付近から<b>京站時尚廣場・台北轉運站へ直結</b>。約5〜7分。九份行きバスに乗る日もこのルート。',
+        desc: '台鉄B1コンコースから北の連絡通路でY区（台北地下街）へ。東端方向に歩き、北側のY5付近から<b>京站時尚廣場・台北轉運站へ直結</b>。約5〜7分。基隆・宜蘭方面のバスに乗る日もこのルート。',
         pts: [[0, -40, 'B1'], [-46, -75, 'B1'], [-46, -119, 'B1'], [80, -119, 'B1'], [85, -150, 'B1'], [85, -205, 'B1']]
       },
       {
@@ -1027,13 +1384,93 @@
       }
     ];
 
-    let routeTube = null, routeBall = null, routeCurve = null, routeT = 0, activeRoute = -1;
-
-    function routePts(i) {
-      return ROUTES[i].pts.map(p => new THREE.Vector3(p[0], F[p[2]].position.y + 4, p[1]));
+    /* ============================================================
+       自由ルート: 歩行ネットワーク（name有り=選択可能な地点 / 無し=通路の中継点）
+       ============================================================ */
+    const NET_NODES = {
+      hall1f:  { p: [0, -35, 'F1'],     name: '1F 大廳・切符売場' },
+      breeze:  { p: [-20, -40, 'F2'],   name: '2F 微風美食街' },
+      traGate: { p: [0, -40, 'B1'],     name: '台鉄・高鉄 改札' },
+      traPlat: { p: [0, -50, 'B2'],     name: '台鉄・高鉄 ホーム' },
+      mrtConc: { p: [20, 58, 'B2'],     name: 'MRT改札・大廳' },
+      blPlat:  { p: [-20, 58, 'B3'],    name: 'BL線（板南線）ホーム' },
+      rPlat:   { p: [163, 40, 'B4'],    name: 'R線（淡水信義線）ホーム' },
+      airA1:   { p: [-340, -66, 'B1'],  name: '機捷A1 チェックイン' },
+      yCenter: { p: [-260, -119, 'B1'], name: 'Y区 台北地下街（中央）' },
+      qSquare: { p: [85, -205, 'B1'],   name: '京站・台北轉運站（バスターミナル）' },
+      zMall:   { p: [-60, 60, 'B1'],    name: 'Z区 站前地下街' },
+      z2:      { p: [40, 74, 'B1'],     name: 'Z2出口（新光三越・宿Mayer Inn）' },
+      kMall:   { p: [60, 34, 'B1'],     name: 'K区 誠品站前' },
+      r79:     { p: [172, -395, 'B1'],  name: 'R区 誠品R79（地下書街）' },
+      beimen:  { p: [-588, -65, 'B1'],  name: '北門駅（G線）・北門' },
+      // 中継点
+      jK4: { p: [-7, 0, 'B1'] }, jK3: { p: [-7, 34, 'B1'] }, jK2: { p: [-7, 46, 'B1'] }, jZ0: { p: [0, 60, 'B1'] },
+      jZB1: { p: [20, 58, 'B1'] }, jB2a: { p: [-20, 58, 'B2'] },
+      jB2b: { p: [120, 55, 'B2'] }, jB2c: { p: [160, 30, 'B2'] }, jB3a: { p: [160, 30, 'B3'] }, jB3b: { p: [163, 0, 'B3'] }, jB4: { p: [163, 0, 'B4'] },
+      jB3c: { p: [160, -30, 'B3'] }, jB2d: { p: [140, -52, 'B2'] },
+      jNP: { p: [-46, -75, 'B1'] }, jY1: { p: [-46, -119, 'B1'] }, yEast: { p: [80, -119, 'B1'] }, jYE: { p: [150, -119, 'B1'] },
+      rS: { p: [158, -112, 'B1'] }, rM: { p: [166, -250, 'B1'] },
+      jQ: { p: [85, -150, 'B1'] },
+      y14: { p: [-300, -119, 'B1'] }, yWest: { p: [-552, -119, 'B1'] }, jBM: { p: [-572, -95, 'B1'] },
+      jW1: { p: [-46, -61, 'B1'] }, jW2: { p: [-150, -61, 'B1'] }, jW3: { p: [-250, -62, 'B1'] }, jA: { p: [-322, -92, 'B1'] }
+    };
+    const NET_EDGES = [
+      ['breeze', 'hall1f'], ['hall1f', 'traGate'], ['traGate', 'traPlat'],
+      ['traGate', 'jK4'], ['jK4', 'jK3'], ['jK3', 'kMall'], ['jK3', 'jK2'], ['jK2', 'jZ0'],
+      ['jZ0', 'zMall'], ['jZ0', 'z2'], ['jZ0', 'jZB1'], ['jZB1', 'mrtConc'],
+      ['mrtConc', 'jB2a'], ['jB2a', 'blPlat'],
+      ['mrtConc', 'jB2b'], ['jB2b', 'jB2c'], ['jB2c', 'jB3a'], ['jB3a', 'jB3b'], ['jB3b', 'jB4'], ['jB4', 'rPlat'],
+      ['jB3a', 'jB3c'], ['jB3c', 'jB2d'], ['jB2d', 'traPlat'],
+      ['traGate', 'jNP'], ['jNP', 'jY1'], ['jY1', 'yEast'], ['yEast', 'jYE'], ['jYE', 'rS'], ['rS', 'rM'], ['rM', 'r79'],
+      ['yEast', 'jQ'], ['jQ', 'qSquare'],
+      ['jY1', 'yCenter'], ['yCenter', 'y14'], ['y14', 'yWest'], ['yWest', 'jBM'], ['jBM', 'beimen'],
+      ['traGate', 'jW1'], ['jW1', 'jW2'], ['jW2', 'jW3'], ['jW3', 'airA1'],
+      ['y14', 'jA'], ['jA', 'airA1']
+    ];
+    const NET_ADJ = {};
+    for (const [a, b] of NET_EDGES) {
+      (NET_ADJ[a] = NET_ADJ[a] || []).push(b);
+      (NET_ADJ[b] = NET_ADJ[b] || []).push(a);
     }
-    function buildRouteGeo(i) {
-      routeCurve = new THREE.CatmullRomCurve3(routePts(i), false, 'catmullrom', .08);
+    function netCost(a, b) {
+      const A = NET_NODES[a].p, B = NET_NODES[b].p;
+      return Math.hypot(A[0] - B[0], A[1] - B[1]) + (A[2] !== B[2] ? 60 : 0);
+    }
+    /* ダイクストラ法（ノード数が少ないのでO(n^2)で十分） */
+    function findPath(from, to) {
+      const dist = { [from]: 0 }, prev = {}, done = new Set();
+      for (;;) {
+        let u = null, best = Infinity;
+        for (const k in dist) if (!done.has(k) && dist[k] < best) { best = dist[k]; u = k; }
+        if (u == null || u === to) break;
+        done.add(u);
+        for (const v of NET_ADJ[u] || []) {
+          const nd = dist[u] + netCost(u, v);
+          if (nd < (dist[v] ?? Infinity)) { dist[v] = nd; prev[v] = u; }
+        }
+      }
+      if (dist[to] == null) return null;
+      const ids = [to];
+      while (ids[0] !== from) ids.unshift(prev[ids[0]]);
+      return { ids, len: dist[to] };
+    }
+
+    let routeTube = null, routeBall = null, routeCurve = null, routeT = 0, activeRoute = -1;
+    let activeRouteObj = null;
+    let routeFollow = true, routeFloorsU = null, routeToastDone = false;
+    let routePaused = false, routeDone = false, seekDrag = false, routeMs = [];
+    const playerEl = document.getElementById('player');
+    const pPlay = document.getElementById('pPlay');
+    const pSeek = document.getElementById('pSeek');
+    const pTitle = document.getElementById('pTitle');
+    const pFlow = document.getElementById('pFlow');
+    const pFollowB = document.getElementById('pFollow');
+
+    function routePts(r) {
+      return r.pts.map(p => new THREE.Vector3(p[0], F[p[2]].position.y + 4, p[1]));
+    }
+    function buildRouteGeo(r) {
+      routeCurve = new THREE.CatmullRomCurve3(routePts(r), false, 'catmullrom', .08);
       if (routeTube) { routeTube.geometry.dispose(); gRoute.remove(routeTube); }
       routeTube = new THREE.Mesh(
         new THREE.TubeGeometry(routeCurve, 110, 1.5, 8),
@@ -1041,17 +1478,132 @@
       );
       gRoute.add(routeTube);
     }
+    /* ルートの弧長パラメータ→フロアキーの対応表（カメラ・階の自動切替用） */
+    function buildRouteFloors(r) {
+      const pts = routePts(r);
+      const fls = r.pts.map(p => p[2]);
+      const M = 180;
+      routeFloorsU = [];
+      for (let j = 0; j < M; j++) {
+        const p = routeCurve.getPointAt(j / (M - 1));
+        let bi = 0, bd = Infinity;
+        pts.forEach((q, qi) => {
+          const d = q.distanceToSquared(p);
+          if (d < bd) { bd = d; bi = qi; }
+        });
+        routeFloorsU.push(fls[bi]);
+      }
+    }
+    function setRouteFloor(fk, doToast = true) {
+      if (FOCUS === fk) return;
+      FOCUS = fk;
+      applyFocus();
+      if (doToast && !routeToastDone) toast(`📍 ${fk}（${FLOORS[fk].jp}）`, 1800);
+    }
+    function floorAtT(tt) {
+      return routeFloorsU[Math.min(routeFloorsU.length - 1, Math.round(Math.min(tt, 1) * (routeFloorsU.length - 1)))];
+    }
+    function buildMilestones(r) {
+      const pts = r.pts;
+      routeMs = [];
+      pts.forEach((p, idx) => {
+        if (!routeMs.length || routeMs[routeMs.length - 1].fk !== p[2])
+          routeMs.push({ fk: p[2], t0: idx / (pts.length - 1) });
+      });
+      pFlow.innerHTML = '';
+      routeMs.forEach((m, j) => {
+        if (j) {
+          const s = document.createElement('span');
+          s.className = 'sep';
+          s.textContent = '▸';
+          pFlow.appendChild(s);
+        }
+        const b = document.createElement('button');
+        b.className = 'pf';
+        b.textContent = m.fk;
+        b.title = FLOORS[m.fk].jp;
+        b.onclick = () => {
+          seekTo(m.t0 + .0001);
+          setRouteFloor(floorAtT(routeT), false);
+          if (routeFollow && routeCurve) {
+            const q = routeCurve.getPointAt(Math.min(routeT, 1));
+            const off = camera.position.clone().sub(controls.target);
+            flyTo({ pos: [q.x + off.x, q.y + off.y, q.z + off.z], tgt: [q.x, q.y, q.z] }, .9);
+          }
+        };
+        pFlow.appendChild(b);
+        m.btn = b;
+      });
+    }
+    function updateMilestoneUI() {
+      let cur = 0;
+      for (let j = 0; j < routeMs.length; j++) if (routeT >= routeMs[j].t0 - 1e-4) cur = j;
+      routeMs.forEach((m, j) => m.btn.classList.toggle('on', j === cur));
+    }
+    function playPauseUI() {
+      pPlay.textContent = routeDone ? '⟲' : (routePaused ? '▶' : '❚❚');
+      const k = routeDone ? 'もう一度再生' : (routePaused ? '再生' : '一時停止');
+      pPlay.title = k;
+      pPlay.setAttribute('aria-label', k);
+    }
+    function seekTo(v) {
+      routeT = Math.max(0, Math.min(1, v));
+      routeDone = false;
+      pSeek.value = Math.round(routeT * 1000);
+      playPauseUI();
+    }
+    pPlay.onclick = () => {
+      if (routeDone) {
+        seekTo(0);
+        routePaused = false;
+        if (routeFollow && routeCurve) {
+          const s = routeCurve.getPointAt(0);
+          const off = camera.position.clone().sub(controls.target);
+          flyTo({ pos: [s.x + off.x, s.y + off.y, s.z + off.z], tgt: [s.x, s.y, s.z] }, 1.1);
+        }
+      } else routePaused = !routePaused;
+      playPauseUI();
+    };
+    pSeek.addEventListener('pointerdown', () => { seekDrag = true; });
+    pSeek.addEventListener('input', () => { seekDrag = true; seekTo(pSeek.value / 1000); });
+    pSeek.addEventListener('change', () => { seekDrag = false; });
+    pSeek.addEventListener('pointerup', () => { seekDrag = false; });
+    pFollowB.onclick = () => {
+      routeFollow = !routeFollow;
+      pFollowB.classList.toggle('on', routeFollow);
+      toast(routeFollow ? '🎥 カメラ追従ON' : '🎥 追従OFF（手動操作）', 1500);
+    };
+    document.getElementById('pInfo').onclick = () => {
+      if (!activeRouteObj) return;
+      const r = activeRouteObj;
+      showInfo({ name: r.name, desc: r.desc, tag: 'ルート', color: '#f15a35', floor: '徒歩' });
+    };
+    document.getElementById('pClose').onclick = () => {
+      clearRoute();
+      infoEl.classList.remove('show', 'lifted');
+    };
     function clearRoute() {
       if (routeTube) routeTube.geometry.dispose();
       gRoute.clear();
-      routeTube = routeBall = routeCurve = null;
+      routeTube = routeBall = routeCurve = routeFloorsU = null;
       activeRoute = -1;
+      activeRouteObj = null;
+      routePaused = false; routeDone = false; routeMs = [];
+      playerEl.classList.remove('show');
+      infoEl.classList.remove('lifted');
       document.querySelectorAll('#routes .chip').forEach(c => c.classList.remove('on'));
+      if (FOCUS) { FOCUS = null; applyFocus(); }
     }
     function showRoute(i) {
-      clearRoute();
+      playRoute(ROUTES[i]);
       activeRoute = i;
-      buildRouteGeo(i);
+    }
+    function playRoute(r) {
+      clearRoute();
+      activeRouteObj = r;
+      buildRouteGeo(r);
+      buildRouteFloors(r);
+      buildMilestones(r);
       routeBall = new THREE.Mesh(new THREE.SphereGeometry(4, 16, 16),
         new THREE.MeshBasicMaterial({ color: 0xffd24d }));
       const halo = new THREE.Mesh(new THREE.SphereGeometry(6.5, 16, 16),
@@ -1059,8 +1611,19 @@
       routeBall.add(halo);
       routeT = 0;
       gRoute.add(routeBall);
-      const r = ROUTES[i];
-      showInfo({ name: r.name, desc: r.desc, tag: 'ルート', color: '#f15a35', floor: '徒歩' });
+      routeFollow = true;
+      routePaused = false;
+      routeDone = false;
+      routeToastDone = false;
+      pSeek.value = 0;
+      pFollowB.classList.add('on');
+      pTitle.textContent = r.name;
+      playPauseUI();
+      updateMilestoneUI();
+      playerEl.classList.add('show');
+      setRouteFloor(routeFloorsU[0], false);
+      const s = routeCurve.getPointAt(0);
+      flyTo({ pos: [s.x + 110, s.y + 150, s.z + 190], tgt: [s.x, s.y, s.z] }, 1.6);
     }
 
     /* ============================================================
@@ -1076,30 +1639,130 @@
       if (d.tag) badges.push(`<span class="bdg ghost">${d.tag}</span>`);
       document.getElementById('ibadges').innerHTML = badges.join('');
       document.getElementById('idesc').innerHTML = d.desc || '';
+      infoEl.classList.toggle('lifted', playerEl.classList.contains('show'));
       infoEl.classList.add('show');
     }
-    document.getElementById('iclose').onclick = () => infoEl.classList.remove('show');
+    document.getElementById('iclose').onclick = () => infoEl.classList.remove('show', 'lifted');
+
+    // 下スワイプでシートを閉じる
+    {
+      let sy = null, dy = 0;
+      infoEl.addEventListener('pointerdown', e => {
+        if (e.target.closest('.idesc') || e.target.closest('.iclose')) return;
+        sy = e.clientY; dy = 0;
+      });
+      infoEl.addEventListener('pointermove', e => {
+        if (sy == null) return;
+        dy = e.clientY - sy;
+        if (dy > 0) infoEl.style.transform = `translate(-50%, ${dy}px)`;
+      });
+      const endSwipe = () => {
+        if (sy == null) return;
+        if (dy > 60) infoEl.classList.remove('show', 'lifted');
+        infoEl.style.transform = '';
+        sy = null;
+      };
+      infoEl.addEventListener('pointerup', endSwipe);
+      infoEl.addEventListener('pointercancel', endSwipe);
+    }
 
     // ヘッダー折りたたみ
     const head = document.getElementById('head');
     document.getElementById('fold').onclick = () => head.classList.toggle('folded');
     if (innerWidth < 640) head.classList.add('folded');
 
+    // ---- 初回ガイド ----
+    const guideEl = document.getElementById('guide');
+    const showGuide = () => guideEl.classList.add('show');
+    const hideGuide = () => {
+      guideEl.classList.remove('show');
+      localStorage.setItem('st3d.guided', '1');
+    };
+    document.getElementById('gStart').onclick = hideGuide;
+    guideEl.addEventListener('click', e => { if (e.target === guideEl) hideGuide(); });
+    document.getElementById('helpBtn').onclick = showGuide;
+
+    // フロアボタンにフロア名ツールチップ
+    document.querySelectorAll('#rail .flr').forEach(b => {
+      const f = FLOORS[b.dataset.f];
+      if (f) { b.title = f.jp; b.setAttribute('aria-label', b.dataset.f + ' ' + f.jp); }
+    });
+
+    // ---- 自由ルート（出発→目的地）モーダル ----
+    const rtModal = document.getElementById('rtModal');
+    const rtFrom = document.getElementById('rtFrom');
+    const rtTo = document.getElementById('rtTo');
+    const DEST_IDS = Object.keys(NET_NODES).filter(k => NET_NODES[k].name);
+    for (const sel of [rtFrom, rtTo]) {
+      for (const id of DEST_IDS) {
+        const o = document.createElement('option');
+        o.value = id;
+        o.textContent = NET_NODES[id].p[2] + ' · ' + NET_NODES[id].name;
+        sel.appendChild(o);
+      }
+    }
+    rtFrom.value = 'traGate';
+    rtTo.value = 'qSquare';
+    document.getElementById('rtOpen').onclick = () => rtModal.classList.add('show');
+    rtModal.addEventListener('click', e => { if (e.target === rtModal) rtModal.classList.remove('show'); });
+    document.getElementById('rtSwap').onclick = () => {
+      const a = rtFrom.value;
+      rtFrom.value = rtTo.value;
+      rtTo.value = a;
+    };
+    document.getElementById('rtGo').onclick = () => {
+      const a = rtFrom.value, b = rtTo.value;
+      if (a === b) { toast('出発地と目的地が同じです', 2000); return; }
+      const path = findPath(a, b);
+      if (!path) return;
+      const mins = Math.max(1, Math.round(path.len / 70));
+      const A = NET_NODES[a].name, B = NET_NODES[b].name;
+      playRoute({
+        name: A + ' → ' + B,
+        desc: `「${A}」から「${B}」まで 徒歩約${mins}分。カメラとフロアが自動で案内します。`,
+        pts: path.ids.map(id => NET_NODES[id].p)
+      });
+      activeRoute = -2;
+      rtModal.classList.remove('show');
+    };
+
     // ---- フロア絞り込み ----
     let FOCUS = null;
+    function applyShopLayers() {
+      for (const s of shopObjs) {
+        const vis = layersOn[s.cat] && (!FOCUS || FOCUS === s.fk);
+        s.mesh.visible = vis;
+        s.pole.visible = vis;
+        s.label.visible = vis;
+      }
+      for (const e of exitObjs) {
+        const vis = layersOn.exitg && (!FOCUS || FOCUS === e.fk || FOCUS === 'F1');
+        e.shaft.visible = vis;
+        e.disc.visible = vis;
+        e.label.visible = vis;
+      }
+    }
     function applyFocus() {
+      // ルート再生中は他フロアを少し残して文脈を保つ
+      const dim = activeRouteObj ? .1 : .04;
       for (const k of FKEY) {
         const active = !FOCUS || FOCUS === k;
+        // 出口の地上位置レイヤーON時は、地下フォーカス中も地上(F1)の道路をうっすら残す
+        const fdim = (k === 'F1' && layersOn.exitg) ? Math.max(dim, .18) : dim;
         F[k].traverse(o => {
           if (o.isMesh || o.isLineSegments || o.isLine) {
             const mt = o.material;
             if (mt && mt.userData) {
               const b = mt.userData.baseOp ?? 1;
-              mt.opacity = active ? b : b * .06;
+              mt.opacity = active ? b : b * fdim;
               mt.depthWrite = active;
             }
           }
-          if (o.isCSS2DObject) o.visible = active;
+          if (o.isCSS2DObject) {
+            let v = active;
+            if (!v && k === 'F1' && layersOn.exitg && o.element.classList.contains('st')) v = true;
+            o.visible = v;
+          }
         });
       }
       for (const m of connMeshes) {
@@ -1107,17 +1770,29 @@
         const active = !FOCUS || FOCUS === c.a || FOCUS === c.b;
         m.material.opacity = active ? m.material.userData.baseOp : .05;
       }
+      applyShopLayers();
       document.querySelectorAll('#rail .flr').forEach(b =>
         b.classList.toggle('on', b.dataset.f === FOCUS));
+    }
+    // フロア選択時はそのフロアが見やすい位置へカメラを自動移動
+    function flyToFloor(fk) {
+      const b = FLOORS[fk].bounds || [-360, 220, -300, 260];
+      const cx = (b[0] + b[1]) / 2, cz = (b[2] + b[3]) / 2;
+      const y = F[fk].position.y;
+      const span = Math.max(b[1] - b[0], b[3] - b[2]);
+      const dist = THREE.MathUtils.clamp(span * .9, 220, 900);
+      flyTo({ pos: [cx, y + dist * .78, cz + dist * .72], tgt: [cx, y, cz] }, 1.1);
     }
     document.getElementById('rail').addEventListener('click', e => {
       const b = e.target.closest('.flr');
       if (b) {
         FOCUS = (FOCUS === b.dataset.f) ? null : b.dataset.f;
         applyFocus();
+        if (FOCUS) flyToFloor(FOCUS);
+        else flyTo(VIEWS.all, 1.1);
       }
     });
-    document.getElementById('btnAll').onclick = () => { FOCUS = null; applyFocus(); };
+    document.getElementById('btnAll').onclick = () => { FOCUS = null; applyFocus(); flyTo(VIEWS.all, 1.1); };
 
     // ---- フロア分解（exploded view）----
     let exploded = false, floorAnimating = false;
@@ -1137,7 +1812,9 @@
       air: { pos: [-540, 210, 150], tgt: [-330, -14, -65] }
     };
     let camAnim = null;
+    const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     function flyTo(v, dur = 1.4) {
+      if (REDUCED) dur = .02;
       camAnim = {
         t: 0, dur,
         p0: camera.position.clone(), p1: new THREE.Vector3(...v.pos),
@@ -1151,15 +1828,46 @@
       flyTo(VIEWS[b.dataset.v]);
     });
 
+    // ---- ズーム・コンパス ----
+    function zoomBy(f) {
+      const v = camera.position.clone().sub(controls.target).multiplyScalar(f);
+      const len = THREE.MathUtils.clamp(v.length(), controls.minDistance, controls.maxDistance);
+      v.setLength(len);
+      camera.position.copy(controls.target).add(v);
+    }
+    document.getElementById('zin').onclick = () => zoomBy(.72);
+    document.getElementById('zout').onclick = () => zoomBy(1.38);
+    document.getElementById('compass').onclick = () => {
+      const tg = controls.target, off = camera.position.clone().sub(tg);
+      const h = Math.max(Math.hypot(off.x, off.z), 120);
+      flyTo({ pos: [tg.x, tg.y + Math.max(off.y, 60), tg.z + h], tgt: [tg.x, tg.y, tg.z] }, .9);
+    };
+
     // ---- ルート切替 ----
     document.getElementById('routes').addEventListener('click', e => {
-      const b = e.target.closest('.chip'); if (!b) return;
+      const b = e.target.closest('.chip'); if (!b || b.dataset.r === undefined) return;
       const i = +b.dataset.r;
       if (activeRoute === i) { clearRoute(); infoEl.classList.remove('show'); return; }
       clearRoute();
       b.classList.add('on');
       showRoute(i);
     });
+
+    // ---- お店・出口レイヤー切替 ----
+    document.getElementById('shops').addEventListener('click', e => {
+      const b = e.target.closest('.chip'); if (!b) return;
+      const s = b.dataset.s;
+      layersOn[s] = !layersOn[s];
+      b.classList.toggle('on', layersOn[s]);
+      applyFocus();
+      const msg = {
+        food: layersOn.food ? '🍜 グルメ店マーカーを表示 — タップで詳細' : 'グルメ店を非表示にしました',
+        shopping: layersOn.shopping ? '🛍 ショップ・書店マーカーを表示 — タップで詳細' : 'ショップを非表示にしました',
+        exitg: layersOn.exitg ? '🚪 出口が地上に出る位置を表示中' : '出口の地上位置を非表示にしました'
+      };
+      toast(msg[s], 2200);
+    });
+    document.querySelector('#shops .chip[data-s="exitg"]').classList.add('on');
 
     // ---- クリック＆ホバー ----
     const ray = new THREE.Raycaster();
@@ -1171,6 +1879,8 @@
       ray.setFromCamera(ptr, camera);
       const hits = ray.intersectObjects(pickables.filter(m => {
         const fk = m.userData.floor;
+        if (m.userData.shopCat) return layersOn[m.userData.shopCat] && (!FOCUS || FOCUS === fk);
+        if (fk === '_exit') return m.visible;
         if (fk === '_conn') {
           const c = m.userData.conn;
           return !FOCUS || FOCUS === c.a || FOCUS === c.b;
@@ -1217,6 +1927,8 @@
        loop
        ============================================================ */
     updateConns();
+    updateExits();
+    applyShopLayers();
     const clock = new THREE.Clock();
     let time = 0;
 
@@ -1243,7 +1955,8 @@
           if (Math.abs(target - next) > .15) done = false; else F[k].position.y = target;
         }
         updateConns();
-        if (activeRoute >= 0) buildRouteGeo(activeRoute);
+        updateExits();
+        if (activeRouteObj) buildRouteGeo(activeRouteObj);
         if (done) floorAnimating = false;
       }
 
@@ -1258,10 +1971,32 @@
       }
 
       if (routeCurve && routeBall) {
-        routeT = (routeT + dt * .11) % 1.15;
-        const tt = Math.min(routeT, 1);
-        routeBall.position.copy(routeCurve.getPointAt(tt));
-        routeBall.visible = routeT <= 1;
+        if (!routePaused && !seekDrag && !routeDone) {
+          routeT += dt * .085;
+          if (routeT >= 1) {
+            // 終点に到達: 一時停止して ⟲（リプレイ）表示
+            routeT = 1;
+            routeDone = true;
+            routePaused = true;
+            routeToastDone = true;
+            playPauseUI();
+          }
+          pSeek.value = Math.round(routeT * 1000);
+        }
+        const p = routeCurve.getPointAt(Math.min(routeT, 1));
+        routeBall.position.copy(p);
+        // 終了後・一時停止中はフロア固定もカメラ追従もしない（自由に操作できる）
+        const guiding = !routeDone && (!routePaused || seekDrag);
+        // 現在地のフロアに自動フォーカス
+        if (routeFloorsU && guiding) setRouteFloor(floorAtT(routeT));
+        updateMilestoneUI();
+        // カメラ追従（回転・ズームはユーザー操作のまま、注視点だけボールに引っぱる）
+        if (routeFollow && !camAnim && guiding) {
+          const k = 1 - Math.pow(.002, dt);
+          const delta = p.clone().sub(controls.target).multiplyScalar(k);
+          controls.target.add(delta);
+          camera.position.add(delta);
+        }
       }
 
       {
@@ -1280,9 +2015,14 @@
     tick();
 
     // intro
+    requestAnimationFrame(() => document.getElementById('boot').classList.add('off'));
     flyTo(VIEWS.all, 2.2);
     document.querySelector('#views .chip[data-v="all"]').classList.add('on');
-    setTimeout(() => toast('ドラッグで回転｜右の階数ボタンでフロア絞り込み｜⇕でフロア分解表示', 5200), 800);
+    if (!localStorage.getItem('st3d.guided')) {
+      setTimeout(showGuide, 700);
+    } else {
+      setTimeout(() => toast('ドラッグで回転｜ルート再生はカメラと階が自動追従｜🍜🛍チップでお店情報を表示', 5200), 800);
+    }
 
     addEventListener('resize', () => {
       camera.aspect = innerWidth / innerHeight;

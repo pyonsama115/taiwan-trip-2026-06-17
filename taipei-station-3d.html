@@ -2755,14 +2755,137 @@ controls.dampingFactor = .08;
 controls.maxPolarAngle = Math.PI * .495;
 controls.minDistance = 50;
 controls.maxDistance = 1800;
-// タッチ操作: 1本指=平行移動(地図アプリと同じ)、2本指=ピンチでズーム+ツイストで回転
-controls.touches.ONE = THREE.TOUCH.PAN;
-controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+// タッチ操作はOrbitControlsに任せず自前制御（Google Mapsアプリの操作感に合わせる）。
+// OrbitControlsはドラッグ中も減衰がかかり指に遅れて付いてくる＝引っ掛かり感の原因。
+//  1本指: 指の真下の地面を掴んで1:1で追従。離した瞬間だけ慣性で滑る
+//  2本指: ピンチ=ズーム / ツイスト=回転 / 上下スワイプ=傾き。ピンチ中心の地点を画面に固定
+controls.touches.ONE = -1;   // OrbitControls側のタッチ処理を無効化（マウスはそのまま）
+controls.touches.TWO = -1;
 controls.screenSpacePanning = false;   // パンは地面に沿わせる
-if (matchMedia('(pointer: coarse)').matches) {
-  // タッチ端末は慣性を強めにして指を離した後もヌルッと滑るように
-  controls.dampingFactor = .05;
-  controls.panSpeed = 1.15;
+let touchGlideStep = () => {};
+{
+  const ZOOM_SENS = .55;    // ピンチ感度。1でOrbitControls相当、小さいほど穏やか
+  const TWIST_LOCK = .08;   // ツイスト回転の遊び(rad)。ピンチ時の誤回転防止
+  const GLIDE_DECAY = 3.2;  // 慣性の減衰率(1/s)
+  const el = renderer.domElement;
+  const pts = new Map();    // pointerId -> 現在の画面座標
+  const ray = new THREE.Raycaster();
+  const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  const ndc = new THREE.Vector2();
+  const sph = new THREE.Spherical();
+  const vel = new THREE.Vector3();
+  const _p = new THREE.Vector3(), _q = new THREE.Vector3(), _d = new THREE.Vector3();
+  let anchor = null;        // 1本指で掴んでいる地面の点
+  let pinch = null;         // 2本指ジェスチャの直前状態
+  let gliding = false;
+  let lastMoveT = 0;
+
+  const camDist = () => camera.position.distanceTo(controls.target);
+  // 画面座標→ターゲット高さの水平面との交点。地平線近くの遠すぎる交点は無効扱い
+  function groundAt(x, y, out) {
+    ndc.set(x / innerWidth * 2 - 1, 1 - y / innerHeight * 2);
+    ray.setFromCamera(ndc, camera);
+    plane.constant = -controls.target.y;
+    const p = ray.ray.intersectPlane(plane, out);
+    return (p && p.distanceTo(camera.position) < camDist() * 8) ? p : null;
+  }
+  function moveWorld(v) { camera.position.add(v); controls.target.add(v); }
+  // レイが地面に当たらないとき用の代替パン（画面ピクセル→地面距離の換算）
+  function screenPan(dx, dy, out) {
+    const s = camDist() * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 2 / innerHeight;
+    _q.copy(controls.target).sub(camera.position); _q.y = 0;
+    if (_q.lengthSq() < 1e-6) _q.set(0, 0, -1);
+    _q.normalize();
+    return out.set(-_q.z, 0, _q.x).multiplyScalar(-dx * s).addScaledVector(_q, dy * s);
+  }
+  function pinchState() {
+    const it = pts.values(), a = it.next().value, b = it.next().value;
+    const dx = b.x - a.x, dy = b.y - a.y;
+    return { d: Math.max(20, Math.hypot(dx, dy)), a: Math.atan2(dy, dx), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
+  }
+  function startPinch() {
+    pinch = pinchState();
+    pinch.rot = 0;
+    pinch.anchor = groundAt(pinch.mx, pinch.my, new THREE.Vector3());
+    anchor = null;
+  }
+
+  el.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'touch') return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    gliding = false; vel.set(0, 0, 0); camAnim = null;
+    if (pts.size === 1) {
+      anchor = groundAt(e.clientX, e.clientY, new THREE.Vector3());
+      lastMoveT = performance.now();
+      controls.dispatchEvent({ type: 'start' });
+    } else if (pts.size === 2) startPinch();
+  });
+
+  el.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'touch' || !pts.has(e.pointerId)) return;
+    const pt = pts.get(e.pointerId);
+    const px = pt.x, py = pt.y;
+    pt.x = e.clientX; pt.y = e.clientY;
+
+    if (pts.size === 1) {
+      // 1本指パン: 掴んだ地点を指の真下に保ち続ける（遅延ゼロの1:1追従）
+      const now = performance.now();
+      const p = anchor && groundAt(pt.x, pt.y, _p);
+      if (p) _d.copy(anchor).sub(p);
+      else screenPan(pt.x - px, pt.y - py, _d);
+      const cap = camDist() * .5;
+      if (_d.length() > cap) _d.setLength(cap);
+      moveWorld(_d);
+      const dts = (now - lastMoveT) / 1000;
+      if (dts > 0) vel.lerp(_q.copy(_d).divideScalar(Math.max(dts, 1 / 240)), Math.min(1, dts * 15));
+      lastMoveT = now;
+    } else if (pinch) {
+      const cur = pinchState();
+      sph.setFromVector3(_p.copy(camera.position).sub(controls.target));
+      sph.radius = THREE.MathUtils.clamp(
+        sph.radius * Math.pow(pinch.d / cur.d, ZOOM_SENS),
+        controls.minDistance, controls.maxDistance);
+      let dA = cur.a - pinch.a;
+      if (dA > Math.PI) dA -= 2 * Math.PI; else if (dA < -Math.PI) dA += 2 * Math.PI;
+      pinch.rot += dA;
+      if (Math.abs(pinch.rot) > TWIST_LOCK) sph.theta += dA;
+      sph.phi = Math.min(sph.phi + (pinch.my - cur.my) * Math.PI / innerHeight, controls.maxPolarAngle);
+      sph.makeSafe();
+      camera.position.copy(controls.target).add(_p.setFromSpherical(sph));
+      camera.lookAt(controls.target);
+      // ピンチ中心の地点が画面上で動かないように平行移動で補正
+      if (pinch.anchor && groundAt(cur.mx, cur.my, _q))
+        moveWorld(_d.copy(pinch.anchor).sub(_q));
+      Object.assign(pinch, cur);
+    }
+  });
+
+  function release(e) {
+    if (e.pointerType !== 'touch' || !pts.delete(e.pointerId)) return;
+    if (pts.size === 2) startPinch();   // 3本→2本: 掴み直し
+    else if (pts.size === 1) {
+      pinch = null;                     // 2本→1本: 残った指でパン続行
+      const pt = pts.values().next().value;
+      anchor = groundAt(pt.x, pt.y, new THREE.Vector3());
+      vel.set(0, 0, 0);
+      lastMoveT = performance.now();
+    } else {
+      // 動かしながら離したときだけ慣性で滑る（止めてから離せばピタッと止まる）
+      gliding = performance.now() - lastMoveT < 90 && vel.lengthSq() > 1;
+      anchor = null; pinch = null;
+      controls.dispatchEvent({ type: 'end' });
+    }
+  }
+  el.addEventListener('pointerup', release);
+  el.addEventListener('pointercancel', release);
+
+  touchGlideStep = dt => {
+    if (!gliding) return;
+    if (camAnim) { gliding = false; return; }
+    moveWorld(_d.copy(vel).multiplyScalar(dt));
+    vel.multiplyScalar(Math.exp(-dt * GLIDE_DECAY));
+    if (vel.length() < camDist() * .02) gliding = false;
+  };
 }
 
 // SPではカメラ操作中だけフロアレールをふわっと消す（CSS側でSP限定）
@@ -4150,6 +4273,7 @@ function tick() {
   const dist = camera.position.distanceTo(controls.target);
   app.classList.toggle('far', dist > SETTINGS.labelFar && !FOCUS);
 
+  touchGlideStep(dt);
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);

@@ -2522,13 +2522,15 @@ function netLink(a, b) {
   (NET_ADJ[b] = NET_ADJ[b] || []).push(a);
 }
 function nearestNetNode(x, z, fk, baseOnly) {
+  // フロアはハードフィルタにしない（F1などノードが疎な階で遠方ノードに
+  // 吸着し、出発・到着が同一ノードになって経路探索を素通りするバグ防止）。
+  // 別フロアは netCost と同じ +60 のペナルティで扱う。
   let best = null, bd = Infinity;
   for (const k in NET_NODES) {
     if (baseOnly && /^(x_|s_)/.test(k)) continue;
     if (!NET_ADJ[k]) continue;
     const p = NET_NODES[k].p;
-    if (p[2] !== fk) continue;
-    const d = (p[0] - x) * (p[0] - x) + (p[1] - z) * (p[1] - z);
+    const d = Math.hypot(p[0] - x, p[1] - z) + (p[2] === fk ? 0 : 60);
     if (d < bd) { bd = d; best = k; }
   }
   return best;
@@ -3138,8 +3140,13 @@ $('#iRoute').onclick = () => {
     pts = path.ids.map(id => NET_NODES[id].p).slice();
     len = path.len;
   }
-  pts.unshift(pre); len += Math.hypot(pre[0] - pts[1][0], pre[1] - pts[1][1]);
-  len += Math.hypot(post[0] - pts[pts.length - 1][0], post[1] - pts[pts.length - 1][1]); pts.push(post);
+  {
+    const d0 = Math.hypot(pre[0] - pts[0][0], pre[1] - pts[0][1]);
+    if (d0 > 2) { pts.unshift(pre); len += d0; }   // ほぼ同一点は曲線が壊れるので追加しない
+    const d1 = Math.hypot(post[0] - pts[pts.length - 1][0], post[1] - pts[pts.length - 1][1]);
+    if (d1 > 2) { pts.push(post); len += d1; }
+  }
+  if (pts.length < 2) { toast(t(UI.rtSame), 2000); return; }
   const destName = curInfo.name;
   const nmA = l => UI.pinName[l] ?? UI.pinName.en;
   const nmB = l => (typeof destName === 'string') ? destName : (destName[l] ?? destName.en ?? '');
@@ -3444,8 +3451,14 @@ $('#rtGo').onclick = () => {
     pts = path.ids.map(id => NET_NODES[id].p).slice();
     len = path.len;
   }
-  if (pre) { pts.unshift(pre); len += Math.hypot(pre[0] - pts[1][0], pre[1] - pts[1][1]); }
-  if (post) { len += Math.hypot(post[0] - pts[pts.length - 1][0], post[1] - pts[pts.length - 1][1]); pts.push(post); }
+  if (pre) {
+    const d0 = Math.hypot(pre[0] - pts[0][0], pre[1] - pts[0][1]);
+    if (d0 > 2) { pts.unshift(pre); len += d0; }   // ほぼ同一点は曲線が壊れるので追加しない
+  }
+  if (post) {
+    const d1 = Math.hypot(post[0] - pts[pts.length - 1][0], post[1] - pts[pts.length - 1][1]);
+    if (d1 > 2) { pts.push(post); len += d1; }
+  }
   if (pts.length < 2) { toast(t(UI.rtSame), 2000); return; }
   const mins = Math.max(1, Math.round(len / 70));
   playRoute({

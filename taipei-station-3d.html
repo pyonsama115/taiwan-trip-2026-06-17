@@ -347,6 +347,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   background: var(--c, transparent);
 }
 #rail hr { width: 26px; border: 0; border-top: 1px dashed var(--panel-line); margin: 3px 0; }
+#rail { transition: opacity .35s ease; }
 
 /* ---- floor flag（選択フロアの真横に出て2秒で自動消去） ---- */
 #floorFlag {
@@ -738,6 +739,8 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   #note { display: none; }
 
   #rail { right: 8px; top: max(124px, calc(47% - 185px)); max-height: calc(100dvh - 210px); padding: 6px 5px; }
+  /* カメラ操作中はレールをふわっと退避 */
+  .cam-moving #rail, .cam-moving #floorFlag { opacity: 0; pointer-events: none; }
   #floorFlag { right: 64px; padding: 7px 11px; }
   #floorFlag span { max-width: 40vw; }
   #floorNow { bottom: max(12px, env(safe-area-inset-bottom)); padding: 7px 12px; }
@@ -2572,6 +2575,19 @@ controls.dampingFactor = .08;
 controls.maxPolarAngle = Math.PI * .495;
 controls.minDistance = 50;
 controls.maxDistance = 1800;
+
+// SPではカメラ操作中だけフロアレールをふわっと消す（CSS側でSP限定）
+{
+  let camMoveT = null;
+  controls.addEventListener('start', () => {
+    clearTimeout(camMoveT);
+    document.body.classList.add('cam-moving');
+  });
+  controls.addEventListener('end', () => {
+    clearTimeout(camMoveT);
+    camMoveT = setTimeout(() => document.body.classList.remove('cam-moving'), 300);
+  });
+}
 
 scene.add(new THREE.AmbientLight(0xffffff, 1.05));
 const sunL = new THREE.DirectionalLight(0xfff3df, 1.5);

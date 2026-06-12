@@ -1286,7 +1286,6 @@ const UI = {
 const TX = {
   followOn:  tx('鏡頭跟隨中', '镜头跟随中', 'カメラ追従中', 'Camera following', '카메라 추적 중'),
   followOff: tx('跟隨已關閉', '跟随已关闭', '追従OFF', 'Follow off', '추적 꺼짐'),
-  intro:     tx('拖曳旋轉｜播放路線時鏡頭與樓層會自動切換｜可開啟美食・商店圖層', '拖拽旋转｜播放路线时镜头与楼层自动切换｜可开启美食・商店图层', 'ドラッグで回転｜ルート再生はカメラと階が自動追従｜グルメ・ショップのレイヤーも', 'Drag to rotate · Routes auto-move camera & floor · Toggle food / shop layers', '드래그로 회전｜경로 재생 시 카메라·층 자동 전환｜맛집·상점 레이어'),
   explodeOn: tx('樓層分解顯示 — 可看清6層立體結構', '楼层分解显示 — 可看清6层立体结构', 'フロア分解表示 — 6層の階層構造が見えます', 'Exploded view — see all 6 levels', '층 분해 보기 — 6개 층 구조가 보입니다'),
   explodeOff:tx('已恢復一般顯示', '已恢复一般显示', '通常表示に戻しました', 'Back to normal view', '일반 보기로 돌아왔습니다'),
   layerOn:   tx('圖層已開啟 — 點選圖示看詳情', '图层已开启 — 点选图标看详情', 'レイヤーを表示 — タップで詳細', 'Layer on — tap markers for details', '레이어 켜짐 — 마커를 탭하면 상세'),
@@ -4135,7 +4134,6 @@ setTimeout(() => {
 FOCUS = 'B1';
 applyFocus();
 flyToFloor('B1');
-setTimeout(() => toast(t(TX.intro), 5200), bootWait + 800);
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;

@@ -596,6 +596,23 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   -webkit-mask-image: radial-gradient(circle at 50% 44%, #000, transparent 60%);
   mask-image: radial-gradient(circle at 50% 44%, #000, transparent 60%);
 }
+/* 波紋: スタック中心からドットを濃く照らすリングが広がる */
+#boot::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(var(--muted) 1.3px, transparent 1.9px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(circle, transparent 32%, #000 44%, transparent 56%);
+  mask-image: radial-gradient(circle, transparent 32%, #000 44%, transparent 56%);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: 50% 42%; mask-position: 50% 42%;
+  -webkit-mask-size: 0 0; mask-size: 0 0;
+  animation: bripple 2.6s ease-out infinite;
+}
+@keyframes bripple {
+  0% { -webkit-mask-size: 0 0; mask-size: 0 0; opacity: .9; }
+  70% { opacity: .5; }
+  100% { -webkit-mask-size: 130vmax 130vmax; mask-size: 130vmax 130vmax; opacity: 0; }
+}
 #boot.off { opacity: 0; pointer-events: none; }
 #boot .bx { text-align: center; position: relative; transition: transform .5s, opacity .5s; }
 #boot.off .bx { transform: scale(.94); opacity: 0; }

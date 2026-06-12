@@ -2479,7 +2479,14 @@ const NET_NODES = {
   rS: { p: [158, -112, 'B1'] }, rM: { p: [166, -250, 'B1'] },
   jQ: { p: [85, -150, 'B1'] },
   y14: { p: [-300, -119, 'B1'] }, yWest: { p: [-552, -119, 'B1'] }, jBM: { p: [-572, -95, 'B1'] },
-  jW1: { p: [-46, -61, 'B1'] }, jW2: { p: [-150, -61, 'B1'] }, jW3: { p: [-250, -62, 'B1'] }, jA: { p: [-322, -92, 'B1'] }
+  jW1: { p: [-46, -61, 'B1'] }, jW2: { p: [-150, -61, 'B1'] }, jW3: { p: [-250, -62, 'B1'] }, jA: { p: [-322, -92, 'B1'] },
+  // MRT B1通路（忠孝西路沿い・M出口のぶら下がる通路）のスパイン
+  jMa: { p: [-70, 87, 'B1'] }, jMb: { p: [-20, 87, 'B1'] }, jMc: { p: [36, 87, 'B1'] },
+  jMd: { p: [125, 87, 'B1'] }, jMe: { p: [158, 87, 'B1'] }, jMf: { p: [187, 82, 'B1'] },
+  // Y区西側の中間点（長区間の直線吸着を防ぐ）
+  yW2: { p: [-430, -119, 'B1'] },
+  // Z区西側（Z8/Z10出口の吸着先）
+  jZw: { p: [-160, 60, 'B1'] }
 };
 const NET_EDGES = [
   ['breeze', 'hall1f'], ['hall1f', 'traGate'], ['traGate', 'traPlat'],
@@ -2490,9 +2497,13 @@ const NET_EDGES = [
   ['jB3a', 'jB3c'], ['jB3c', 'jB2d'], ['jB2d', 'traPlat'],
   ['traGate', 'jNP'], ['jNP', 'jY1'], ['jY1', 'yEast'], ['yEast', 'jYE'], ['jYE', 'rS'], ['rS', 'rM'], ['rM', 'r79'],
   ['yEast', 'jQ'], ['jQ', 'qSquare'],
-  ['jY1', 'yCenter'], ['yCenter', 'y14'], ['y14', 'yWest'], ['yWest', 'jBM'], ['jBM', 'beimen'],
+  ['jY1', 'yCenter'], ['yCenter', 'y14'], ['y14', 'yW2'], ['yW2', 'yWest'], ['yWest', 'jBM'], ['jBM', 'beimen'],
   ['traGate', 'jW1'], ['jW1', 'jW2'], ['jW2', 'jW3'], ['jW3', 'airA1'],
-  ['y14', 'jA'], ['jA', 'airA1']
+  ['y14', 'jA'], ['jA', 'airA1'],
+  // MRT B1通路のスパインとZ区からの接続（M出口はここに自動接続される）
+  ['zMall', 'jMa'], ['jZ0', 'jMb'], ['z2', 'jMc'],
+  ['jMa', 'jMb'], ['jMb', 'jMc'], ['jMc', 'jMd'], ['jMd', 'jMe'], ['jMe', 'jMf'],
+  ['zMall', 'jZw']
 ];
 const NET_ADJ = {};
 for (const [a, b] of NET_EDGES) {
@@ -2818,8 +2829,27 @@ const pTitle = $('#pTitle');
 const pFlow = $('#pFlow');
 const pFollowB = $('#pFollow');
 
+/* 長い区間に中間点を打ち、CatmullRom曲線が通路の角をショートカットしないようにする */
+function expandRoute(r) {
+  const out = [];
+  const pts = r.pts;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    if (i && pts[i - 1][2] === p[2]) {   // 同一フロア区間のみ直線補間
+      const q = pts[i - 1];
+      const d = Math.hypot(p[0] - q[0], p[1] - q[1]);
+      const n = Math.floor(d / 30);
+      for (let j = 1; j < n; j++) {
+        const tt = j / n;
+        out.push([q[0] + (p[0] - q[0]) * tt, q[1] + (p[1] - q[1]) * tt, p[2]]);
+      }
+    }
+    out.push(p);
+  }
+  return out;
+}
 function routePts(r) {
-  return r.pts.map(p => new THREE.Vector3(p[0], F[p[2]].position.y + 4, p[1]));
+  return expandRoute(r).map(p => new THREE.Vector3(p[0], F[p[2]].position.y + 4, p[1]));
 }
 function buildRouteGeo(r) {
   routeCurve = new THREE.CatmullRomCurve3(routePts(r), false, 'catmullrom', .08);
@@ -2834,7 +2864,7 @@ function buildRouteGeo(r) {
 }
 function buildRouteFloors(r) {
   const pts = routePts(r);
-  const fls = r.pts.map(p => p[2]);
+  const fls = expandRoute(r).map(p => p[2]);   // routePtsと同じ細分化でインデックスを揃える
   const M = 180;
   routeFloorsU = [];
   for (let j = 0; j < M; j++) {
@@ -3571,21 +3601,36 @@ function placePinAt(cx, cy) {
   ptr.set((cx / innerWidth) * 2 - 1, -(cy / innerHeight) * 2 + 1);
   ray.setFromCamera(ptr, camera);
   const hits = ray.intersectObjects(scene.children, true);
-  for (const h of hits) {
-    let o = h.object, fk = null;
-    while (o) {
-      for (const k of FKEY) if (F[k] === o) { fk = k; break; }
-      if (fk) break;
-      o = o.parent;
+  const tryPass = strict => {
+    for (const h of hits) {
+      // 非表示オブジェクト（B階フォーカス中の駅舎など）はレイキャストに残るため除外
+      let vis = true;
+      for (let o2 = h.object; o2; o2 = o2.parent) {
+        if (o2.visible === false) { vis = false; break; }
+      }
+      if (!vis) continue;
+      // 厳格パス: ほぼ透明な面（フロアスラブ・透明な地面）は「見えている階」と
+      // 違う階にピンが立つ原因なので除外。どこにも当たらなければ緩和パスで許可
+      if (strict) {
+        const mt = h.object.material;
+        if (mt && mt.transparent && (mt.opacity ?? 1) < .05) continue;
+      }
+      let o = h.object, fk = null;
+      while (o) {
+        for (const k of FKEY) if (F[k] === o) { fk = k; break; }
+        if (fk) break;
+        o = o.parent;
+      }
+      if (!fk) continue;
+      if (FOCUS && fk !== FOCUS) continue;
+      savePin(h.point.x, h.point.z, fk);
+      pinArmed = false;
+      pinBtnEl.classList.remove('armed');
+      return true;
     }
-    if (!fk) continue;
-    if (FOCUS && fk !== FOCUS) continue;
-    savePin(h.point.x, h.point.z, fk);
-    pinArmed = false;
-    pinBtnEl.classList.remove('armed');
-    return true;
-  }
-  return false;
+    return false;
+  };
+  return tryPass(true) || tryPass(false);
 }
 
 renderer.domElement.addEventListener('pointerdown', e => { downXY = [e.clientX, e.clientY]; });

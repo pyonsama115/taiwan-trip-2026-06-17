@@ -540,25 +540,77 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   position: fixed; inset: 0; z-index: 40;
   background: var(--paper);
   display: grid; place-items: center;
-  transition: opacity .45s;
+  transition: opacity .5s;
+}
+#boot::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(var(--line2) 1px, transparent 1.6px);
+  background-size: 26px 26px;
+  opacity: .4;
+  -webkit-mask-image: radial-gradient(circle at 50% 44%, #000, transparent 60%);
+  mask-image: radial-gradient(circle at 50% 44%, #000, transparent 60%);
 }
 #boot.off { opacity: 0; pointer-events: none; }
-#boot .bx { text-align: center; }
-#boot .mark {
-  width: 54px; height: 54px; margin: 0 auto 14px;
-  border-radius: 16px; background: #221f19; color: #fbf8f0;
+#boot .bx { text-align: center; position: relative; transition: transform .5s, opacity .5s; }
+#boot.off .bx { transform: scale(.94); opacity: 0; }
+#boot .iso { width: 110px; height: 110px; margin: 0 auto 4px; perspective: 700px; position: relative; }
+#boot .tilt {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(57deg) rotateZ(45deg);
+}
+#boot .fl {
+  position: absolute; inset: 20px;
+  border-radius: 13px;
+  animation: bfloat 2.6s ease-in-out infinite;
+}
+#boot .fl.f1 { --z: -24px; background: var(--line2); opacity: .55; box-shadow: 0 0 26px rgba(34, 31, 25, .22); }
+#boot .fl.f2 { --z: 5px; background: var(--paper); border: 2px solid var(--ink2); animation-delay: .18s; }
+#boot .fl.f3 {
+  --z: 34px; background: var(--ink); animation-delay: .36s;
   display: grid; place-items: center;
-  font-family: var(--grotesk); font-weight: 800; font-size: 15px; letter-spacing: .06em;
-  position: relative;
+  color: var(--paper); font-family: var(--grotesk); font-weight: 800; font-size: 21px;
 }
-#boot .mark::after {
-  content: ''; position: absolute; inset: -8px;
-  border-radius: 22px; border: 2px solid var(--line2);
-  border-top-color: var(--accent);
-  animation: bspin 1s linear infinite;
+@keyframes bfloat {
+  0%, 100% { transform: translateZ(var(--z)); }
+  50% { transform: translateZ(calc(var(--z) + 12px)); }
 }
-@keyframes bspin { to { transform: rotate(360deg); } }
-#boot .bt { font-family: var(--grotesk); font-weight: 800; font-size: 10px; letter-spacing: .22em; color: var(--muted); white-space: nowrap; }
+#boot .pin { position: absolute; left: 50%; top: -14px; width: 18px; height: 18px; margin-left: -9px; animation: bpin 2.6s ease-in-out .36s infinite; }
+#boot .pin::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--accent);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
+#boot .pin::after {
+  content: ''; position: absolute; left: 50%; top: 40%; width: 6px; height: 6px;
+  transform: translate(-50%, -50%); border-radius: 50%; background: var(--paper);
+}
+@keyframes bpin {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+#boot .bt {
+  font-family: var(--grotesk); font-weight: 800; font-size: 11px; color: var(--ink); white-space: nowrap;
+  animation: btrack .9s cubic-bezier(.2, .7, .3, 1) both;
+}
+@keyframes btrack {
+  from { opacity: 0; letter-spacing: .5em; }
+  to { opacity: 1; letter-spacing: .26em; }
+}
+#boot .bar {
+  position: relative; width: 132px; height: 2px; margin: 14px auto 0;
+  background: var(--line2); border-radius: 99px; overflow: hidden;
+}
+#boot .bar::after {
+  content: ''; position: absolute; inset: 0; width: 36%;
+  background: var(--accent); border-radius: 99px;
+  animation: bslide 1.15s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+@keyframes bslide {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(320%); }
+}
 
 /* ---- modal overlays ---- */
 #guide, #rtModal {
@@ -779,8 +831,16 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 <body>
   <div id="boot">
     <div class="bx">
-      <div class="mark">北</div>
+      <div class="iso">
+        <div class="tilt">
+          <div class="fl f1"></div>
+          <div class="fl f2"></div>
+          <div class="fl f3">北</div>
+        </div>
+        <div class="pin"></div>
+      </div>
       <div class="bt">TAIPEI MAIN STATION 3D</div>
+      <div class="bar"></div>
     </div>
   </div>
   <script>window.__bootT0 = Date.now(); setTimeout(function () { var b = document.getElementById('boot'); if (b) b.classList.add('off'); }, 12000);</script>
@@ -990,6 +1050,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
         <button data-k="hall" data-i="rtFHall"></button>
         <button data-k="exit" data-i="rtFExit"></button>
         <button data-k="shop" data-i="rtFShop"></button>
+        <button data-k="fac" data-i="rtFFac"></button>
         <button data-k="plat" data-i="rtFPlat"></button>
       </div>
       <div class="rtrows">
@@ -1112,6 +1173,7 @@ const UI = {
   rtFHall:  tx('樓層・大廳', '楼层・大厅', '階層・改札', 'Areas & gates', '구역·개찰'),
   rtFExit:  tx('出口', '出口', '出口', 'Exits', '출구'),
   rtFShop:  tx('商店', '商店', 'お店', 'Shops', '상점'),
+  rtFFac:   tx('廁所・寄物', '厕所・寄存', 'トイレ・ロッカー', 'WC & lockers', '화장실·보관함'),
   rtFPlat:  tx('月台', '站台', '乗り場', 'Platforms', '승강장'),
   tSwap:    tx('交換出發與目的地', '交换出发与目的地', '出発と目的地を入れ替え', 'Swap start & destination', '출발·도착 바꾸기'),
   rtSame:   tx('出發地與目的地相同', '出发地与目的地相同', '出発地と目的地が同じです', 'Start and destination are the same', '출발지와 목적지가 같습니다'),
@@ -2114,7 +2176,7 @@ function buildWorld(scene) {
     m.position.set(x, isPoi ? 11 : 9, z);
     m.userData.floor = fk;
     m.userData.shopCat = cat;
-    m.userData.info = { name, desc, tag: SHOP_CATS[cat].tag, color: hex(c), floor: fk };
+    m.userData.info = { name, desc, tag: SHOP_CATS[cat].tag, color: hex(c), floor: fk, cat };
     pickables.push(m);
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(isPoi ? .8 : .45, isPoi ? .8 : .45, isPoi ? 11 : 9, 6), mat(c, .55));
     pole.position.set(x, isPoi ? 5.5 : 4.5, z);
@@ -2625,14 +2687,15 @@ function nearestNetNode(x, z, fk, baseOnly) {
 }
 for (const e of exitObjs) {
   const id = 'x_' + e.id;
-  NET_NODES[id] = { p: [e.x, e.z, e.fk], kind: 'exit', name: mapTx(l => TAG.exit[l] + ' ' + e.id) };
+  NET_NODES[id] = { p: [e.x, e.z, e.fk], kind: 'exit', cat: 'exitg', name: mapTx(l => TAG.exit[l] + ' ' + e.id) };
   const n = nearestNetNode(e.x, e.z, e.fk, true);
   if (n) netLink(id, n);
 }
 shopObjs.forEach((s, i) => {
   const id = 's_' + i;
   const p = s.mesh.position;
-  NET_NODES[id] = { p: [p.x, p.z, s.fk], kind: 'shop', name: s.mesh.userData.info.name };
+  const fac = (s.cat === 'wc' || s.cat === 'locker');   // トイレ/ロッカーは「設備」括り
+  NET_NODES[id] = { p: [p.x, p.z, s.fk], kind: fac ? 'fac' : 'shop', cat: s.cat, name: s.mesh.userData.info.name };
   const n = nearestNetNode(p.x, p.z, s.fk, true);
   if (n) netLink(id, n);
 });
@@ -2713,6 +2776,15 @@ function applyShopLayers() {
     e.disc.visible = vis;
     e.label.visible = vis;
   }
+}
+// 発着地に選んだPOI(トイレ/ロッカー/お店/出口)のレイヤーがOFFだと
+// 目的地マーカーが見えないため、自動でONにする
+function ensureLayerOn(cat) {
+  if (!cat || !(cat in layersOn) || layersOn[cat]) return;
+  layersOn[cat] = true;
+  const b = document.querySelector(`#shops .chip[data-s="${cat}"]`);
+  if (b) b.classList.add('on');
+  applyShopLayers();
 }
 let flagTimer = null;
 function updateFloorFlag() {
@@ -3248,6 +3320,7 @@ $('#iDel').onclick = deletePin;
 // マイピン→この場所のルート案内
 $('#iRoute').onclick = () => {
   if (!pinState || !curAnchor || !curInfo) return;
+  ensureLayerOn(curInfo.cat);   // 目的地のレイヤーがOFFなら自動ON
   let fk = curFk;
   if (!fk || !FLOORS[fk]) fk = floorFromY(curAnchor.y);
   const a = nearestNetNode(pinState.x, pinState.z, pinState.fk, false);
@@ -3550,6 +3623,9 @@ $('#rtSwap').onclick = () => {
 $('#rtGo').onclick = () => {
   let a = rtFrom.value, b = rtTo.value;
   if (a === b) { toast(t(UI.rtSame), 2000); return; }
+  // 発着地がトイレ/ロッカー/お店/出口なら該当レイヤーを自動ON
+  ensureLayerOn(NET_NODES[a]?.cat);
+  ensureLayerOn(NET_NODES[b]?.cat);
   const nmOf = id => id === '_pin'
     ? (l => UI.pinName[l] ?? UI.pinName.en)
     : (l => NET_NODES[id].name[l] ?? NET_NODES[id].name.en);

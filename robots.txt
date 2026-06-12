@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pyonsama115.github.io/taiwan-trip-2026-06-17/sitemap.xml

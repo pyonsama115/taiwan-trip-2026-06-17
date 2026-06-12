@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="15" fill="#221f19"/>
+  <text x="31" y="45" font-family="'Hiragino Sans','Noto Sans CJK JP','Microsoft JhengHei',sans-serif" font-size="36" font-weight="800" fill="#fbf8f0" text-anchor="middle">北</text>
+  <path d="M50 6c-4.4 0-8 3.5-8 7.9 0 5.9 8 13.1 8 13.1s8-7.2 8-13.1C58 9.5 54.4 6 50 6z" fill="#f15a35"/>
+  <circle cx="50" cy="14" r="2.8" fill="#fbf8f0"/>
+</svg>

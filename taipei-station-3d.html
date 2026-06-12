@@ -3032,6 +3032,13 @@ function applyFocus() {
   updateFloorFlag();
 }
 function flyToFloor(fk) {
+  // SPのB1はフロア全域(西に長い)ではなく台北駅駅舎まわりを中心にする
+  if (fk === 'B1' && mq.matches) {
+    const y = F.B1.position.y;
+    const dist = 520;
+    flyTo({ pos: [0, y + dist * .78, -35 + dist * .72], tgt: [0, y, -35] }, 1.1);
+    return;
+  }
   const b = FLOORS[fk].bounds || [-360, 220, -300, 260];
   const cx = (b[0] + b[1]) / 2, cz = (b[2] + b[3]) / 2;
   const y = F[fk].position.y;
@@ -4152,13 +4159,7 @@ setTimeout(() => {
 // 初期表示はB1（地下街・台鉄高鉄改札）を選択した状態で開始
 FOCUS = 'B1';
 applyFocus();
-if (mq.matches) {
-  // SPは台北駅駅舎（台鉄・高鉄改札まわり）を中心に
-  const dist = 520;
-  flyTo({ pos: [0, -12 + dist * .78, -35 + dist * .72], tgt: [0, -12, -35] }, 1.1);
-} else {
-  flyToFloor('B1');
-}
+flyToFloor('B1');   // SPは駅舎中心・PCはB1全域フィット（flyToFloor内で分岐）
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;

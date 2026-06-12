@@ -171,7 +171,9 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   padding: 1.5px 5.5px; border-radius: 5px;
   background: rgba(34, 31, 25, .86); color: #fff;
   transition: opacity .3s;
+  pointer-events: auto; cursor: pointer;
 }
+.far .lbl.exit { pointer-events: none; }
 .lbl.spot {
   font-weight: 700; font-size: 10.5px; color: var(--ink2);
   text-shadow: 0 1px 3px rgba(251, 248, 240, .95), 0 0 6px rgba(251, 248, 240, .9);
@@ -705,22 +707,6 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   font-weight: 900; font-size: 14px;
   box-shadow: 0 8px 20px -8px rgba(241, 90, 53, .6);
 }
-.glangs { display: flex; flex-direction: column; gap: 7px; margin-top: 14px; }
-.glangs button {
-  appearance: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 13px 16px; border-radius: 14px;
-  border: 1.5px solid var(--line2); background: var(--paper);
-  font-weight: 800; font-size: 14px; color: var(--ink);
-}
-.glangs button:hover { border-color: var(--muted); }
-.glangs button.on { border-color: var(--accent); background: #fff; }
-.glangs button.on::after {
-  content: ''; width: 10px; height: 6px;
-  border-left: 2.5px solid var(--accent); border-bottom: 2.5px solid var(--accent);
-  transform: rotate(-45deg) translateY(-2px);
-}
-#gLang[hidden], #gTips[hidden] { display: none; }
 
 /* ---- custom route fields ---- */
 .rtfilter { display: flex; gap: 6px; flex-wrap: wrap; margin: 13px 0 0; }
@@ -1052,20 +1038,9 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
     </div>
   </div>
 
-  <!-- first-run guide -->
+  <!-- help guide (via ? button) -->
   <div id="guide">
     <div class="gcard" role="dialog" aria-modal="true">
-      <div id="gLang" hidden>
-        <h2><span data-ic="globe" data-ic-size="19"></span>Language</h2>
-        <div class="gsub">語言 · 语言 · 言語 · 언어</div>
-        <div class="glangs">
-          <button data-l="tw">繁體中文</button>
-          <button data-l="cn">简体中文</button>
-          <button data-l="en">English</button>
-          <button data-l="ja">日本語</button>
-          <button data-l="ko">한국어</button>
-        </div>
-      </div>
       <div id="gTips">
         <h2 data-i="gTitle"></h2>
         <div class="gsub" data-i="gSub"></div>
@@ -1452,8 +1427,19 @@ function buildWorld(scene) {
     m.userData.floor = fk;
     m.userData.info = info;
     pickables.push(m);
+    // ラベル(文字チップ)のタップでも説明シートを開く
+    const tapLabel = (lab, mesh) => {
+      lab.element.addEventListener('click', ev => {
+        ev.stopPropagation();
+        const p = new THREE.Vector3();
+        mesh.getWorldPosition(p);
+        const lfk = mesh.userData.floor;
+        showInfo(info, p, FLOORS[lfk] ? lfk : null);
+      });
+    };
     const l = makeLabel(id, 'exit');
     l.position.y = 10;
+    tapLabel(l, m);
     m.add(l);
     F[fk].add(m);
 
@@ -1467,6 +1453,7 @@ function buildWorld(scene) {
     const gl = makeLabel(id, 'exit');
     gl.element.style.opacity = '.92';
     gl.position.y = 5;
+    tapLabel(gl, disc);
     disc.add(gl);
     scene.add(disc);
     exitObjs.push({ fk, x, z, id, shaft, disc, label: gl });
@@ -3560,7 +3547,7 @@ function setLang(l) {
   updatePlayerLang();
   renderInfo();
   $('#langCur').textContent = LANG_LABEL[l];
-  document.querySelectorAll('#langMenu button, .glangs button').forEach(b =>
+  document.querySelectorAll('#langMenu button').forEach(b =>
     b.classList.toggle('on', b.dataset.l === l));
   fillRtSelects();
   updateFloorFlag();
@@ -3592,27 +3579,11 @@ $('#fold').onclick = () => head.classList.toggle('folded');
 if (innerWidth < 700) head.classList.add('folded');
 
 const guideEl = $('#guide');
-const gLangEl = $('#gLang');
-const gTipsEl = $('#gTips');
-const showGuide = (askLang = false) => {
-  gLangEl.hidden = !askLang;
-  gTipsEl.hidden = askLang;
-  guideEl.classList.add('show');
-};
-const hideGuide = () => {
-  guideEl.classList.remove('show');
-  localStorage.setItem('tps3d.guided', '1');
-};
-$('#gLang .glangs').addEventListener('click', e => {
-  const b = e.target.closest('button');
-  if (!b) return;
-  setLang(b.dataset.l);
-  gLangEl.hidden = true;
-  gTipsEl.hidden = false;
-});
+const showGuide = () => guideEl.classList.add('show');
+const hideGuide = () => guideEl.classList.remove('show');
 $('#gStart').onclick = hideGuide;
 guideEl.addEventListener('click', e => { if (e.target === guideEl) hideGuide(); });
-$('#helpBtn').onclick = () => showGuide(false);
+$('#helpBtn').onclick = showGuide;
 
 const rtModal = $('#rtModal');
 const rtFrom = $('#rtFrom');
@@ -3993,11 +3964,7 @@ setTimeout(() => {
 FOCUS = 'B1';
 applyFocus();
 flyToFloor('B1');
-if (!localStorage.getItem('tps3d.guided')) {
-  setTimeout(() => showGuide(true), bootWait + 700);
-} else {
-  setTimeout(() => toast(t(TX.intro), 5200), bootWait + 800);
-}
+setTimeout(() => toast(t(TX.intro), 5200), bootWait + 800);
 
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;

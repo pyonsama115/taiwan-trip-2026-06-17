@@ -3410,10 +3410,12 @@ function showSelMarker(p, fk) {
     scene.add(selMarker);
   }
 }
-function showInfo(d, anchor = null, fk = null) {
+let infoFromHover = false;   // 現在のシートがホバー起点か（クリック起点はホバーで上書きさせない）
+function showInfo(d, anchor = null, fk = null, fromHover = false) {
   curInfo = d;
   curAnchor = anchor;
   curFk = fk;
+  infoFromHover = fromHover;
   renderInfo();
   if (anchor) showSelMarker(anchor, fk); else hideSelMarker();
   infoEl.classList.toggle('lifted', playerEl.classList.contains('show'));
@@ -3917,13 +3919,16 @@ renderer.domElement.addEventListener('pointermove', e => {
   if (m && m !== hovered) {
     hovered = m;
     m.material.emissive?.setHex(0x2a2208);
-    // 出口マーカーはホバーだけで説明シートを表示
+    // 出口マーカーはホバーだけで説明シートを表示。
+    // ただしクリックで開いたシートは上書きしない（「ここにピン」等の操作対象が
+    // ホバー通過した出口にすり替わる事故の防止）。ピン設置モード中も表示しない
     const inf = m.userData.info;
-    if (inf && inf.tag === TAG.exit) {
+    if (inf && inf.tag === TAG.exit && !pinArmed &&
+        (!infoEl.classList.contains('show') || infoFromHover)) {
       const p = new THREE.Vector3();
       m.getWorldPosition(p);
       const fk = m.userData.floor;
-      showInfo(inf, p, FLOORS[fk] ? fk : null);
+      showInfo(inf, p, FLOORS[fk] ? fk : null, true);
     }
   }
   renderer.domElement.style.cursor = pinArmed ? 'crosshair' : (m ? 'pointer' : '');

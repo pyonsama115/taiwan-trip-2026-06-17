@@ -3002,12 +3002,14 @@ function applyFocus() {
   for (const k of FKEY) {
     const active = !FOCUS || FOCUS === k;
     const fdim = (k === 'F1' && layersOn.exitg) ? Math.max(dim, .18) : dim;
+    // フロア未選択時は地上(F1/F2)をゴースト表示にして地下全フロアを透かして見せる
+    const ghost = (!FOCUS && (k === 'F1' || k === 'F2')) ? .35 : 1;
     F[k].traverse(o => {
       if (o.isMesh || o.isLineSegments || o.isLine) {
         const mt = o.material;
         if (mt && mt.userData) {
           const b = mt.userData.baseOp ?? 1;
-          mt.opacity = active ? b : b * fdim;
+          mt.opacity = active ? b * ghost : b * fdim;
           mt.depthWrite = active;
         }
       }

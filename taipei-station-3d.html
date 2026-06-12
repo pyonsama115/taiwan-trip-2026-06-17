@@ -1475,6 +1475,8 @@ function buildWorld(scene) {
     if (o.noPin) m.userData.noPin = true;   // 通路・道路などピン設置不可
     if (o.name) {
       m.userData.info = { name: o.name, desc: o.desc || '', tag: o.tag, color: o.color || hex(color), floor: o.floor || fk };
+      // ピン不可の場所は情報シートの「ここにピン」「ここへ案内」も出さない
+      if (o.noPin) m.userData.info.noPin = true;
       pickables.push(m);
     }
     if (o.edges !== false && h > 1.4) {
@@ -2188,7 +2190,7 @@ function buildWorld(scene) {
     label: tx('捷運大廳（閘門）', '捷运大厅（检票）', 'MRT改札フロア', 'MRT concourse', 'MRT 대합실'), ly: 6
   });
   box('B2', 95, 150, 40, 70, 5, COL.mrt, {
-    opacity: .8, edges: false,
+    opacity: .8, edges: false, noPin: true,
     name: tx('捷運連絡通路（B2）', '捷运连络通路（B2）', 'MRT連絡通路（B2）', 'MRT link passage (B2)', 'MRT 연결통로(B2)'),
     tag: 'B2', color: '#0e9fb3',
     desc: tx('從捷運大廳往東，通往淡水信義線（公園路下）的通路。', '从捷运大厅往东，通往淡水信义线（公园路下）的通路。', 'MRT改札フロアから東へ、淡水信義線（公園路下）方面への連絡通路。', 'Eastbound passage from the MRT concourse toward the Red Line (under Gongyuan Rd.).', 'MRT 대합실에서 동쪽으로, 레드라인(궁위안루 아래) 방면 통로.')
@@ -3508,9 +3510,10 @@ function renderInfo() {
   $('#idesc').innerHTML = t(d.desc) || '';
   const acts = $('#iactions');
   const pinBtn = $('#iPin'), delBtn = $('#iDel'), routeBtn = $('#iRoute');
-  pinBtn.hidden = !(curAnchor && !d.isPin);
+  // 通路・道路(noPin)はピン設置もルート案内の目的地も不可
+  pinBtn.hidden = !(curAnchor && !d.isPin && !d.noPin);
   delBtn.hidden = !d.isPin;
-  routeBtn.hidden = !(pinState && curAnchor && !d.isPin);
+  routeBtn.hidden = !(pinState && curAnchor && !d.isPin && !d.noPin);
   acts.hidden = pinBtn.hidden && delBtn.hidden && routeBtn.hidden;
   pinBtn.querySelector('span:last-child').textContent = t(UI.pinHere);
   delBtn.querySelector('span:last-child').textContent = t(UI.pinDel);
@@ -3695,7 +3698,7 @@ pinBtnEl.onclick = () => {
   toast(t(UI.pinArm), 4000);
 };
 $('#iPin').onclick = () => {
-  if (!curAnchor) return;
+  if (!curAnchor || curInfo?.noPin) return;
   let fk = curFk;
   if (!fk || !FLOORS[fk]) fk = floorFromY(curAnchor.y);
   savePin(curAnchor.x, curAnchor.z, fk);
@@ -3704,7 +3707,7 @@ $('#iPin').onclick = () => {
 $('#iDel').onclick = deletePin;
 // マイピン→この場所のルート案内
 $('#iRoute').onclick = () => {
-  if (!pinState || !curAnchor || !curInfo) return;
+  if (!pinState || !curAnchor || !curInfo || curInfo.noPin) return;
   ensureLayerOn(curInfo.cat);   // 目的地のレイヤーがOFFなら自動ON
   let fk = curFk;
   if (!fk || !FLOORS[fk]) fk = floorFromY(curAnchor.y);

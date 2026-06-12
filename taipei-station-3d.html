@@ -3326,11 +3326,49 @@ function renderInfo() {
   delBtn.querySelector('span:last-child').textContent = t(UI.pinDel);
   routeBtn.querySelector('span:last-child').textContent = t(UI.pinRoute);
 }
+/* 選択中の場所を示すピング（ソナー）マーカー: 情報シート表示中だけ脈動 */
+let selMarker = null;
+function hideSelMarker() {
+  if (!selMarker) return;
+  selMarker.parent?.remove(selMarker);
+  selMarker = null;
+}
+function showSelMarker(p, fk) {
+  hideSelMarker();
+  selMarker = new THREE.Group();
+  const ringGeo = new THREE.RingGeometry(5.5, 7, 36);
+  const mkRing = phase => {
+    const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({
+      color: SETTINGS.accent, transparent: true, opacity: .9,
+      depthTest: false, depthWrite: false, side: THREE.DoubleSide
+    }));
+    m.rotation.x = -Math.PI / 2;
+    m.userData.phase = phase;
+    return m;
+  };
+  const r1 = mkRing(0), r2 = mkRing(.5);
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(2.4, 12, 12),
+    new THREE.MeshBasicMaterial({ color: SETTINGS.accent, transparent: true, depthTest: false, depthWrite: false }));
+  dot.position.y = 2;
+  selMarker.add(r1, r2, dot);
+  selMarker.userData.rings = [r1, r2];
+  selMarker.userData.dot = dot;
+  selMarker.traverse(o => { o.renderOrder = 70; });
+  if (fk && F[fk]) {
+    // フロアグループに入れて分解/フォーカスに追従させ、足元の高さでピングを出す
+    selMarker.position.set(p.x, .6, p.z);
+    F[fk].add(selMarker);
+  } else {
+    selMarker.position.set(p.x, p.y + .5, p.z);
+    scene.add(selMarker);
+  }
+}
 function showInfo(d, anchor = null, fk = null) {
   curInfo = d;
   curAnchor = anchor;
   curFk = fk;
   renderInfo();
+  if (anchor) showSelMarker(anchor, fk); else hideSelMarker();
   infoEl.classList.toggle('lifted', playerEl.classList.contains('show'));
   infoEl.classList.add('show');
 }
@@ -3949,6 +3987,20 @@ function tick() {
       const s = 1 + Math.sin(time * 3) * .25;
       ring.scale.set(s, s, 1);
       ring.material.opacity = .2 + .18 * (1 + Math.sin(time * 3 + Math.PI)) / 2;
+    }
+  }
+
+  // 選択中マーカーのピコーン（広がって消えるソナーリング）
+  if (selMarker) {
+    if (!infoEl.classList.contains('show')) hideSelMarker();
+    else {
+      for (const r of selMarker.userData.rings) {
+        const tt = (time * .8 + r.userData.phase) % 1;
+        const s = .5 + tt * 2.2;
+        r.scale.set(s, s, 1);
+        r.material.opacity = (1 - tt) * .85;
+      }
+      selMarker.userData.dot.scale.setScalar(1 + Math.sin(time * 6) * .18);
     }
   }
 

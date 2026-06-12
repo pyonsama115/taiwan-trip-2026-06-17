@@ -131,6 +131,13 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   transition: opacity .3s;
 }
 .lbl.spot .ic { vertical-align: -2px; margin-right: 3px; }
+.lbl.poi-badge {
+  font-weight: 800; font-size: 10.5px;
+  padding: 3.5px 10px; border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
+  text-shadow: none;
+}
+.lbl.poi-badge .ic { vertical-align: -2.5px; margin-right: 4px; }
 .lbl.st {
   font-weight: 700; font-size: 9.5px; color: #a99e8c; letter-spacing: .12em;
   text-shadow: 0 1px 3px rgba(251, 248, 240, .95);
@@ -2096,14 +2103,16 @@ function buildWorld(scene) {
      ============================================================ */
   function shop(fk, x, z, cat, name, desc, labelText) {
     const c = SHOP_CATS[cat].col;
-    const m = new THREE.Mesh(new THREE.OctahedronGeometry(3.4), mat(c));
-    m.position.set(x, 9, z);
+    const isPoi = (cat === 'wc' || cat === 'locker');   // 設備系は大きく・明るく
+    const m = new THREE.Mesh(new THREE.OctahedronGeometry(isPoi ? 4.8 : 3.4), mat(c));
+    if (isPoi) m.material.emissive.copy(new THREE.Color(c)).multiplyScalar(.4);
+    m.position.set(x, isPoi ? 11 : 9, z);
     m.userData.floor = fk;
     m.userData.shopCat = cat;
     m.userData.info = { name, desc, tag: SHOP_CATS[cat].tag, color: hex(c), floor: fk };
     pickables.push(m);
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.45, .45, 9, 6), mat(c, .55));
-    pole.position.set(x, 4.5, z);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(isPoi ? .8 : .45, isPoi ? .8 : .45, isPoi ? 11 : 9, 6), mat(c, .55));
+    pole.position.set(x, isPoi ? 5.5 : 4.5, z);
     const l = makeLabel(labelText || name, 'spot', hex(c));
     l.element.classList.add('cat-' + cat);
     if (cat === 'wc' || cat === 'locker') {
@@ -2112,11 +2121,15 @@ function buildWorld(scene) {
       const ent = i18nLabels.find(it => it.el === div);
       const span = document.createElement('span');
       span.innerHTML = div.innerHTML;
-      div.innerHTML = ic(cat, 12);
+      div.innerHTML = ic(cat, 13);
       div.appendChild(span);
       if (ent) ent.el = span;
+      // 視認性重視の塗りつぶしバッジ
+      div.classList.add('poi-badge');
+      div.style.background = hex(c);
+      div.style.color = '#fff';
     }
-    l.position.y = 6;
+    l.position.y = (cat === 'wc' || cat === 'locker') ? 11 : 6;
     m.add(l);
     F[fk].add(m);
     F[fk].add(pole);
@@ -2271,6 +2284,34 @@ function buildWorld(scene) {
     tx('廁所（微風2F）', '厕所（微风2F）', 'トイレ（微風2F）', 'Restroom (Breeze 2F)', '화장실(브리즈 2F)'),
     tx('微風美食街東側的化妝室。', '微风美食街东侧的化妆室。', '微風美食街・東側のトイレ。食事ついでに。', 'Restrooms on the east side of the Breeze 2F food court.', '브리즈 2층 푸드코트 동쪽 화장실.'),
     wcLbl);
+  shop('F1', 80, -55, 'wc',
+    tx('廁所（1F大廳東側）', '厕所（1F大厅东侧）', 'トイレ（1Fホール東側）', 'Restroom (1F hall, east)', '화장실(1층 홀 동쪽)'),
+    tx('1F大廳層的廁所（東側）。位置為大致參考。', '1F大厅层的厕所（东侧）。位置为大致参考。', '1Fホール層のトイレ（東側）。位置はおおよその目安。', 'Restrooms on the 1F hall level (east side). Position approximate.', '1층 홀의 화장실(동쪽). 위치는 대략적인 기준.'),
+    wcLbl);
+  shop('B1', -70, 34, 'wc',
+    tx('廁所（K區地下街）', '厕所（K区地下街）', 'トイレ（K区地下街）', 'Restroom (K Mall)', '화장실(K구 지하상가)'),
+    tx('東森廣場（K區）內的公廁。位置為大致參考。', '东森广场（K区）内的公厕。位置为大致参考。', 'K区地下街（東森廣場）内の公衆トイレ。位置はおおよその目安。', 'Public restroom inside K Mall (Dong Sen Plaza). Position approximate.', 'K구 지하상가(둥썬광장) 내 공중화장실. 위치는 대략적인 기준.'),
+    wcLbl);
+  shop('B1', 168, -300, 'wc',
+    tx('廁所（R區中山地下街）', '厕所（R区中山地下街）', 'トイレ（R区中山地下街）', 'Restroom (R Mall)', '화장실(R구 중산 지하상가)'),
+    tx('中山地下街中段的公廁。位置為大致參考。', '中山地下街中段的公厕。位置为大致参考。', '中山地下街・中ほどの公衆トイレ。位置はおおよその目安。', 'Public restroom mid-way along Zhongshan Metro Mall. Position approximate.', '중산 지하상가 중간의 공중화장실. 위치는 대략적인 기준.'),
+    wcLbl);
+  shop('B1', -380, -70, 'wc',
+    tx('廁所（機捷A1）', '厕所（机捷A1）', 'トイレ（空港MRT A1）', 'Restroom (Airport MRT A1)', '화장실(공항MRT A1)'),
+    tx('機捷A1報到大廳層的廁所。', '机捷A1值机大厅层的厕所。', '空港MRT A1・チェックインホール階のトイレ。', 'Restrooms on the Airport MRT A1 check-in level.', '공항MRT A1 체크인 홀 층의 화장실.'),
+    wcLbl);
+  shop('B1', 100, -195, 'wc',
+    tx('廁所（京站B3）', '厕所（京站B3）', 'トイレ（京站B3）', 'Restroom (Q square B3)', '화장실(큐스퀘어 B3)'),
+    tx('京站B3美食大道層的化妝室。', '京站B3美食大道层的化妆室。', '京站B3フードコート階のトイレ。', 'Restrooms on Q square\'s B3 food-court level.', '큐스퀘어 B3 푸드코트 층의 화장실.'),
+    wcLbl);
+  shop('B3', 150, 15, 'wc',
+    tx('廁所（淡水信義線大廳）', '厕所（淡水信义线大厅）', 'トイレ（R線改札フロア）', 'Restroom (Red Line concourse)', '화장실(단수이신이선 대합실)'),
+    tx('R線（淡水信義線）大廳層的廁所。', 'R线（淡水信义线）大厅层的厕所。', 'R線（淡水信義線）改札フロアのトイレ。', 'Restrooms on the Red Line concourse level.', 'R선(단수이신이선) 대합실 층의 화장실.'),
+    wcLbl);
+  shop('B1', -590, -50, 'wc',
+    tx('廁所（北門站）', '厕所（北门站）', 'トイレ（北門駅）', 'Restroom (Beimen Sta.)', '화장실(베이먼역)'),
+    tx('捷運北門站內的廁所。', '捷运北门站内的厕所。', 'MRT北門駅構内のトイレ。', 'Restrooms inside Beimen MRT Station.', 'MRT 베이먼역 구내 화장실.'),
+    wcLbl);
 
   /* ---- コインロッカー（おおよその位置） ---- */
   const lkLbl = tx('寄物櫃', '寄存柜', 'ロッカー', 'Lockers', '보관함');
@@ -2278,9 +2319,9 @@ function buildWorld(scene) {
     tx('寄物櫃（台鐵高鐵閘門西側）', '寄存柜（台铁高铁检票口西侧）', 'コインロッカー（台鉄・高鉄改札 西側）', 'Lockers (west of TRA/HSR gates)', '물품보관함(TRA/HSR 개찰 서쪽)'),
     tx('B1閘門層最大的一排電子寄物櫃。約NT$20〜70／3小時，可用悠遊卡。', 'B1检票层最大的一排电子寄存柜。约NT$20〜70／3小时，可用悠游卡。', 'B1改札フロアで一番大きいロッカー群。3時間 NT$20〜70目安、悠遊カード払い可。', 'The biggest bank of e-lockers on the B1 gate level. Roughly NT$20–70 per 3 h; EasyCard accepted.', 'B1 개찰층 최대 규모의 전자 보관함. 3시간 약 NT$20~70, 이지카드 사용 가능.'),
     lkLbl);
-  shop('B1', 95, 8, 'locker',
-    tx('寄物櫃（東側・誠品方向）', '寄存柜（东侧・诚品方向）', 'コインロッカー（東側・誠品方面）', 'Lockers (east side, towards eslite)', '물품보관함(동쪽·청핀 방면)'),
-    tx('B1東側通道的寄物櫃。閘門旁滿櫃時可來這裡。', 'B1东侧通道的寄存柜。检票口旁满柜时可来这里。', 'B1東側通路のロッカー。改札横が満杯のときの代替に。', 'Lockers along the B1 east corridor — a good backup when the gate-side bank is full.', 'B1 동쪽 통로의 보관함. 개찰구 옆이 만석일 때 대안.'),
+  shop('B1', 95, -20, 'locker',
+    tx('寄物櫃（北迴廊東側・往中山地下街）', '寄存柜（北回廊东侧・往中山地下街）', 'コインロッカー（北東通路・中山地下街方面）', 'Lockers (NE corridor, towards R Mall)', '물품보관함(북동 통로·중산 지하상가 방면)'),
+    tx('B1北迴廊東側（往淡水信義線・中山地下街的通道）的寄物櫃，大中小都有、好找。', 'B1北回廊东侧（往淡水信义线・中山地下街的通道）的寄存柜，大中小都有、好找。', 'B1北側通路の東寄り（R線・中山地下街への連絡通路）のロッカー群。大中小そろい、見つけやすい定番の場所。', 'Lockers on the east end of the B1 north corridor (passage to the Red Line / Zhongshan Metro Mall) — all sizes, easy to find.', 'B1 북쪽 통로 동쪽(단수이신이선·중산 지하상가 연결통로)의 보관함. 대중소 모두 있고 찾기 쉬움.'),
     lkLbl);
   shop('B2', 75, 40, 'locker',
     tx('寄物櫃（捷運大廳）', '寄存柜（捷运大厅）', 'コインロッカー（MRT改札フロア）', 'Lockers (MRT concourse)', '물품보관함(MRT 대합실)'),
@@ -2289,6 +2330,22 @@ function buildWorld(scene) {
   shop('B1', -340, -105, 'locker',
     tx('寄物櫃（Y區西側・往機捷）', '寄存柜（Y区西侧・往机捷）', 'コインロッカー（Y区西側・空港MRT方面）', 'Lockers (Y mall west, towards Airport MRT)', '물품보관함(Y구 서쪽·공항MRT 방면)'),
     tx('台北地下街西段的寄物櫃，去機捷A1前寄放方便。', '台北地下街西段的寄存柜，去机捷A1前寄放方便。', '台北地下街・西寄りのロッカー。空港MRT A1へ行く前の預け入れに便利。', 'Lockers in the west stretch of Taipei Mall — handy before heading to Airport MRT A1.', '타이베이 지하상가 서쪽 보관함. 공항MRT A1 가기 전에 편리.'),
+    lkLbl);
+  shop('B1', 10, 8, 'locker',
+    tx('寄物櫃（南側通道・往捷運）', '寄存柜（南侧通道・往捷运）', 'コインロッカー（南側通路・MRT方面）', 'Lockers (south corridor, towards MRT)', '물품보관함(남쪽 통로·MRT 방면)'),
+    tx('B1南迴廊（往捷運／Z區方向）牆面的寄物櫃。台北車站全站約有300格、24小時、約NT$10〜50／3小時。', 'B1南回廊（往捷运／Z区方向）墙面的寄存柜。台北车站全站约有300格、24小时、约NT$10〜50／3小时。', 'B1南側通路（MRT・Z区方面）壁面のロッカー。台北車站全体で約300台・24時間・3時間あたり約NT$10〜50。', 'Lockers along the B1 south corridor (towards MRT / Z Mall). The station has ~300 lockers total, 24 h, ~NT$10–50 per 3 h.', 'B1 남쪽 통로(MRT·Z구 방면) 벽면의 보관함. 역 전체 약 300개, 24시간, 3시간당 약 NT$10~50.'),
+    lkLbl);
+  shop('B1', -360, -55, 'locker',
+    tx('寄物櫃（機捷A1）', '寄存柜（机捷A1）', 'コインロッカー（空港MRT A1）', 'Lockers (Airport MRT A1)', '물품보관함(공항MRT A1)'),
+    tx('機捷A1報到大廳的寄物櫃。市區預辦登機（06:00〜21:30）就把行李交給航空公司更輕鬆。', '机捷A1值机大厅的寄存柜。市区预办登机（06:00〜21:30）就把行李交给航空公司更轻松。', '空港MRT A1ホールのロッカー。当日便ならインタウンチェックイン（06:00〜21:30）で荷物ごと預ける手も。', 'Lockers in the Airport MRT A1 hall. For same-day flights, in-town check-in (06:00–21:30) can take the bags entirely.', '공항MRT A1 홀의 보관함. 당일 항공편이면 시내 사전 체크인(06:00~21:30)으로 짐을 통째로 맡기는 방법도.'),
+    lkLbl);
+  shop('B1', -585, -78, 'locker',
+    tx('寄物櫃（北門站）', '寄存柜（北门站）', 'コインロッカー（北門駅）', 'Lockers (Beimen Sta.)', '물품보관함(베이먼역)'),
+    tx('捷運北門站內的寄物櫃。北車客滿時的備案。', '捷运北门站内的寄存柜。北车客满时的备案。', 'MRT北門駅構内のロッカー。台北車站側が満杯のときの代替に。', 'Lockers inside Beimen MRT Station — a backup when Taipei Main\'s banks are full.', 'MRT 베이먼역 구내 보관함. 타이베이역이 만석일 때 대안.'),
+    lkLbl);
+  shop('F1', -95, -60, 'locker',
+    tx('行李房（人工寄物）', '行李房（人工寄物）', '手荷物預かり所（行李房・有人）', 'Staffed luggage room', '수하물 보관소(유인)'),
+    tx('台鐵的人工寄物窗口。超大行李或寄物櫃客滿時可用（收費按件）。位置為大致參考。', '台铁的人工寄物窗口。超大行李或寄存柜客满时可用（收费按件）。位置为大致参考。', '台鉄の有人手荷物預かり（行李房）。特大の荷物やロッカー満杯時に。料金は個数制。位置はおおよその目安。', 'TRA\'s staffed left-luggage counter — for oversized bags or when lockers are full (per-piece fee). Position approximate.', 'TRA 유인 수하물 보관소. 초대형 짐이나 보관함 만석 시 이용(개당 요금). 위치는 대략적인 기준.'),
     lkLbl);
 
   /* ============================================================
@@ -2719,6 +2776,8 @@ function toggleExplode() {
   $('#btnExplode').classList.toggle('on', exploded);
   toast(t(exploded ? TX.explodeOn : TX.explodeOff), 2200);
 }
+// ルート案内中だけ自動で分解表示にした場合のフラグ（終了時に元へ戻す）
+let routeAutoExplode = false;
 $('#btnExplode').onclick = toggleExplode;
 
 /* ---------- views / zoom / compass ---------- */
@@ -2884,6 +2943,15 @@ function updatePlayerLang() {
 }
 function clearRoute() {
   if (routeTube) routeTube.geometry.dispose();
+  // 自動分解した場合は案内終了時に元の表示へ戻す
+  if (routeAutoExplode) {
+    routeAutoExplode = false;
+    if (exploded) {
+      exploded = false;
+      floorAnimating = true;
+      $('#btnExplode').classList.remove('on');
+    }
+  }
   gRoute.clear();
   routeTube = routeBall = routeCurve = routeFloorsU = null;
   activeRoute = -1;
@@ -2896,6 +2964,13 @@ function clearRoute() {
 }
 function playRoute(r) {
   clearRoute();
+  // 階をまたぐ案内を見やすくするため、自動でフロア分解表示にしてから開始
+  if (!exploded) {
+    routeAutoExplode = true;
+    exploded = true;
+    floorAnimating = true;
+    $('#btnExplode').classList.add('on');
+  }
   activeRouteObj = r;
   buildRouteGeo(r);
   buildRouteFloors(r);

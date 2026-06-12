@@ -158,6 +158,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 
 /* ================= CSS2D labels（地図上のラベルはテーマ非依存） ================= */
 .lbl { pointer-events: none; white-space: nowrap; font-family: var(--sans); transform: translate(-50%, -50%); }
+.lbl.clickable { pointer-events: auto; cursor: pointer; }
 .lbl.zone {
   font-weight: 900; font-size: 12px; letter-spacing: .03em;
   padding: 3px 10px; border-radius: 999px;
@@ -203,10 +204,10 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   background: var(--accent); color: #fff;
   box-shadow: 0 3px 10px rgba(0, 0, 0, .25);
 }
-.far .lbl.exit, .far .lbl.spot, .far .lbl.st { opacity: 0; }
+.far .lbl.exit, .far .lbl.spot, .far .lbl.st { opacity: 0; pointer-events: none; }
 /* 明示的にONにしたレイヤーのラベルはズームアウトしても隠さない */
 .far.lyr-food .lbl.spot.cat-food, .far.lyr-shopping .lbl.spot.cat-shopping,
-.far.lyr-wc .lbl.spot.cat-wc, .far.lyr-locker .lbl.spot.cat-locker { opacity: 1; }
+.far.lyr-wc .lbl.spot.cat-wc, .far.lyr-locker .lbl.spot.cat-locker { opacity: 1; pointer-events: auto; }
 
 /* ================= panels ================= */
 .panel {
@@ -1381,6 +1382,18 @@ function buildWorld(scene) {
     return new CSS2DObject(div);
   }
 
+  /* ラベル(店名など)のタップでも対象の情報シートを開けるようにする */
+  function clickableLabel(l, mesh, fk) {
+    l.element.classList.add('clickable');
+    l.element.addEventListener('click', e => {
+      e.stopPropagation();
+      if (!mesh.userData.info) return;
+      const p = new THREE.Vector3();
+      mesh.getWorldPosition(p);
+      showInfo(mesh.userData.info, p, FLOORS[fk] ? fk : null);
+    });
+  }
+
   function mat(color, opacity) {
     const m = new THREE.MeshLambertMaterial({ color, transparent: true, opacity: opacity ?? 1 });
     m.userData.baseOp = opacity ?? 1;
@@ -1406,6 +1419,7 @@ function buildWorld(scene) {
     if (o.label) {
       const l = makeLabel(o.label, o.labelCls || 'zone', o.labelColor || hex(color));
       l.position.set(o.lx ?? 0, h / 2 + (o.ly ?? 5), o.lz ?? 0);
+      if (o.name) clickableLabel(l, m, fk);   // 情報を持つ建物/ゾーンはラベルタップでも開ける
       m.add(l);
     }
     if (o.rotY) m.rotation.y = o.rotY;
@@ -1474,6 +1488,7 @@ function buildWorld(scene) {
     F[fk].add(pole);
     const l = makeLabel(labelText || name, 'spot', hex(color));
     l.position.y = 6;
+    clickableLabel(l, m, fk);
     m.add(l);
     F[fk].add(m);
   }
@@ -2228,6 +2243,7 @@ function buildWorld(scene) {
       div.style.color = '#fff';
     }
     l.position.y = (cat === 'wc' || cat === 'locker') ? 11 : 6;
+    clickableLabel(l, m, fk);
     m.add(l);
     F[fk].add(m);
     F[fk].add(pole);

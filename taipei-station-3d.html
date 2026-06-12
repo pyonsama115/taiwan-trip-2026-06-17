@@ -3137,22 +3137,37 @@ function playRoute(r) {
   routeBall = new THREE.Group();
   {
     const wMat = o => new THREE.MeshBasicMaterial({ color: 0xffd24d, depthTest: false, ...(o || {}) });
+    const oMat = () => new THREE.MeshBasicMaterial({ color: 0x221f19, depthTest: false, side: THREE.BackSide });
     const body = new THREE.Mesh(new THREE.CapsuleGeometry(1.6, 3.6, 4, 10), wMat());
     body.position.y = 6.2;
     const head = new THREE.Mesh(new THREE.SphereGeometry(1.7, 14, 14), wMat());
     head.position.y = 10.6;
+    // 墨色アウトライン（背面拡大法）で背景に紛れないように
+    const bodyOut = new THREE.Mesh(body.geometry, oMat());
+    bodyOut.position.copy(body.position);
+    bodyOut.scale.setScalar(1.22);
+    const headOut = new THREE.Mesh(head.geometry, oMat());
+    headOut.position.copy(head.position);
+    headOut.scale.setScalar(1.28);
     const legGeo = new THREE.CylinderGeometry(.55, .5, 3.8, 8);
     const legL = new THREE.Group(), legR = new THREE.Group();
     const lmesh = new THREE.Mesh(legGeo, wMat());
     lmesh.position.y = -1.9;
     legL.add(lmesh); legR.add(lmesh.clone());
     legL.position.set(.85, 4.4, 0); legR.position.set(-.85, 4.4, 0);
-    const halo = new THREE.Mesh(new THREE.RingGeometry(3.4, 5.4, 26), wMat({ transparent: true, opacity: .35 }));
-    halo.rotation.x = -Math.PI / 2;
-    halo.position.y = .25;
-    routeBall.add(body, head, legL, legR, halo);
+    // 二重リング: 内側は面、外側はくっきりした輪（内側は脈動）
+    const haloFill = new THREE.Mesh(new THREE.RingGeometry(4.2, 7.2, 32), wMat({ transparent: true, opacity: .4 }));
+    haloFill.rotation.x = -Math.PI / 2;
+    haloFill.position.y = .25;
+    const haloEdge = new THREE.Mesh(new THREE.RingGeometry(7.2, 8.4, 32), wMat({ transparent: true, opacity: .95 }));
+    haloEdge.rotation.x = -Math.PI / 2;
+    haloEdge.position.y = .3;
+    routeBall.add(bodyOut, headOut, body, head, legL, legR, haloFill, haloEdge);
     routeBall.traverse(o => { o.renderOrder = 60; });
+    bodyOut.renderOrder = headOut.renderOrder = 59;   // アウトラインは本体の下に描く
     routeBall.userData.legs = [legL, legR];
+    routeBall.userData.halo = haloFill;
+    routeBall.scale.setScalar(1.4);                   // 全体を一回り大きく
   }
   routeT = 0;
   gRoute.add(routeBall);
@@ -3921,6 +3936,13 @@ function tick() {
       legs[0].rotation.x = sw;
       legs[1].rotation.x = -sw;
       if (walking) routeBall.position.y += Math.abs(Math.sin(ph)) * .5;
+    }
+    // 足元リングの脈動（ピンのリングと同じ呼吸感）
+    const wHalo = routeBall.userData.halo;
+    if (wHalo) {
+      const s = 1 + Math.sin(time * 3) * .22;
+      wHalo.scale.set(s, s, 1);
+      wHalo.material.opacity = .3 + .2 * (1 + Math.sin(time * 3 + Math.PI)) / 2;
     }
     if (routeFloorsU && guiding) setRouteFloor(floorAtT(routeT));
     updateMilestoneUI();

@@ -130,6 +130,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   text-shadow: 0 1px 3px rgba(251, 248, 240, .95), 0 0 6px rgba(251, 248, 240, .9);
   transition: opacity .3s;
 }
+.lbl.spot .ic { vertical-align: -2px; margin-right: 3px; }
 .lbl.st {
   font-weight: 700; font-size: 9.5px; color: #a99e8c; letter-spacing: .12em;
   text-shadow: 0 1px 3px rgba(251, 248, 240, .95);
@@ -897,6 +898,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
       <div class="badges" id="ibadges"></div>
       <div class="idesc" id="idesc"></div>
       <div class="iactions" id="iactions" hidden>
+        <button class="sheet-act" id="iRoute" hidden><span data-ic="nav" data-ic-size="14"></span><span></span></button>
         <button class="sheet-act" id="iPin" hidden><span data-ic="pin" data-ic-size="14"></span><span></span></button>
         <button class="sheet-act" id="iDel" hidden><span data-ic="trash" data-ic-size="14"></span><span></span></button>
       </div>
@@ -1113,6 +1115,7 @@ const UI = {
   pinName:  tx('我的釘選', '我的钉选', 'マイピン', 'My pin', '내 핀'),
   pinDesc:  tx('你標記的位置。離開前釘選集合點或寄物櫃，就不會迷路。', '你标记的位置。离开前钉选集合点或寄物柜，就不会迷路。', 'あなたが記録した場所。集合場所やコインロッカーをピンしておくと迷いません。', 'A spot you marked. Pin your meeting point or coin locker so you can always find your way back.', '직접 표시한 위치. 약속 장소나 물품보관함을 핀해 두면 길을 잃지 않아요.'),
   pinHere:  tx('釘選這裡', '钉选这里', 'ここにピン', 'Pin this place', '여기에 핀'),
+  pinRoute: tx('從釘選到這裡', '从钉选到这里', 'マイピンからここへ', 'From my pin', '내 핀에서 여기로'),
   pinDel:   tx('刪除釘選', '删除钉选', 'ピンを削除', 'Remove pin', '핀 삭제'),
   pinDeleted: tx('已刪除釘選', '已删除钉选', 'ピンを削除しました', 'Pin removed', '핀을 삭제했습니다'),
   pinCancel: tx('已取消釘選模式', '已取消钉选模式', 'ピン設置をキャンセルしました', 'Pin placement cancelled', '핀 설치를 취소했습니다'),
@@ -1790,10 +1793,11 @@ function buildWorld(scene) {
              '중샤오시루 바로 아래로 <b>동서 343m</b> 뻗은 지하상가(동쪽 끝 난양제·신광미츠코시 앞~서쪽 끝 충칭난루). 분식·패션·잡화 중심으로 하루 5만~15만 명이 오갑니다. <b>Z2 출구는 미츠코시·아시아 플라자 앞</b>, Z10은 우체국·베이먼 방면.'),
     label: tx('Z區 站前地下街', 'Z区 站前地下街', 'Z区 站前地下街', 'Z · Zhanqian Mall', 'Z구 잔첸 지하상가'), lx: -60, ly: 7
   });
-  box('B1', -20, 6, 44, 48, 6, COL.z, { opacity: .8, edges: false });
-  box('B1', 60, 86, 44, 48, 6, COL.z, { opacity: .8, edges: false });
-  box('B1', -20, 6, 14, 24, 6, COL.k, { opacity: .8, edges: false });
-  box('B1', 60, 86, 14, 24, 6, COL.k, { opacity: .8, edges: false });
+  // 連絡スタブは高さ5.6＋両端2食い込みで隣接面の重なり(z-fighting)を回避
+  box('B1', -20, 6, 42, 50, 5.6, COL.z, { opacity: .8, edges: false });
+  box('B1', 60, 86, 42, 50, 5.6, COL.z, { opacity: .8, edges: false });
+  box('B1', -20, 6, 12, 26, 5.6, COL.k, { opacity: .8, edges: false });
+  box('B1', 60, 86, 12, 26, 5.6, COL.k, { opacity: .8, edges: false });
   box('B1', 48, 70, 72, 84, 6, 0xd9a23f, {
     opacity: .9,
     name: tx('亞洲廣場 B1入口', '亚洲广场 B1入口', '亞洲廣場 地下入口（B1）', 'Asia Plaza B1 entrance', '아시아 플라자 B1 입구'),
@@ -1816,9 +1820,9 @@ function buildWorld(scene) {
              '시민대도 아래 <b>동서 825m</b>, 187개 점포의 타이완 최장급 지하상가. 오락실·가챠·애니·카드숍이 밀집해 "<b>타이베이의 아키바</b>"로 불립니다. 평일 11:00~21:30/주말 ~22:00. 남측 출구는 TRA·HSR·공항MRT, 북측은 큐스퀘어·버스터미널 방면.'),
     label: tx('Y區 台北地下街', 'Y区 台北地下街', 'Y区 台北地下街', 'Y · Taipei Mall', 'Y구 타이베이 지하상가'), lx: -150, ly: 7
   });
-  box('B1', -60, -32, -110, -88, 6, COL.y, { opacity: .8, edges: false });
-  box('B1', 18, 46, -110, -88, 6, COL.y, { opacity: .8, edges: false });
-  box('B1', 70, 100, -168, -128, 6, COL.y, { opacity: .8, edges: false });
+  box('B1', -60, -32, -112, -86, 5.6, COL.y, { opacity: .8, edges: false });
+  box('B1', 18, 46, -112, -86, 5.6, COL.y, { opacity: .8, edges: false });
+  box('B1', 70, 100, -170, -126, 5.6, COL.y, { opacity: .8, edges: false });
   box('B1', 50, 120, -250, -168, 6, 0xf15a35, {
     opacity: .85,
     name: tx('京站 B1（Y區直通）', '京站 B1（Y区直通）', '京站 B1（Y区直結）', 'Q square B1 (linked to Y Mall)', '큐스퀘어 B1(Y구 직결)'),
@@ -1843,7 +1847,16 @@ function buildWorld(scene) {
     label: tx('北門站（綠線）', '北门站（绿线）', '北門駅（G線）', 'Beimen (Green)', '베이먼역(그린)'),
     labelColor: '#0a8f54', ly: 7
   });
-  box('B1', -558, -530, -80, -58, 6, COL.lnGreen, { opacity: .7, edges: false });
+  // 北門站⇔台北地下街Y28の連絡通路（公式: 北門站改札からY28＝Y区最西端に直結）
+  box('B1', -560, -535, -80, -58, 5.6, COL.lnGreen, { opacity: .7, edges: false });
+  box('B1', -555, -537, -112, -60, 5.6, COL.lnGreen, {
+    opacity: .7,
+    name: tx('北門站連通道（Y28）', '北门站连通道（Y28）', '北門駅 連絡通路（Y28）', 'Beimen Sta. link passage (Y28)', '베이먼역 연결통로(Y28)'),
+    tag: 'B1', color: '#0a8f54',
+    desc: tx('台北地下街最西端的Y28出口與捷運北門站（綠線）以地下通道直結，不用出地面。', '台北地下街最西端的Y28出口与捷运北门站（绿线）以地下通道直结，不用出地面。', '台北地下街の最西端Y28出口とMRT北門駅（G線）は地下通路で直結。地上に出ずに行き来できる。', 'Exit Y28 at the west end of Taipei Mall links directly underground to Beimen Station (Green Line) — no need to surface.', '타이베이 지하상가 서쪽 끝 Y28 출구와 베이먼역(그린라인)이 지하 통로로 직결. 지상에 나갈 필요 없음.'),
+    label: tx('北門站連通道', '北门站连通道', '北門駅連絡通路', 'Beimen link', '베이먼 연결통로'),
+    labelCls: 'spot', labelColor: '#0a8f54', ly: 5
+  });
 
   // ---- 機捷 A1 ----
   box('B1', -420, -260, -95, -40, 6, COL.air, {
@@ -1867,10 +1880,10 @@ function buildWorld(scene) {
              'Passage linking the TRA B1 concourse with Airport MRT A1 — moving walkways, 4–5 min on foot. Also accessible from the south side of Y Mall (near Y14).',
              'TRA B1 대합실과 공항MRT A1을 잇는 통로. 무빙워크 있음, 도보 4~5분. Y구 남측(Y14 부근)에서도 진입 가능.')
   });
-  box('B1', -340, -310, -110, -95, 6, COL.air, { opacity: .7, edges: false });
+  box('B1', -340, -310, -112, -93, 5.6, COL.air, { opacity: .7, edges: false });
 
   // ---- R区 ----
-  box('B1', 130, 176, -128, -98, 6, COL.r, { opacity: .8, edges: false });
+  box('B1', 130, 176, -126, -96, 5.6, COL.r, { opacity: .8, edges: false });
   {
     const sx = 158, sz = -112, exx = 185, ez = -470;
     const len = Math.hypot(exx - sx, ez - sz), w = 22;
@@ -1933,10 +1946,10 @@ function buildWorld(scene) {
     label: tx('捷運B1通道（M出口）', '捷运B1通道（M出口）', 'MRT B1通路（M出口）', 'MRT B1 walkway', 'MRT B1 통로'),
     labelColor: '#0e9fb3', lx: 60, ly: 6
   });
-  box('B1', -76, -64, 72, 80, 6, COL.mrt, { opacity: .6, edges: false });
-  box('B1', -26, -14, 72, 80, 6, COL.mrt, { opacity: .6, edges: false });
-  box('B1', 30, 42, 72, 80, 6, COL.mrt, { opacity: .6, edges: false });
-  box('B1', 180, 194, 56, 80, 6, COL.mrt, { opacity: .6, edges: false });
+  box('B1', -76, -64, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false });
+  box('B1', -26, -14, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false });
+  box('B1', 30, 42, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false });
+  box('B1', 180, 194, 54, 82, 5.6, COL.mrt, { opacity: .6, edges: false });
 
   // M出口
   EX(-70, 85, COL.mrt, 'M2', '忠孝西路南側西段。', '忠孝西路南侧西段。', '忠孝西路南側・西寄り。', 'South side of Zhongxiao W. Rd., west section.', '중샤오시루 남측 서쪽.');
@@ -2093,6 +2106,16 @@ function buildWorld(scene) {
     pole.position.set(x, 4.5, z);
     const l = makeLabel(labelText || name, 'spot', hex(c));
     l.element.classList.add('cat-' + cat);
+    if (cat === 'wc' || cat === 'locker') {
+      // アイコン＋テキスト構成にする（言語切替の再描画はテキストspanだけ対象に差し替え）
+      const div = l.element;
+      const ent = i18nLabels.find(it => it.el === div);
+      const span = document.createElement('span');
+      span.innerHTML = div.innerHTML;
+      div.innerHTML = ic(cat, 12);
+      div.appendChild(span);
+      if (ent) ent.el = span;
+    }
     l.position.y = 6;
     m.add(l);
     F[fk].add(m);
@@ -2950,12 +2973,14 @@ function renderInfo() {
   $('#ibadges').innerHTML = badges.join('');
   $('#idesc').innerHTML = t(d.desc) || '';
   const acts = $('#iactions');
-  const pinBtn = $('#iPin'), delBtn = $('#iDel');
+  const pinBtn = $('#iPin'), delBtn = $('#iDel'), routeBtn = $('#iRoute');
   pinBtn.hidden = !(curAnchor && !d.isPin);
   delBtn.hidden = !d.isPin;
-  acts.hidden = pinBtn.hidden && delBtn.hidden;
-  pinBtn.querySelector('span').textContent = t(UI.pinHere);
-  delBtn.querySelector('span').textContent = t(UI.pinDel);
+  routeBtn.hidden = !(pinState && curAnchor && !d.isPin);
+  acts.hidden = pinBtn.hidden && delBtn.hidden && routeBtn.hidden;
+  pinBtn.querySelector('span:last-child').textContent = t(UI.pinHere);
+  delBtn.querySelector('span:last-child').textContent = t(UI.pinDel);
+  routeBtn.querySelector('span:last-child').textContent = t(UI.pinRoute);
 }
 function showInfo(d, anchor = null, fk = null) {
   curInfo = d;
@@ -3093,6 +3118,39 @@ $('#iPin').onclick = () => {
   showInfo(pinInfo(), curAnchor.clone(), fk);
 };
 $('#iDel').onclick = deletePin;
+// マイピン→この場所のルート案内
+$('#iRoute').onclick = () => {
+  if (!pinState || !curAnchor || !curInfo) return;
+  let fk = curFk;
+  if (!fk || !FLOORS[fk]) fk = floorFromY(curAnchor.y);
+  const a = nearestNetNode(pinState.x, pinState.z, pinState.fk, false);
+  const b = nearestNetNode(curAnchor.x, curAnchor.z, fk, false);
+  if (!a || !b) return;
+  const pre = [pinState.x, pinState.z, pinState.fk];
+  const post = [curAnchor.x, curAnchor.z, fk];
+  let pts, len;
+  if (a === b) {
+    pts = [NET_NODES[a].p];
+    len = 0;
+  } else {
+    const path = findPath(a, b);
+    if (!path) return;
+    pts = path.ids.map(id => NET_NODES[id].p).slice();
+    len = path.len;
+  }
+  pts.unshift(pre); len += Math.hypot(pre[0] - pts[1][0], pre[1] - pts[1][1]);
+  len += Math.hypot(post[0] - pts[pts.length - 1][0], post[1] - pts[pts.length - 1][1]); pts.push(post);
+  const destName = curInfo.name;
+  const nmA = l => UI.pinName[l] ?? UI.pinName.en;
+  const nmB = l => (typeof destName === 'string') ? destName : (destName[l] ?? destName.en ?? '');
+  const mins = Math.max(1, Math.round(len / 70));
+  playRoute({
+    name: mapTx(l => nmA(l) + ' → ' + nmB(l)),
+    desc: mapTx(l => RT_DESC[l](nmA(l), nmB(l), mins)),
+    pts
+  });
+  activeRoute = -2;
+};
 
 function floorFromY(y) {
   let best = 'B1', bd = Infinity;
@@ -3467,6 +3525,14 @@ renderer.domElement.addEventListener('pointermove', e => {
   if (m && m !== hovered) {
     hovered = m;
     m.material.emissive?.setHex(0x2a2208);
+    // 出口マーカーはホバーだけで説明シートを表示
+    const inf = m.userData.info;
+    if (inf && inf.tag === TAG.exit) {
+      const p = new THREE.Vector3();
+      m.getWorldPosition(p);
+      const fk = m.userData.floor;
+      showInfo(inf, p, FLOORS[fk] ? fk : null);
+    }
   }
   renderer.domElement.style.cursor = pinArmed ? 'crosshair' : (m ? 'pointer' : '');
 });
@@ -3610,10 +3676,19 @@ function tick() {
     if (routeFloorsU && guiding) setRouteFloor(floorAtT(routeT));
     updateMilestoneUI();
     if (routeFollow && !camAnim && guiding) {
+      // 進行方向の斜め後ろ上空から、少し先を見るチェイスカメラ
       const k = 1 - Math.pow(.002, dt);
-      const delta = p.clone().sub(controls.target).multiplyScalar(k);
-      controls.target.add(delta);
-      camera.position.add(delta);
+      const dir = tan.clone().setY(0);
+      if (dir.lengthSq() < 1e-4) dir.set(0, 0, 1);
+      dir.normalize();
+      const side = new THREE.Vector3(-dir.z, 0, dir.x);
+      const desired = p.clone()
+        .addScaledVector(dir, -150)
+        .addScaledVector(side, 55);
+      desired.y = p.y + 135;
+      camera.position.lerp(desired, k);
+      const look = p.clone().addScaledVector(dir, 45);
+      controls.target.lerp(look, k);
     }
   }
 

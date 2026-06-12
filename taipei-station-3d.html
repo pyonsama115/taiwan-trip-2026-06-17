@@ -1203,6 +1203,7 @@ const UI = {
   /* ---- pin ---- */
   tPin:     tx('我的釘選', '我的钉选', 'マイピン', 'My pin', '내 핀'),
   pinArm:   tx('點地圖任一處放置釘選', '点地图任一处放置钉选', '地図をタップしてピンを置いてください', 'Tap anywhere on the map to drop your pin', '지도를 탭해 핀을 놓으세요'),
+  pinNo:    tx('通道或道路無法釘選，請點店家或建築', '通道或道路无法钉选，请点店家或建筑', '通路・道路にはピンを置けません。お店や建物をタップしてください', 'Can\'t pin walkways or streets — tap a shop or building', '통로·도로에는 핀을 둘 수 없어요. 가게나 건물을 탭하세요'),
   pinSet:   tx('已釘選！按釘選鈕可隨時回到這裡', '已钉选！按钉选钮可随时回到这里', 'ピンを置きました。ピンボタンでいつでも戻れます', 'Pin saved — tap the pin button anytime to return', '핀 저장됨 — 핀 버튼으로 언제든 돌아올 수 있어요'),
   pinName:  tx('我的釘選', '我的钉选', 'マイピン', 'My pin', '내 핀'),
   pinDesc:  tx('你標記的位置。離開前釘選集合點或寄物櫃，就不會迷路。', '你标记的位置。离开前钉选集合点或寄物柜，就不会迷路。', 'あなたが記録した場所。集合場所やコインロッカーをピンしておくと迷いません。', 'A spot you marked. Pin your meeting point or coin locker so you can always find your way back.', '직접 표시한 위치. 약속 장소나 물품보관함을 핀해 두면 길을 잃지 않아요.'),
@@ -1407,6 +1408,7 @@ function buildWorld(scene) {
     const m = new THREE.Mesh(geo, mat(color, o.opacity));
     m.position.set(x1 + w / 2, (o.dy ?? 0) + h / 2, z1 + d / 2);
     m.userData.floor = fk;
+    if (o.noPin) m.userData.noPin = true;   // 通路・道路などピン設置不可
     if (o.name) {
       m.userData.info = { name: o.name, desc: o.desc || '', tag: o.tag, color: o.color || hex(color), floor: o.floor || fk };
       pickables.push(m);
@@ -1538,6 +1540,7 @@ function buildWorld(scene) {
     m.rotation.x = -Math.PI / 2;
     m.position.set((x1 + x2) / 2, -0.8, (z1 + z2) / 2);
     m.userData.floor = fk;
+    m.userData.noPin = true;
     F[fk].add(m);
     const eMat = new THREE.LineBasicMaterial({ color: COL.ink, transparent: true, opacity: .12 });
     eMat.userData.baseOp = .12;
@@ -1551,7 +1554,7 @@ function buildWorld(scene) {
   /* ============================================================
      1F: 地面・道路・建物
      ============================================================ */
-  box('F1', -760, 460, -560, 460, .4, 0xf6f0e1, { dy: -1, edges: false, opacity: 0 });
+  box('F1', -760, 460, -560, 460, .4, 0xf6f0e1, { dy: -1, edges: false, opacity: 0, noPin: true });
   {
     // 紙の上に置いた島のように縁をぼかしたベースプレート
     const c = document.createElement('canvas');
@@ -1578,7 +1581,7 @@ function buildWorld(scene) {
   const ST = (x1, x2, z1, z2, name, desc) =>
     box('F1', x1, x2, z1, z2, .5, COL.street, {
       edges: false, name, tag: TAG.street, color: '#9a9080',
-      desc: desc || ST_DESC_DEFAULT
+      desc: desc || ST_DESC_DEFAULT, noPin: true
     });
 
   ST(-720, 440, 40, 76,
@@ -1912,10 +1915,10 @@ function buildWorld(scene) {
     label: tx('Z區 站前地下街', 'Z区 站前地下街', 'Z区 站前地下街', 'Z · Zhanqian Mall', 'Z구 잔첸 지하상가'), lx: -60, ly: 7
   });
   // 連絡スタブは高さ5.6＋両端2食い込みで隣接面の重なり(z-fighting)を回避
-  box('B1', -20, 6, 42, 50, 5.6, COL.z, { opacity: .8, edges: false });
-  box('B1', 60, 86, 42, 50, 5.6, COL.z, { opacity: .8, edges: false });
-  box('B1', -20, 6, 12, 26, 5.6, COL.k, { opacity: .8, edges: false });
-  box('B1', 60, 86, 12, 26, 5.6, COL.k, { opacity: .8, edges: false });
+  box('B1', -20, 6, 42, 50, 5.6, COL.z, { opacity: .8, edges: false, noPin: true });
+  box('B1', 60, 86, 42, 50, 5.6, COL.z, { opacity: .8, edges: false, noPin: true });
+  box('B1', -20, 6, 12, 26, 5.6, COL.k, { opacity: .8, edges: false, noPin: true });
+  box('B1', 60, 86, 12, 26, 5.6, COL.k, { opacity: .8, edges: false, noPin: true });
   box('B1', 48, 70, 72, 84, 6, 0xd9a23f, {
     opacity: .9,
     name: tx('亞洲廣場 B1入口', '亚洲广场 B1入口', '亞洲廣場 地下入口（B1）', 'Asia Plaza B1 entrance', '아시아 플라자 B1 입구'),
@@ -1938,9 +1941,9 @@ function buildWorld(scene) {
              '시민대도 아래 <b>동서 825m</b>, 187개 점포의 타이완 최장급 지하상가. 오락실·가챠·애니·카드숍이 밀집해 "<b>타이베이의 아키바</b>"로 불립니다. 평일 11:00~21:30/주말 ~22:00. 남측 출구는 TRA·HSR·공항MRT, 북측은 큐스퀘어·버스터미널 방면.'),
     label: tx('Y區 台北地下街', 'Y区 台北地下街', 'Y区 台北地下街', 'Y · Taipei Mall', 'Y구 타이베이 지하상가'), lx: -150, ly: 7
   });
-  box('B1', -60, -32, -112, -86, 5.6, COL.y, { opacity: .8, edges: false });
-  box('B1', 18, 46, -112, -86, 5.6, COL.y, { opacity: .8, edges: false });
-  box('B1', 70, 100, -170, -126, 5.6, COL.y, { opacity: .8, edges: false });
+  box('B1', -60, -32, -112, -86, 5.6, COL.y, { opacity: .8, edges: false, noPin: true });
+  box('B1', 18, 46, -112, -86, 5.6, COL.y, { opacity: .8, edges: false, noPin: true });
+  box('B1', 70, 100, -170, -126, 5.6, COL.y, { opacity: .8, edges: false, noPin: true });
   box('B1', 50, 120, -250, -168, 6, 0xf15a35, {
     opacity: .85,
     name: tx('京站 B1（Y區直通）', '京站 B1（Y区直通）', '京站 B1（Y区直結）', 'Q square B1 (linked to Y Mall)', '큐스퀘어 B1(Y구 직결)'),
@@ -1966,14 +1969,14 @@ function buildWorld(scene) {
     labelColor: '#0a8f54', ly: 7
   });
   // 北門站⇔台北地下街Y28の連絡通路（公式: 北門站改札からY28＝Y区最西端に直結）
-  box('B1', -560, -535, -80, -58, 5.6, COL.lnGreen, { opacity: .7, edges: false });
+  box('B1', -560, -535, -80, -58, 5.6, COL.lnGreen, { opacity: .7, edges: false, noPin: true });
   box('B1', -555, -537, -112, -60, 5.6, COL.lnGreen, {
     opacity: .7,
     name: tx('北門站連通道（Y28）', '北门站连通道（Y28）', '北門駅 連絡通路（Y28）', 'Beimen Sta. link passage (Y28)', '베이먼역 연결통로(Y28)'),
     tag: 'B1', color: '#0a8f54',
     desc: tx('台北地下街最西端的Y28出口與捷運北門站（綠線）以地下通道直結，不用出地面。', '台北地下街最西端的Y28出口与捷运北门站（绿线）以地下通道直结，不用出地面。', '台北地下街の最西端Y28出口とMRT北門駅（G線）は地下通路で直結。地上に出ずに行き来できる。', 'Exit Y28 at the west end of Taipei Mall links directly underground to Beimen Station (Green Line) — no need to surface.', '타이베이 지하상가 서쪽 끝 Y28 출구와 베이먼역(그린라인)이 지하 통로로 직결. 지상에 나갈 필요 없음.'),
     label: tx('北門站連通道', '北门站连通道', '北門駅連絡通路', 'Beimen link', '베이먼 연결통로'),
-    labelCls: 'spot', labelColor: '#0a8f54', ly: 5
+    labelCls: 'spot', labelColor: '#0a8f54', ly: 5, noPin: true
   });
 
   // ---- 機捷 A1 ----
@@ -1996,12 +1999,13 @@ function buildWorld(scene) {
              '连接台铁B1大厅与机捷A1的通道，有自动步道，步行4〜5分。也可从Y区南侧（Y14附近）进入。',
              '台鉄B1コンコースと空港MRT A1を結ぶ連絡通路。動く歩道あり、徒歩4〜5分。Y区南側（Y14前後）からも入れる。',
              'Passage linking the TRA B1 concourse with Airport MRT A1 — moving walkways, 4–5 min on foot. Also accessible from the south side of Y Mall (near Y14).',
-             'TRA B1 대합실과 공항MRT A1을 잇는 통로. 무빙워크 있음, 도보 4~5분. Y구 남측(Y14 부근)에서도 진입 가능.')
+             'TRA B1 대합실과 공항MRT A1을 잇는 통로. 무빙워크 있음, 도보 4~5분. Y구 남측(Y14 부근)에서도 진입 가능.'),
+    noPin: true
   });
-  box('B1', -340, -310, -112, -93, 5.6, COL.air, { opacity: .7, edges: false });
+  box('B1', -340, -310, -112, -93, 5.6, COL.air, { opacity: .7, edges: false, noPin: true });
 
   // ---- R区 ----
-  box('B1', 130, 176, -126, -96, 5.6, COL.r, { opacity: .8, edges: false });
+  box('B1', 130, 176, -126, -96, 5.6, COL.r, { opacity: .8, edges: false, noPin: true });
   {
     const sx = 158, sz = -112, exx = 185, ez = -470;
     const len = Math.hypot(exx - sx, ez - sz), w = 22;
@@ -2062,12 +2066,12 @@ function buildWorld(scene) {
              'The MRT station\'s B1 walkway along the south side of Zhongxiao W. Rd. — exits M2–M8 surface from here. It links to Zhanqian Mall (Z) and down to the B2 MRT concourse.',
              '중샤오시루 남측을 따라 뻗은 MRT역 B1 통로. M2~M8 출구가 여기서 지상으로 이어집니다. 잔첸 지하상가(Z구)와 연결되며 아래는 B2 MRT 대합실.'),
     label: tx('捷運B1通道（M出口）', '捷运B1通道（M出口）', 'MRT B1通路（M出口）', 'MRT B1 walkway', 'MRT B1 통로'),
-    labelColor: '#0e9fb3', lx: 60, ly: 6
+    labelColor: '#0e9fb3', lx: 60, ly: 6, noPin: true
   });
-  box('B1', -76, -64, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false });
-  box('B1', -26, -14, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false });
-  box('B1', 30, 42, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false });
-  box('B1', 180, 194, 54, 82, 5.6, COL.mrt, { opacity: .6, edges: false });
+  box('B1', -76, -64, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false, noPin: true });
+  box('B1', -26, -14, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false, noPin: true });
+  box('B1', 30, 42, 70, 82, 5.6, COL.mrt, { opacity: .6, edges: false, noPin: true });
+  box('B1', 180, 194, 54, 82, 5.6, COL.mrt, { opacity: .6, edges: false, noPin: true });
 
   // M出口
   EX(-70, 85, COL.mrt, 'M2', '忠孝西路南側西段。', '忠孝西路南侧西段。', '忠孝西路南側・西寄り。', 'South side of Zhongxiao W. Rd., west section.', '중샤오시루 남측 서쪽.');
@@ -3750,12 +3754,14 @@ function placePinAt(cx, cy) {
   const hits = ray.intersectObjects(scene.children, true);
   const tryPass = strict => {
     for (const h of hits) {
-      // 非表示オブジェクト（B階フォーカス中の駅舎など）はレイキャストに残るため除外
-      let vis = true;
+      // 非表示オブジェクト（B階フォーカス中の駅舎など）と
+      // ピン設置不可（通路・道路・地面）はレイキャストから除外
+      let vis = true, noPin = false;
       for (let o2 = h.object; o2; o2 = o2.parent) {
         if (o2.visible === false) { vis = false; break; }
+        if (o2.userData && o2.userData.noPin) { noPin = true; break; }
       }
-      if (!vis) continue;
+      if (!vis || noPin) continue;
       // 厳格パス: ほぼ透明な面（フロアスラブ・透明な地面）は「見えている階」と
       // 違う階にピンが立つ原因なので除外。どこにも当たらなければ緩和パスで許可
       if (strict) {
@@ -3777,7 +3783,9 @@ function placePinAt(cx, cy) {
     }
     return false;
   };
-  return tryPass(true) || tryPass(false);
+  const ok = tryPass(true) || tryPass(false);
+  if (!ok) toast(t(UI.pinNo), 2400);   // 置けない場所（武装状態は維持して再タップ可能）
+  return ok;
 }
 
 renderer.domElement.addEventListener('pointerdown', e => { downXY = [e.clientX, e.clientY]; });

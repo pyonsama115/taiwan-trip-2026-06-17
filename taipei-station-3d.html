@@ -588,31 +588,8 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
   display: grid; place-items: center;
   transition: opacity .5s;
 }
-#boot::before {
-  content: ''; position: absolute; inset: 0;
-  background-image: radial-gradient(var(--line2) 1px, transparent 1.6px);
-  background-size: 26px 26px;
-  opacity: .4;
-  -webkit-mask-image: radial-gradient(circle at 50% 44%, #000, transparent 60%);
-  mask-image: radial-gradient(circle at 50% 44%, #000, transparent 60%);
-}
-/* 波紋: スタック中心からドットを濃く照らすリングが広がる */
-#boot::after {
-  content: ''; position: absolute; inset: 0;
-  background-image: radial-gradient(var(--muted) 1.3px, transparent 1.9px);
-  background-size: 26px 26px;
-  -webkit-mask-image: radial-gradient(circle, transparent 32%, #000 44%, transparent 56%);
-  mask-image: radial-gradient(circle, transparent 32%, #000 44%, transparent 56%);
-  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-  -webkit-mask-position: 50% 42%; mask-position: 50% 42%;
-  -webkit-mask-size: 0 0; mask-size: 0 0;
-  animation: bripple 2.6s ease-out infinite;
-}
-@keyframes bripple {
-  0% { -webkit-mask-size: 0 0; mask-size: 0 0; opacity: .9; }
-  70% { opacity: .5; }
-  100% { -webkit-mask-size: 130vmax 130vmax; mask-size: 130vmax 130vmax; opacity: 0; }
-}
+/* 波打つ布: ドット面を遠近付きの3D波としてcanvasに描画(スタックも同じ波で上下) */
+#bootFx { position: absolute; inset: 0; width: 100%; height: 100%; }
 #boot.off { opacity: 0; pointer-events: none; }
 #boot .bx { text-align: center; position: relative; transition: transform .5s, opacity .5s; }
 #boot.off .bx { transform: scale(.94); opacity: 0; }
@@ -656,6 +633,11 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 #boot .bt {
   font-family: var(--grotesk); font-weight: 800; font-size: 11px; color: var(--ink); white-space: nowrap;
   animation: btrack .9s cubic-bezier(.2, .7, .3, 1) both;
+  position: relative;
+}
+#boot .bt::before {
+  content: ''; position: absolute; inset: -30px -52px -46px; z-index: -1;
+  background: radial-gradient(closest-side, var(--paper) 38%, rgba(251, 248, 240, 0));
 }
 @keyframes btrack {
   from { opacity: 0; letter-spacing: .5em; }
@@ -876,6 +858,7 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 
 <body>
   <div id="boot">
+    <canvas id="bootFx"></canvas>
     <div class="bx">
       <div class="iso">
         <div class="tilt">
@@ -889,7 +872,71 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
       <div class="bar"></div>
     </div>
   </div>
-  <script>window.__bootT0 = Date.now(); setTimeout(function () { var b = document.getElementById('boot'); if (b) b.classList.add('off'); }, 12000);</script>
+  <script>
+    window.__bootT0 = Date.now();
+    setTimeout(function () { var b = document.getElementById('boot'); if (b) b.classList.add('off'); }, 12000);
+    /* 波打つ布: ドットの床を高さフィールド＋遠近投影で描き、スタックを波に浮かべる */
+    (function () {
+      var boot = document.getElementById('boot');
+      var cv = document.getElementById('bootFx');
+      var iso = boot.querySelector('.iso');
+      if (!cv || !cv.getContext) return;
+      var ctx = cv.getContext('2d');
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var W, H, cx, cy, z0, pxPerUnit;
+      var F = 320, CAM_Y = 64;          // 焦点距離・カメラ高さ(ワールド単位)
+      function layout() {
+        W = innerWidth; H = innerHeight;
+        cv.width = W * dpr; cv.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        var r = iso.getBoundingClientRect();
+        cx = W / 2;
+        cy = r.top + r.height * .26;                 // 水平線(布の消失点)をスタック上部に
+        z0 = F * CAM_Y / Math.max(40, r.bottom + 18 - cy); // 波源=スタック直下
+        pxPerUnit = F / z0;
+      }
+      layout();
+      addEventListener('resize', layout);
+      var t0 = performance.now(), offAt = 0;
+      function wave(x, z, t) {
+        var r = Math.hypot(x, z - z0);
+        return 7 * Math.sin(r / 24 - t * 2.42) * Math.exp(-r / 230);
+      }
+      function frame(now) {
+        if (!cv.isConnected) return;
+        if (boot.classList.contains('off')) {
+          if (!offAt) offAt = now;
+          if (now - offAt > 600) return;             // フェード完了後に停止
+        }
+        var t = (now - t0) / 1000;
+        ctx.clearRect(0, 0, W, H);
+        for (var z = 26; z < 560; z += 13) {
+          var xmax = z * (cx + 30) / F;
+          var sx0 = Math.ceil(-xmax / 13) * 13;
+          for (var x = sx0; x <= xmax; x += 13) {
+            var y = wave(x, z, t);
+            var sy = cy + F * (CAM_Y - y) / z;
+            if (sy > H + 12) continue;
+            var sx = cx + F * x / z;
+            var depth = Math.min(1, 1.7 * F / (z * 3));
+            var a = depth * (.34 + .42 * Math.max(0, y / 7));
+            a *= Math.max(0, Math.min(1, (sy - cy) / 46)); // 水平線際はフェード
+            if (a < .015) continue;
+            ctx.globalAlpha = a;
+            ctx.fillStyle = y > 2 ? '#5d5547' : '#9b9181';
+            ctx.beginPath();
+            ctx.arc(sx, sy, Math.min(3.4, Math.max(.7, F / z * 1.25)) * (1 + Math.max(0, y) * .04), 0, 6.2832);
+            ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+        // スタック(風船)を波の高さに同期して上下
+        iso.style.transform = 'translateY(' + (-wave(0, z0, t) * pxPerUnit * 1.5).toFixed(2) + 'px)';
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
 
   <div id="app"></div>
 

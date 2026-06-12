@@ -2758,6 +2758,11 @@ controls.maxDistance = 1800;
 controls.touches.ONE = THREE.TOUCH.PAN;
 controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
 controls.screenSpacePanning = false;   // パンは地面に沿わせる
+if (matchMedia('(pointer: coarse)').matches) {
+  // タッチ端末は慣性を強めにして指を離した後もヌルッと滑るように
+  controls.dampingFactor = .05;
+  controls.panSpeed = 1.15;
+}
 
 // SPではカメラ操作中だけフロアレールをふわっと消す（CSS側でSP限定）
 {

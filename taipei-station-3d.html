@@ -1230,7 +1230,7 @@ const UI = {
   gTitle:   tx('台北車站 3D地下街地圖', '台北车站 3D地下街地图', '台北駅 3D地下街マップ', 'Taipei Station 3D Map', '타이베이역 3D 지하 지도'),
   gSub:     tx('記住這5招就上手', '记住这5招就上手', '使い方はこの5つだけ', 'Five things to know', '사용법은 이 5가지뿐'),
   g1t:      tx('旋轉・縮放', '旋转・缩放', '回す・ズーム', 'Rotate & zoom', '회전·줌'),
-  g1d:      tx('拖曳旋轉視角，雙指（或滾輪）縮放。', '拖拽旋转视角，双指（或滚轮）缩放。', 'ドラッグで回転、ピンチ／ホイールでズーム。', 'Drag to rotate; pinch or scroll to zoom.', '드래그로 회전, 핀치/휠로 줌.'),
+  g1d:      tx('電腦拖曳旋轉；手機單指平移、雙指旋轉縮放。', '电脑拖拽旋转；手机单指平移、双指旋转缩放。', 'PCはドラッグで回転。スマホは1本指で移動、2本指で回転・ズーム。', 'Drag to rotate on PC; on mobile one finger pans, two rotate/zoom.', 'PC는 드래그 회전, 모바일은 한 손가락 이동·두 손가락 회전/줌.'),
   g2t:      tx('專注一個樓層', '专注一个楼层', 'フロアを選ぶ', 'Focus one floor', '층 고르기'),
   g2d:      tx('點右側 2F〜B4 只看該層，分解鈕可看6層構造。', '点右侧 2F〜B4 只看该层，分解钮可看6层构造。', '右の 2F〜B4 でその階だけ表示。分解ボタンで6層を展開。', 'Tap 2F–B4 on the right to isolate a level; the explode button reveals all six.', '오른쪽 2F~B4로 한 층만 보기, 분해 버튼으로 6개 층 펼치기.'),
   g3t:      tx('路線自動導覽', '路线自动导览', 'ルート自動案内', 'Guided routes', '자동 경로 안내'),
@@ -1455,6 +1455,7 @@ function buildWorld(scene) {
       const p = new THREE.Vector3();
       mesh.getWorldPosition(p);
       showInfo(mesh.userData.info, p, FLOORS[fk] ? fk : null);
+      tapRecenter(p);
     });
   }
 
@@ -1509,6 +1510,7 @@ function buildWorld(scene) {
         mesh.getWorldPosition(p);
         const lfk = mesh.userData.floor;
         showInfo(info, p, FLOORS[lfk] ? lfk : null);
+        tapRecenter(p);
       });
     };
     const l = makeLabel(id, 'exit');
@@ -2752,6 +2754,10 @@ controls.dampingFactor = .08;
 controls.maxPolarAngle = Math.PI * .495;
 controls.minDistance = 50;
 controls.maxDistance = 1800;
+// タッチ操作: 1本指=平行移動(地図アプリと同じ)、2本指=ピンチでズーム+ツイストで回転
+controls.touches.ONE = THREE.TOUCH.PAN;
+controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+controls.screenSpacePanning = false;   // パンは地面に沿わせる
 
 // SPではカメラ操作中だけフロアレールをふわっと消す（CSS側でSP限定）
 {
@@ -3409,6 +3415,16 @@ function showSelMarker(p, fk) {
     scene.add(selMarker);
   }
 }
+/* SPのみ: タップした場所が画面中央に来るようにカメラを平行移動 */
+function tapRecenter(p) {
+  if (!mq.matches) return;
+  const dx = p.x - controls.target.x, dy = p.y - controls.target.y, dz = p.z - controls.target.z;
+  flyTo({
+    pos: [camera.position.x + dx, camera.position.y + dy, camera.position.z + dz],
+    tgt: [p.x, p.y, p.z]
+  }, .8);
+}
+
 let infoFromHover = false;   // 現在のシートがホバー起点か（クリック起点はホバーで上書きさせない）
 function showInfo(d, anchor = null, fk = null, fromHover = false) {
   curInfo = d;
@@ -3906,6 +3922,7 @@ renderer.domElement.addEventListener('pointerup', e => {
     m.getWorldPosition(p);
     const fk = m.userData.floor;
     showInfo(m.userData.info, p, FLOORS[fk] ? fk : null);
+    tapRecenter(p);
   }
 });
 renderer.domElement.addEventListener('pointermove', e => {

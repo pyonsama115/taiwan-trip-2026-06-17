@@ -3211,8 +3211,10 @@ function playRoute(r) {
   // 人型ウォーカー（常に最前面）
   routeBall = new THREE.Group();
   {
-    const wMat = o => new THREE.MeshBasicMaterial({ color: 0xffd24d, depthTest: false, ...(o || {}) });
-    const oMat = () => new THREE.MeshBasicMaterial({ color: 0x221f19, depthTest: false, side: THREE.BackSide });
+    // transparent:true で半透明描画パス(マップの建物群より後)に乗せないと、
+    // 不透明扱い→半透明ボックスに上塗りされてオブジェクト内で見えなくなる
+    const wMat = o => new THREE.MeshBasicMaterial({ color: 0xffd24d, depthTest: false, depthWrite: false, transparent: true, ...(o || {}) });
+    const oMat = () => new THREE.MeshBasicMaterial({ color: 0x221f19, depthTest: false, depthWrite: false, transparent: true, side: THREE.BackSide });
     const body = new THREE.Mesh(new THREE.CapsuleGeometry(1.6, 3.6, 4, 10), wMat());
     body.position.y = 6.2;
     const head = new THREE.Mesh(new THREE.SphereGeometry(1.7, 14, 14), wMat());

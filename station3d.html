@@ -13,7 +13,6 @@
   <style>
     :root {
       --paper: #fdfbf4;
-      --paper2: #fdf0dd;
       --card: #ffffff;
       --ink: #23201a;
       --ink2: #5b5345;
@@ -22,18 +21,22 @@
       --line2: #dccfb8;
       --accent: #f15a35;
       --sun: #ffd24d;
-      --empty: #1fa15f;
-      --okay: #f2a517;
       --tactic: #0e9fb3;
+      --c-y: #f2a517;
+      --c-z: #1fa15f;
+      --c-k: #b0413e;
+      --c-r: #7c5cdb;
+      --c-mrt: #0e9fb3;
+      --c-tra: #9a7b3f;
+      --c-air: #8246af;
       --ln-red: #e3002c;
       --ln-blue: #0070bd;
-      --ln-green: #0a8f54;
       --sans: "Zen Kaku Gothic New", system-ui, sans-serif;
       --grotesk: "Archivo", system-ui, sans-serif;
-      --shadow: 0 1px 2px rgba(60, 40, 25, .05), 0 12px 26px -18px rgba(60, 40, 25, .22);
+      --shadow: 0 1px 2px rgba(60, 40, 25, .06), 0 14px 30px -18px rgba(60, 40, 25, .28);
     }
 
-    * { box-sizing: border-box }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     html, body {
       margin: 0; padding: 0; height: 100%;
@@ -42,116 +45,243 @@
       background: var(--paper);
       color: var(--ink);
       touch-action: none;
+      overscroll-behavior: none;
     }
 
     #app { position: fixed; inset: 0; }
     #app canvas { display: block; }
 
-    /* ---- CSS2D labels ---- */
+    /* ================= CSS2D labels ================= */
     .lbl {
       pointer-events: none;
       white-space: nowrap;
       font-family: var(--sans);
       transform: translate(-50%, -50%);
-      text-shadow: 0 1px 3px rgba(253, 251, 244, .9), 0 0 8px rgba(253, 251, 244, .8);
     }
     .lbl.zone {
-      font-weight: 900; font-size: 13px; letter-spacing: .04em;
-      padding: 3px 9px; border-radius: 999px;
-      background: rgba(255, 255, 255, .88);
+      font-weight: 900; font-size: 12px; letter-spacing: .03em;
+      padding: 3px 10px; border-radius: 999px;
+      background: rgba(255, 255, 255, .92);
       border: 1.5px solid currentColor;
-      box-shadow: var(--shadow);
-      text-shadow: none;
+      box-shadow: 0 2px 8px rgba(60, 40, 25, .18);
     }
     .lbl.exit {
-      font-weight: 700; font-size: 10px;
-      padding: 1px 6px; border-radius: 6px;
-      background: rgba(35, 32, 26, .82); color: #fff;
-      text-shadow: none;
+      font-weight: 800; font-size: 9px; letter-spacing: .04em;
+      padding: 1px 5px; border-radius: 5px;
+      background: rgba(35, 32, 26, .85); color: #fff;
+      transition: opacity .3s;
     }
     .lbl.spot {
-      font-weight: 700; font-size: 11px; color: var(--ink2);
+      font-weight: 700; font-size: 10.5px; color: var(--ink2);
+      text-shadow: 0 1px 3px rgba(253,251,244,.95), 0 0 6px rgba(253,251,244,.9);
+      transition: opacity .3s;
+    }
+    .lbl.st {
+      font-weight: 700; font-size: 9.5px; color: #a99e8c;
+      letter-spacing: .12em;
+      text-shadow: 0 1px 3px rgba(253,251,244,.95);
+      transition: opacity .3s;
     }
     .lbl.dir {
-      font-weight: 700; font-size: 11px; color: var(--accent);
-      background: rgba(255,255,255,.85); padding: 2px 8px; border-radius: 999px;
-      border: 1px dashed var(--accent); text-shadow: none;
+      font-weight: 800; font-size: 10.5px; color: var(--accent);
+      background: rgba(255, 255, 255, .9); padding: 2px 9px; border-radius: 999px;
+      border: 1.2px dashed var(--accent);
     }
+    .lbl.floor-tag {
+      font-family: var(--grotesk);
+      font-weight: 800; font-size: 13px; letter-spacing: .1em;
+      padding: 4px 12px; border-radius: 8px;
+      background: var(--ink); color: var(--paper);
+      box-shadow: 0 3px 10px rgba(60, 40, 25, .3);
+    }
+    .lbl.floor-tag small {
+      font-family: var(--sans); font-weight: 700; font-size: 10px;
+      letter-spacing: 0; margin-left: 7px; opacity: .75;
+    }
+    .far .lbl.exit, .far .lbl.spot, .far .lbl.st { opacity: 0; }
 
-    /* ---- UI panels ---- */
+    /* ================= panels ================= */
     .panel {
       position: fixed; z-index: 10;
-      background: var(--card);
+      background: rgba(255, 255, 255, .94);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--line2);
-      border-radius: 14px;
+      border-radius: 16px;
       box-shadow: var(--shadow);
     }
 
+    /* ---- header ---- */
     #head {
-      top: 12px; left: 12px; right: 12px;
-      max-width: 480px;
-      padding: 12px 14px 10px;
+      top: 12px; left: 12px;
+      width: min(330px, calc(100vw - 24px));
+      padding: 14px 16px 12px;
     }
+    #head .hrow { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
     #head .kicker {
-      font-family: var(--grotesk); font-weight: 800; font-size: 10px;
-      letter-spacing: .18em; text-transform: uppercase; color: var(--accent);
+      font-family: var(--grotesk); font-weight: 800; font-size: 9.5px;
+      letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
     }
-    #head h1 { margin: 2px 0 4px; font-size: 18px; font-weight: 900; }
-    #head .sub { font-size: 11px; color: var(--muted); line-height: 1.5; }
-    #head .back {
-      display: inline-block; margin-top: 6px;
-      font-size: 11px; font-weight: 700; color: var(--tactic); text-decoration: none;
+    #head h1 { margin: 2px 0 0; font-size: 17px; font-weight: 900; letter-spacing: .01em; }
+    #fold {
+      flex: none; appearance: none; cursor: pointer;
+      width: 26px; height: 26px; border-radius: 8px;
+      border: 1px solid var(--line2); background: var(--paper);
+      color: var(--ink2); font-size: 12px; line-height: 1;
+      transition: transform .25s;
+    }
+    #head.folded #fold { transform: rotate(180deg); }
+    #head .body { overflow: hidden; max-height: 600px; transition: max-height .3s ease, opacity .25s; }
+    #head.folded .body { max-height: 0; opacity: 0; }
+
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 4px 10px;
+      margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--line2);
+    }
+    .legend span {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 700; color: var(--ink2);
+    }
+    .legend i {
+      width: 8px; height: 8px; border-radius: 3px; flex: none;
+      background: var(--c, #999);
     }
 
-    .chips {
-      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+    .sec {
+      margin-top: 10px;
+      font-family: var(--grotesk); font-weight: 800; font-size: 9px;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
     }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
     .chip {
       appearance: none; cursor: pointer;
       font-family: var(--sans); font-weight: 700; font-size: 11px;
-      padding: 5px 10px; border-radius: 999px;
+      padding: 5px 11px; border-radius: 999px;
       border: 1.5px solid var(--line2);
-      background: var(--paper); color: var(--muted);
+      background: var(--paper); color: var(--ink2);
       transition: all .15s;
     }
-    .chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
-    .chip.view { border-style: dashed; }
-    .chip.view.on { background: var(--accent); border-color: var(--accent); border-style: solid; }
-    .chip.route.on { background: var(--tactic); border-color: var(--tactic); }
+    .chip:hover { border-color: var(--muted); }
+    .chip.view.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .chip.route { border-style: dashed; }
+    .chip.route.on { background: var(--tactic); border-color: var(--tactic); border-style: solid; color: #fff; }
 
-    #info {
-      bottom: 12px; left: 12px; right: 12px;
-      max-width: 480px; margin: 0 auto;
-      padding: 12px 14px;
-      transform: translateY(140%);
-      transition: transform .25s ease;
-    }
-    #info.show { transform: translateY(0); }
-    #info .iname { font-weight: 900; font-size: 14px; }
-    #info .iname .tag {
-      display: inline-block; margin-left: 6px; padding: 1px 8px;
-      font-size: 10px; font-weight: 700; border-radius: 999px;
-      color: #fff; vertical-align: 2px;
-    }
-    #info .idesc { margin-top: 4px; font-size: 12px; color: var(--ink2); line-height: 1.65; }
-    #info .iclose {
-      position: absolute; top: 8px; right: 10px; cursor: pointer;
-      border: 0; background: none; font-size: 16px; color: var(--muted);
+    #head .back {
+      display: inline-block; margin-top: 11px;
+      font-size: 11px; font-weight: 700; color: var(--tactic); text-decoration: none;
     }
 
-    #foot {
-      position: fixed; z-index: 9;
-      bottom: 12px; right: 12px;
-      font-size: 10px; color: var(--muted);
-      background: rgba(253, 251, 244, .8);
-      padding: 3px 8px; border-radius: 8px;
+    /* ---- elevator floor rail ---- */
+    #rail {
+      top: 50%; right: 12px; transform: translateY(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 8px 7px;
+      gap: 4px;
+    }
+    #rail .flr {
+      appearance: none; cursor: pointer;
+      width: 40px; height: 34px; border-radius: 10px;
+      border: 1.5px solid transparent;
+      background: none; position: relative;
+      font-family: var(--grotesk); font-weight: 800; font-size: 12px;
+      color: var(--ink2);
+      transition: all .15s;
+    }
+    #rail .flr:hover { background: var(--paper); }
+    #rail .flr.on {
+      background: var(--ink); color: var(--paper);
+      box-shadow: 0 3px 10px rgba(35, 32, 26, .35);
+    }
+    #rail .flr i {
+      position: absolute; left: 4px; top: 4px;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--c, transparent);
+    }
+    #rail hr { width: 26px; border: 0; border-top: 1px dashed var(--line2); margin: 2px 0; }
+    #rail .tool {
+      appearance: none; cursor: pointer;
+      width: 40px; height: 34px; border-radius: 10px;
+      border: 1.5px solid var(--line2); background: var(--paper);
+      font-size: 14px; color: var(--ink2);
+      transition: all .15s;
+    }
+    #rail .tool.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+    #rail .cap {
+      font-family: var(--grotesk); font-weight: 800; font-size: 8px;
+      letter-spacing: .1em; color: var(--muted); margin-top: 1px;
+    }
+
+    /* ---- compass ---- */
+    #compass {
+      position: fixed; z-index: 10;
+      top: 12px; right: 12px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow);
+      display: grid; place-items: center;
       pointer-events: none;
+    }
+    #needle { width: 30px; height: 30px; }
+
+    /* ---- info bottom sheet ---- */
+    #info {
+      bottom: 12px; left: 50%;
+      width: min(470px, calc(100vw - 24px));
+      transform: translate(-50%, 130%);
+      transition: transform .3s cubic-bezier(.2, .9, .25, 1);
+      overflow: hidden;
+      padding: 0;
+    }
+    #info.show { transform: translate(-50%, 0); }
+    #info .bar { height: 5px; background: var(--bar, var(--accent)); }
+    #info .inner { padding: 12px 16px 13px; position: relative; }
+    #info .iname { font-weight: 900; font-size: 14.5px; padding-right: 26px; line-height: 1.4; }
+    #info .badges { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+    #info .bdg {
+      display: inline-block; padding: 1.5px 9px;
+      font-size: 10px; font-weight: 800; border-radius: 999px;
+      color: #fff; background: var(--b, var(--muted));
+      font-family: var(--grotesk); letter-spacing: .05em;
+    }
+    #info .bdg.ghost { background: var(--paper); color: var(--ink2); border: 1px solid var(--line2); }
+    #info .idesc { margin-top: 7px; font-size: 12px; color: var(--ink2); line-height: 1.7; }
+    #info .idesc b { color: var(--ink); }
+    #info .iclose {
+      position: absolute; top: 9px; right: 10px; cursor: pointer;
+      width: 24px; height: 24px; border-radius: 8px;
+      border: 0; background: var(--paper); color: var(--muted); font-size: 13px;
+    }
+
+    /* ---- toast ---- */
+    #toast {
+      position: fixed; z-index: 11;
+      bottom: 18px; left: 50%; transform: translateX(-50%);
+      background: rgba(35, 32, 26, .92); color: var(--paper);
+      font-size: 11.5px; font-weight: 700;
+      padding: 9px 18px; border-radius: 999px;
+      box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none;
+      transition: opacity .5s;
+      max-width: calc(100vw - 40px); text-align: center;
+    }
+    #toast.show { opacity: 1; }
+
+    #note {
+      position: fixed; z-index: 9;
+      bottom: 10px; right: 12px;
+      font-size: 9.5px; color: var(--muted);
+      pointer-events: none;
+      text-align: right; line-height: 1.5;
     }
 
     @media (max-width: 640px) {
-      #head { max-width: none; }
-      #head .sub { display: none; }
-      #foot { bottom: auto; top: 8px; right: 8px; display: none; }
+      #head { width: calc(100vw - 86px); }
+      #rail { right: 8px; padding: 6px 5px; }
+      #rail .flr { width: 36px; height: 31px; font-size: 11px; }
+      #rail .tool { width: 36px; height: 31px; }
+      #compass { top: auto; bottom: 64px; right: 8px; width: 38px; height: 38px; }
+      #note { display: none; }
+      #info { bottom: 8px; }
     }
   </style>
   <script type="importmap">
@@ -167,37 +297,85 @@
 <body>
   <div id="app"></div>
 
+  <!-- header -->
   <div class="panel" id="head">
-    <div class="kicker">Taipei Main Station / Underground</div>
-    <h1>台北駅 地下街 3Dマップ</h1>
-    <div class="sub">ドラッグで回転・ピンチ/ホイールでズーム・2本指/右ドラッグで移動。通路や駅をタップすると解説が出ます。</div>
-    <div class="chips" id="layers">
-      <button class="chip on" data-g="g1F">地上 1F</button>
-      <button class="chip on" data-g="gB1">B1 地下街</button>
-      <button class="chip on" data-g="gB2">B2 ホーム</button>
-      <button class="chip on" data-g="gB4">B4 BL線</button>
+    <div class="hrow">
+      <div>
+        <div class="kicker">Taipei Main Station — Underground City</div>
+        <h1>台北駅 地下街 3Dマップ</h1>
+      </div>
+      <button id="fold" title="折りたたみ">▴</button>
     </div>
-    <div class="chips" id="views">
-      <button class="chip view" data-v="all">全体</button>
-      <button class="chip view" data-v="mrt">MRT乗換</button>
-      <button class="chip view" data-v="y">Y区・京站</button>
-      <button class="chip view" data-v="z">Z区・站前</button>
+    <div class="body">
+      <div class="legend">
+        <span><i style="--c:#f2a517"></i>Y区 台北地下街</span>
+        <span><i style="--c:#1fa15f"></i>Z区 站前</span>
+        <span><i style="--c:#b0413e"></i>K区 誠品</span>
+        <span><i style="--c:#7c5cdb"></i>R区 中山</span>
+        <span><i style="--c:#0070bd"></i>BL線</span>
+        <span><i style="--c:#e3002c"></i>R線</span>
+        <span><i style="--c:#9a7b3f"></i>台鉄・高鉄</span>
+        <span><i style="--c:#8246af"></i>機捷(空港)</span>
+      </div>
+
+      <div class="sec">View / 視点</div>
+      <div class="chips" id="views">
+        <button class="chip view" data-v="all">全体</button>
+        <button class="chip view" data-v="mrt">MRT乗換</button>
+        <button class="chip view" data-v="y">Y区・京站</button>
+        <button class="chip view" data-v="z">Z区・站前</button>
+        <button class="chip view" data-v="air">機捷A1</button>
+      </div>
+
+      <div class="sec">Route / 歩行ルート再生</div>
+      <div class="chips" id="routes">
+        <button class="chip route" data-r="0">BL→R線 乗換</button>
+        <button class="chip route" data-r="1">台鉄→Y区→京站</button>
+        <button class="chip route" data-r="2">Z区→新光三越</button>
+        <button class="chip route" data-r="3">帰国日: →機捷A1</button>
+      </div>
+
+      <a class="back" href="index.html">← しおりに戻る</a>
     </div>
-    <div class="chips" id="routes">
-      <button class="chip route" data-r="0">▶ BL→R線 乗換</button>
-      <button class="chip route" data-r="1">▶ 台鉄→Y区→京站</button>
-      <button class="chip route" data-r="2">▶ Z区→新光三越</button>
-    </div>
-    <a class="back" href="index.html">← しおりに戻る</a>
   </div>
 
+  <!-- elevator rail -->
+  <div class="panel" id="rail">
+    <button class="flr" data-f="F2">2F<i style="--c:#e8a33d"></i></button>
+    <button class="flr" data-f="F1">1F<i style="--c:#9a9080"></i></button>
+    <button class="flr" data-f="B1">B1<i style="--c:#f2a517"></i></button>
+    <button class="flr" data-f="B2">B2<i style="--c:#9a7b3f"></i></button>
+    <button class="flr" data-f="B3">B3<i style="--c:#0070bd"></i></button>
+    <button class="flr" data-f="B4">B4<i style="--c:#e3002c"></i></button>
+    <hr>
+    <button class="tool" id="btnAll" title="全フロア表示">⛶</button>
+    <button class="tool" id="btnExplode" title="フロア分解表示">⇕</button>
+    <div class="cap">FLOOR</div>
+  </div>
+
+  <!-- compass -->
+  <div id="compass">
+    <svg id="needle" viewBox="0 0 40 40">
+      <polygon points="20,5 25,22 20,19 15,22" fill="#f15a35" />
+      <polygon points="20,35 25,18 20,21 15,18" fill="#c9bda4" />
+      <text x="20" y="14" text-anchor="middle" font-size="7" font-weight="800" fill="#23201a"
+        font-family="Archivo,sans-serif">N</text>
+    </svg>
+  </div>
+
+  <!-- info sheet -->
   <div class="panel" id="info">
-    <button class="iclose" id="iclose">✕</button>
-    <div class="iname" id="iname"></div>
-    <div class="idesc" id="idesc"></div>
+    <div class="bar" id="ibar"></div>
+    <div class="inner">
+      <button class="iclose" id="iclose">✕</button>
+      <div class="iname" id="iname"></div>
+      <div class="badges" id="ibadges"></div>
+      <div class="idesc" id="idesc"></div>
+    </div>
   </div>
 
-  <div id="foot">※位置・縮尺・出口番号は概略です。現地の案内表示を優先。</div>
+  <div id="toast"></div>
+  <div id="note">公式情報（台北捷運・台鉄・桃園捷運・各地下街）を元にした概略図<br>位置・縮尺は模式化しています。現地の案内表示を優先してください。</div>
 
   <script type="module">
     import * as THREE from 'three';
@@ -206,28 +384,48 @@
 
     /* ============================================================
        座標系: 1unit ≒ 1m / +X=東 / +Z=南 / +Y=上（概略スケール）
-       レベル: 1F=0 / B1=-8 / B2=-18 / B4=-28
+
+       実際の階層構成（公式情報に基づく）:
+         2F  微風台北車站（美食街）
+         1F  台鉄・高鉄 切符売場・大廳（チェック柄の床）
+         B1  台鉄・高鉄改札 ＋ 地下街網（Y・Z・K・R区／機捷連絡）
+         B2  台鉄(3・4月台)・高鉄(1・2月台)ホーム ＋ 捷運大廳(板南線改札)
+         B3  板南線ホーム（忠孝西路下・東西）＋ 淡水信義線大廳（公園路下）
+         B4  淡水信義線ホーム（公園路下・南北）
        ============================================================ */
 
     const COL = {
       paper: 0xfdfbf4, ink: 0x23201a,
-      street: 0xe7ddc8, park: 0xcfe4c4, bldg: 0xded3bd,
-      tra: 0x9a7b3f,       // 台鉄/高鉄コンコース
-      mrt: 0x0e9fb3,       // MRT大廳
-      y: 0xf2a517,         // 台北地下街 Y区
-      z: 0x1fa15f,         // 站前地下街 Z区
-      r: 0x7c5cdb,         // 中山地下街 R区
+      street: 0xe9dfca, park: 0xcfe4c4, bldg: 0xded3bd,
+      tra: 0x9a7b3f, mrt: 0x0e9fb3,
+      y: 0xf2a517, z: 0x1fa15f, k: 0xb0413e, r: 0x7c5cdb,
+      air: 0x8246af, airDark: 0x5e3083,
       lnRed: 0xe3002c, lnBlue: 0x0070bd, lnGreen: 0x0a8f54,
-      route: 0xf15a35
+      platform: 0xcec6b4, track: 0x47423a,
+      conn: 0xffd24d, route: 0xf15a35,
+      breeze: 0xe8a33d
     };
+    const hex = c => '#' + c.toString(16).padStart(6, '0');
 
+    /* ---------- フロア定義 ---------- */
+    const FLOORS = {
+      F2: { y: 14,  ey: 110,  jp: '微風美食街',              bounds: [-105, 105, -92, 18] },
+      F1: { y: 0,   ey: 50,   jp: '地上・駅舎',               bounds: null },
+      B1: { y: -12, ey: -30,  jp: '地下街・台鉄高鉄改札',      bounds: [-665, 270, -500, 120] },
+      B2: { y: -24, ey: -105, jp: '台鉄・高鉄ホーム／捷運大廳', bounds: [-445, 165, -105, 100] },
+      B3: { y: -34, ey: -170, jp: 'BL線ホーム／R線大廳',      bounds: [-130, 200, -80, 95] },
+      B4: { y: -44, ey: -235, jp: 'R線（淡水信義線）ホーム',   bounds: [130, 200, -75, 115] }
+    };
+    const FKEY = Object.keys(FLOORS);
+
+    /* ---------- scene ---------- */
     const app = document.getElementById('app');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(COL.paper);
-    scene.fog = new THREE.Fog(COL.paper, 900, 2200);
+    scene.fog = new THREE.Fog(COL.paper, 1100, 2600);
 
-    const camera = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, 1, 4000);
-    camera.position.set(-120, 430, 470);
+    const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 1, 5000);
+    camera.position.set(-150, 1000, 1250);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(innerWidth, innerHeight);
@@ -240,406 +438,806 @@
     app.appendChild(labelRenderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(-110, -10, -10);
+    controls.target.set(-110, -15, -20);
     controls.enableDamping = true;
     controls.dampingFactor = .08;
-    controls.maxPolarAngle = Math.PI * .49;
-    controls.minDistance = 60;
-    controls.maxDistance = 1400;
+    controls.maxPolarAngle = Math.PI * .495;
+    controls.minDistance = 50;
+    controls.maxDistance = 1800;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.15));
-    const sun = new THREE.DirectionalLight(0xfff3df, 1.6);
-    sun.position.set(-300, 500, 250);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.05));
+    const sun = new THREE.DirectionalLight(0xfff3df, 1.5);
+    sun.position.set(-350, 600, 300);
     scene.add(sun);
+    const fill = new THREE.DirectionalLight(0xe8f2ff, .5);
+    fill.position.set(300, 200, -400);
+    scene.add(fill);
 
-    /* ---- groups (layer toggle) ---- */
-    const G = { g1F: new THREE.Group(), gB1: new THREE.Group(), gB2: new THREE.Group(), gB4: new THREE.Group(), gRoute: new THREE.Group() };
-    Object.values(G).forEach(g => scene.add(g));
+    /* ---------- floor groups ---------- */
+    const F = {};
+    for (const k of FKEY) {
+      F[k] = new THREE.Group();
+      F[k].position.y = FLOORS[k].y;
+      scene.add(F[k]);
+    }
+    const gRoute = new THREE.Group();
+    scene.add(gRoute);
 
     const pickables = [];
 
+    /* ---------- helpers ---------- */
     function makeLabel(text, cls, color) {
       const div = document.createElement('div');
       div.className = 'lbl ' + cls;
-      div.textContent = text;
+      div.innerHTML = text;
       if (color) div.style.color = color;
       return new CSS2DObject(div);
     }
 
-    /* box(x1,x2, z1,z2, yBottom, height, color, opts) */
-    function box(x1, x2, z1, z2, yB, h, color, opts = {}) {
-      const w = x2 - x1, d = z2 - z1;
-      const geo = new THREE.BoxGeometry(w, h, d);
-      const mat = new THREE.MeshLambertMaterial({
-        color, transparent: opts.opacity !== undefined, opacity: opts.opacity ?? 1
+    function mat(color, opacity) {
+      const m = new THREE.MeshLambertMaterial({
+        color, transparent: true, opacity: opacity ?? 1
       });
-      const m = new THREE.Mesh(geo, mat);
-      m.position.set(x1 + w / 2, yB + h / 2, z1 + d / 2);
-      if (opts.name) {
-        m.userData = { name: opts.name, desc: opts.desc || '', tag: opts.tag, tagColor: opts.tagColor };
-        pickables.push(m);
-      }
-      if (opts.edges !== false && h > 1.5) {
-        const eg = new THREE.LineSegments(
-          new THREE.EdgesGeometry(geo),
-          new THREE.LineBasicMaterial({ color: COL.ink, transparent: true, opacity: .18 })
-        );
-        m.add(eg);
-      }
-      if (opts.label) {
-        const l = makeLabel(opts.label, opts.labelCls || 'zone', opts.labelColor || '#' + color.toString(16).padStart(6, '0'));
-        l.position.set(opts.lx ?? 0, h / 2 + (opts.ly ?? 6), opts.lz ?? 0);
-        m.add(l);
-      }
-      (opts.group || G.gB1).add(m);
+      m.userData.baseOp = opacity ?? 1;
       return m;
     }
 
-    function exitMarker(x, z, color, id, desc, group = G.gB1) {
-      const m = new THREE.Mesh(
-        new THREE.CylinderGeometry(2.6, 2.6, 13, 12),
-        new THREE.MeshLambertMaterial({ color })
-      );
-      m.position.set(x, -4, z);
-      m.userData = { name: '出口 ' + id, desc, tag: '出口', tagColor: '#' + color.toString(16).padStart(6, '0') };
+    /* box(floorKey, x1,x2, z1,z2, h, color, opts) — 底面はフロアのローカルy0 */
+    function box(fk, x1, x2, z1, z2, h, color, o = {}) {
+      const w = x2 - x1, d = z2 - z1;
+      const geo = new THREE.BoxGeometry(w, h, d);
+      const m = new THREE.Mesh(geo, mat(color, o.opacity));
+      m.position.set(x1 + w / 2, (o.dy ?? 0) + h / 2, z1 + d / 2);
+      m.userData.floor = fk;
+      if (o.name) {
+        m.userData.info = { name: o.name, desc: o.desc || '', tag: o.tag, color: o.color || hex(color), floor: fk };
+        pickables.push(m);
+      }
+      if (o.edges !== false && h > 1.4) {
+        const eMat = new THREE.LineBasicMaterial({ color: COL.ink, transparent: true, opacity: .15 });
+        eMat.userData.baseOp = .15;
+        m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), eMat));
+      }
+      if (o.label) {
+        const l = makeLabel(o.label, o.labelCls || 'zone', o.labelColor || hex(color));
+        l.position.set(o.lx ?? 0, h / 2 + (o.ly ?? 5), o.lz ?? 0);
+        m.add(l);
+      }
+      if (o.rotY) m.rotation.y = o.rotY;
+      if (o.cx !== undefined) m.position.set(o.cx, (o.dy ?? 0) + h / 2, o.cz);
+      F[fk].add(m);
+      return m;
+    }
+
+    function exitMarker(fk, x, z, color, id, desc) {
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 15, 10), mat(color));
+      m.position.set(x, 7.5, z);
+      m.userData.floor = fk;
+      m.userData.info = { name: '出口 ' + id, desc, tag: '出口', color: hex(color), floor: fk };
       pickables.push(m);
       const l = makeLabel(id, 'exit');
-      l.position.y = 9;
+      l.position.y = 10;
       m.add(l);
-      group.add(m);
+      F[fk].add(m);
     }
 
-    function spotLabel(x, y, z, text, cls = 'spot', color, group = G.g1F) {
-      const l = makeLabel(text, cls, color);
+    function poi(fk, x, z, color, name, desc, labelText) {
+      const m = new THREE.Mesh(new THREE.SphereGeometry(3.4, 14, 14), mat(color));
+      m.position.set(x, 7, z);
+      m.userData.floor = fk;
+      m.userData.info = { name, desc, tag: 'スポット', color: hex(color), floor: fk };
+      pickables.push(m);
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(.5, .5, 7, 6), mat(color, .7));
+      pole.position.set(x, 3.5, z);
+      F[fk].add(pole);
+      const l = makeLabel(labelText || name, 'spot', hex(color));
+      l.position.y = 6;
+      m.add(l);
+      F[fk].add(m);
+    }
+
+    function dirLabel(fk, x, y, z, text) {
+      const l = makeLabel(text, 'dir');
       l.position.set(x, y, z);
-      group.add(l);
+      F[fk].add(l);
+    }
+    function stLabel(x, z, text) {
+      const l = makeLabel(text, 'st');
+      l.position.set(x, 3, z);
+      F['F1'].add(l);
     }
 
-    /* ============ 1F: 地面・道路・建物 ============ */
+    /* ---------- floor slabs（階層の見える化） ---------- */
+    function slab(fk) {
+      const b = FLOORS[fk].bounds;
+      if (!b) return;
+      const [x1, x2, z1, z2] = b;
+      const geo = new THREE.PlaneGeometry(x2 - x1, z2 - z1);
+      const m = new THREE.Mesh(geo, mat(fk === 'F2' ? COL.breeze : COL.ink, .045));
+      m.rotation.x = -Math.PI / 2;
+      m.position.set((x1 + x2) / 2, -0.8, (z1 + z2) / 2);
+      F[fk].add(m);
+      const eMat = new THREE.LineBasicMaterial({ color: COL.ink, transparent: true, opacity: .12 });
+      eMat.userData.baseOp = .12;
+      const edge = new THREE.LineSegments(new THREE.EdgesGeometry(geo), eMat);
+      edge.rotation.x = -Math.PI / 2;
+      edge.position.copy(m.position);
+      F[fk].add(edge);
+      const tag = makeLabel(`${fk}<small>${FLOORS[fk].jp}</small>`, 'floor-tag');
+      tag.position.set(x1 + 4, 4, z1 + 14);
+      F[fk].add(tag);
+    }
+    ['F2', 'B1', 'B2', 'B3', 'B4'].forEach(slab);
 
-    box(-750, 450, -550, 450, -.6, .4, 0xf6f0e1, { group: G.g1F, edges: false });           // 地盤
+    /* ============================================================
+       1F: 地面・道路・建物
+       ============================================================ */
 
-    const ST = (x1, x2, z1, z2, name) =>
-      box(x1, x2, z1, z2, -.1, .5, COL.street, { group: G.g1F, edges: false, name, desc: '地上の道路（概略）', tag: '道路', tagColor: '#9a9080' });
+    box('F1', -760, 460, -560, 460, .4, 0xf6f0e1, { dy: -1, edges: false });   // 地盤
 
-    ST(-700, 420, 38, 72, '忠孝西路');           // 駅南側の大通り
-    ST(-700, 420, -138, -104, '市民大道');        // 駅北側（Y区が下を走る）
-    ST(14, 40, 72, 360, '館前路');               // 新光三越の通り
-    ST(150, 180, 72, 380, '公園路');
-    ST(-210, -180, -380, 380, '重慶南北路');
-    ST(95, 125, -420, -138, '承徳路');
-    ST(230, 262, -420, 38, '中山北路');
-    ST(-560, -532, -380, 38, '延平北路');
+    const ST = (x1, x2, z1, z2, name, desc) =>
+      box('F1', x1, x2, z1, z2, .5, COL.street, {
+        edges: false, name, tag: '道路', color: '#9a9080',
+        desc: desc || '地上の道路（概略位置）。'
+      });
+    ST(-720, 440, 40, 76, '忠孝西路', '駅前の大通り。この真下にZ区站前地下街（B1）・捷運大廳（B2）・板南線ホーム（B3）が3層に重なる。');
+    ST(-720, 440, -138, -102, '市民大道（鄭州路）', '駅北側の大通り。この下をY区台北地下街が東西825m走る。');
+    ST(10, 38, 76, 360, '館前路', '駅正面から二二八公園へ。新光三越はこの通りの西側。');
+    ST(58, 76, 130, 300, '南陽街', '「予備校街」。安くて旨い学生メシの密集地帯。Z区東端Z2のすぐ南。');
+    ST(148, 176, -102, 400, '公園路', 'この真下に淡水信義線の駅（B3大廳・B4ホーム）が南北に伸びる。');
+    ST(-210, -182, -400, 400, '重慶南路・北路');
+    ST(130, 158, -440, -102, '承徳路', '台北轉運站・京站の通り。');
+    ST(228, 258, -440, 40, '中山北路');
+    ST(-560, -532, -400, 40, '延平北路・塔城街');
+    ST(-720, 440, -235, -208, '長安西路');
+    stLabel(-330, 58, '忠 孝 西 路');
+    stLabel(-330, -120, '市 民 大 道');
+    stLabel(24, 330, '館前路');
+    stLabel(162, 330, '公園路');
+    stLabel(-196, 330, '重慶南路');
+    stLabel(144, -380, '承徳路');
+    stLabel(243, -380, '中山北路');
 
     // 台北車站 本屋
-    box(-110, 110, -95, 25, 0, 24, COL.bldg, {
-      group: G.g1F, opacity: .3,
-      name: '台北車站（駅ビル）', tag: '1F', tagColor: '#9a7b3f',
-      desc: '台鉄・高鉄・MRTが集まる台湾最大のターミナル。1Fが切符売場、2Fは「微風台北車站」美食街（牛肉麺コンペ常連店あり）。B1が改札・地下街への入口。',
-      label: '台北車站', labelColor: '#23201a'
+    box('F1', -108, 108, -92, 22, 24, COL.bldg, {
+      opacity: .3,
+      name: '台北車站（駅舎）', tag: '1F〜2F', color: '#9a7b3f',
+      desc: '台鉄・高鉄・MRT・機捷が集まる台湾最大のターミナル。1Fは黒白チェック床の大広間と切符売場、2Fは微風美食街。<b>改札はすべて地下</b>（台鉄・高鉄B1／捷運B2）。',
+      label: '台北車站', labelColor: '#23201a', ly: 18
+    });
+    const roof = new THREE.Mesh(new THREE.CylinderGeometry(0, 86, 16, 4), mat(0xa8432f, .85));
+    roof.rotation.y = Math.PI / 4;
+    roof.scale.set(1.55, 1, 0.78);
+    roof.position.set(0, 32, -35);
+    roof.userData.floor = 'F1';
+    F['F1'].add(roof);
+
+    // 1F 大廳のチェック床
+    const ck = document.createElement('canvas');
+    ck.width = ck.height = 64;
+    const cxx = ck.getContext('2d');
+    cxx.fillStyle = '#efe9da'; cxx.fillRect(0, 0, 64, 64);
+    cxx.fillStyle = '#494439'; cxx.fillRect(0, 0, 32, 32); cxx.fillRect(32, 32, 32, 32);
+    const ckTex = new THREE.CanvasTexture(ck);
+    ckTex.wrapS = ckTex.wrapT = THREE.RepeatWrapping;
+    ckTex.repeat.set(9, 5);
+    const hallMat = new THREE.MeshLambertMaterial({ map: ckTex, transparent: true, opacity: .95 });
+    hallMat.userData.baseOp = .95;
+    const hall = new THREE.Mesh(new THREE.PlaneGeometry(180, 95), hallMat);
+    hall.rotation.x = -Math.PI / 2;
+    hall.position.set(0, .8, -35);
+    hall.userData.floor = 'F1';
+    hall.userData.info = {
+      name: '1F 大廳（チェック柄の床）', tag: '1F', color: '#9a7b3f', floor: 'F1',
+      desc: '駅舎1Fの吹き抜け大広間。黒白チェックの床は待ち合わせの定番で、床に座って列車を待つ光景が台北名物。台鉄・高鉄の切符売場と「台鉄便當本舗」（排骨弁当 NT$100前後）もこのフロア。'
+    };
+    pickables.push(hall);
+    F['F1'].add(hall);
+
+    // 京站・轉運站（承徳路の西側／東側）
+    box('F1', 40, 125, -285, -160, 38, COL.bldg, {
+      opacity: .28,
+      name: '京站時尚廣場（Q square）', tag: '1F〜', color: '#f15a35',
+      desc: 'Y区東端と直結のショッピングモール。<b>B3フードコート</b>が駅周辺で一番使いやすい。上層は映画館・君品酒店。台北轉運站と同じ複合施設。',
+      label: '京站 Q square', labelColor: '#f15a35', ly: 12
+    });
+    box('F1', 165, 255, -285, -150, 30, COL.bldg, {
+      opacity: .25,
+      name: '台北轉運站（バスターミナル）', tag: '1F〜', color: '#9a9080',
+      desc: '長距離バスターミナル（承徳路一段1號）。<b>九份・基隆方面のバスはここ発</b>。R区中山地下街のR1出口前。',
+      label: '台北轉運站', labelColor: '#5b5345', ly: 10
     });
 
-    // 京站時尚廣場 Q square
-    box(60, 150, -280, -160, 0, 36, COL.bldg, {
-      group: G.g1F, opacity: .3,
-      name: '京站時尚廣場（Q square）', tag: '1F〜', tagColor: '#f15a35',
-      desc: 'Y区の東端直結のショッピングモール。B3に人気フードコート、雨に濡れず駅から直行できる。上層は映画館とホテル（君品酒店）。',
-      label: '京站 Q square', labelColor: '#f15a35'
+    // 新光三越（館前路西側・忠孝西路南）
+    box('F1', -60, 8, 80, 170, 95, COL.bldg, {
+      opacity: .26,
+      name: '新光三越 台北站前店', tag: '1F〜', color: '#0e9fb3',
+      desc: '駅前ランドマークの高層タワー（新光人壽摩天大樓）。<b>Z区のZ2出口の目の前</b>。地下にデパ地下グルメ。',
+      label: '新光三越', labelColor: '#0e9fb3', ly: 14
+    });
+    // 凱撒（館前路東側）
+    box('F1', 48, 118, 80, 128, 32, COL.bldg, {
+      opacity: .25,
+      name: '凱撒大飯店（シーザーパーク台北）', tag: '1F〜', color: '#9a9080',
+      desc: '駅正面の老舗ホテル（忠孝西路一段38號）。M6出口前。',
+      label: '凱撒大飯店', labelColor: '#5b5345', ly: 10
+    });
+    // 台北郵局
+    box('F1', -525, -455, 82, 135, 18, COL.bldg, {
+      opacity: .25,
+      name: '台北郵局（北門郵局）', tag: '1F〜', color: '#9a9080',
+      desc: '1930年築の歴史建築。Z区西端Z10からこの方向。北門のすぐ南東。',
+      label: '台北郵局', labelColor: '#5b5345', ly: 8
     });
 
-    // 台北轉運站（バスターミナル）
-    box(160, 250, -280, -150, 0, 28, COL.bldg, {
-      group: G.g1F, opacity: .25,
-      name: '台北轉運站', tag: '1F〜', tagColor: '#9a9080',
-      desc: '長距離バスターミナル。九份・基隆方面のバスはここから。京站と連結。',
-      label: '台北轉運站', labelColor: '#5b5345'
+    box('F1', 40, 145, 185, 335, .6, COL.park, {
+      edges: false,
+      name: '二二八和平公園', tag: '公園', color: '#1fa15f',
+      desc: '駅南東の緑地。園内に国立台湾博物館。南端はMRT台大醫院駅。'
     });
+    const parkL = makeLabel('二二八和平公園', 'spot', '#1fa15f');
+    parkL.position.set(92, 5, 260);
+    F['F1'].add(parkL);
 
-    // 新光三越（站前店・摩天楼）
-    box(-70, 5, 140, 230, 0, 90, COL.bldg, {
-      group: G.g1F, opacity: .28,
-      name: '新光三越 站前店', tag: '1F〜', tagColor: '#0e9fb3',
-      desc: '台北駅前のランドマーク高層ビル。Z区（站前地下街）のZ4出口直結。地下にデパ地下グルメ。',
-      label: '新光三越', labelColor: '#0e9fb3'
-    });
-
-    // 凱撒大飯店
-    box(-100, -30, 85, 135, 0, 30, COL.bldg, {
-      group: G.g1F, opacity: .25,
-      name: '凱撒大飯店（シーザーパーク）', tag: '1F〜', tagColor: '#9a9080',
-      desc: '駅正面のホテル。M6出口がすぐ前。',
-      label: '凱撒大飯店', labelColor: '#5b5345'
-    });
-
-    // 二二八和平公園
-    box(60, 220, 150, 380, -.05, .6, COL.park, { group: G.g1F, edges: false,
-      name: '二二八和平公園', tag: '公園', tagColor: '#1fa15f',
-      desc: '駅南東の緑地。台大醫院駅方面。' });
-    spotLabel(140, 6, 265, '二二八和平公園', 'spot', '#1fa15f');
-
-    // 北門（國定古蹟）
-    box(-580, -552, 4, 32, 0, 16, 0xb0413e, {
-      group: G.g1F, opacity: .85,
-      name: '北門（承恩門）', tag: '史跡', tagColor: '#b0413e',
-      desc: '清代の城門が残る国定古跡。Y区の西端からすぐ地上に出られる。MRT松山新店線「北門駅」もここ。',
-      label: '北門', labelColor: '#b0413e'
-    });
-
-    /* ============ B1: 地下街ネットワーク ============ */
-    const B1 = -10.5, H1 = 5;
-
-    // 台鉄/高鉄 B1 コンコース
-    box(-100, 100, -90, 15, B1, H1, COL.tra, {
-      name: '台鉄・高鉄 B1コンコース', tag: 'B1', tagColor: '#9a7b3f',
-      desc: '台鉄・高鉄の改札フロア。中央の黒白チェック床の大広間が待ち合わせの定番。ここから四方の地下街（Y・Z・R・M）に繋がる。',
-      label: '台鉄・高鉄 改札（B1）'
-    });
-
-    // MRT 台北車站 大廳（忠孝西路の下）
-    box(-60, 95, 35, 80, B1, H1, COL.mrt, {
-      name: 'MRT台北車站 大廳', tag: 'B1', tagColor: '#0e9fb3',
-      desc: 'MRT改札フロア。下にR線（淡水信義線・B2）とBL線（板南線・B4）のホームが重なる。悠遊卡（EasyCard）のチャージ機多数。',
-      label: 'MRT改札（B1）'
-    });
-
-    // 連絡通路: 台鉄B1 ⇄ MRT大廳
-    box(-20, 5, 15, 35, B1, H1, COL.mrt, { opacity: .85, edges: false });
-    box(55, 80, 15, 35, B1, H1, COL.mrt, { opacity: .85, edges: false });
-
-    // 連絡通路: 台鉄B1 ⇄ Y区
-    box(-60, -30, -112, -90, B1, H1, COL.y, { opacity: .85, edges: false });
-    box(20, 50, -112, -90, B1, H1, COL.y, { opacity: .85, edges: false });
-
-    // ---- Y区 台北地下街（市民大道の下・東西825m）----
-    box(-560, 110, -130, -112, B1, H1, COL.y, {
-      name: '台北地下街（Y区）', tag: 'B1', tagColor: '#f2a517',
-      desc: '東西825mの台湾最長級地下街。グルメ・ゲーセン・アニメグッズ店が多く「台北のアキバ」とも。西端は北門、東端は京站・バスターミナル直結。雨の日の移動にも◎。',
-      label: 'Y区 台北地下街', lx: -120
-    });
-    // Y区 ⇄ 京站
-    box(75, 105, -170, -130, B1, H1, COL.y, { opacity: .85, edges: false });
-    box(70, 140, -250, -170, B1, H1, 0xf15a35, {
-      opacity: .8,
-      name: '京站 B1（Y区直結）', tag: 'B1', tagColor: '#f15a35',
-      desc: 'Y区東端から直結。B3のフードコートは駅周辺で一番使いやすい。'
-    });
-    // 北門駅（G線）
-    box(-620, -560, -95, -35, B1, H1, COL.lnGreen, {
+    // 北門
+    box('F1', -580, -552, 4, 32, 14, 0xb0413e, {
       opacity: .9,
-      name: 'MRT北門駅（松山新店線）', tag: 'B1', tagColor: '#0a8f54',
-      desc: 'Y区西端から連絡。G線で西門・松山方面へ。',
-      label: '北門駅（G線）', labelColor: '#0a8f54'
+      name: '北門（承恩門）', tag: '史跡', color: '#b0413e',
+      desc: '1884年築、清代の姿が残る唯一の城門（国定古跡）。Y区西端のY28から地上に出てすぐ。夕方の写真スポット。',
+      label: '北門', labelColor: '#b0413e', ly: 9
     });
-    box(-560, -535, -80, -60, B1, H1, COL.lnGreen, { opacity: .7, edges: false });
+    const gRoof = new THREE.Mesh(new THREE.CylinderGeometry(0, 21, 7, 4), mat(0x6e2a22, .95));
+    gRoof.rotation.y = Math.PI / 4;
+    gRoof.scale.set(1.1, 1, .8);
+    gRoof.position.set(-566, 17.5, 18);
+    gRoof.userData.floor = 'F1';
+    F['F1'].add(gRoof);
 
-    // Y区 出口
-    exitMarker(-500, -136, COL.y, 'Y3', '北門・大稻埕方面の出口。');
-    exitMarker(-380, -136, COL.y, 'Y7', '華陰街（問屋街）方面。');
-    exitMarker(-250, -136, COL.y, 'Y13', 'Y区中央。市民大道北側に出る。');
-    exitMarker(-120, -136, COL.y, 'Y19', '太原路方面。');
-    exitMarker(20, -136, COL.y, 'Y25', '京站・台北轉運站の手前。');
-    exitMarker(95, -150, COL.y, 'Y27', '京站時尚廣場の真ん前。');
-
-    // ---- Z区 站前地下街（駅前広場〜新光三越の下・南北）----
-    box(8, 38, 80, 300, B1, H1, COL.z, {
-      name: '站前地下街（Z区）', tag: 'B1', tagColor: '#1fa15f',
-      desc: '駅前から南へ延びる地下街。本屋・服飾・雑貨など。南端で新光三越・補習班街（南陽街）に出る。MRT大廳から直結。',
-      label: 'Z区 站前地下街', lz: 30
-    });
-
-    // Z区 出口
-    exitMarker(0, 110, COL.z, 'Z2', '凱撒大飯店前。');
-    exitMarker(0, 200, COL.z, 'Z4', '新光三越 站前店 直結。');
-    exitMarker(46, 160, COL.z, 'Z6', '館前路東側。');
-    exitMarker(46, 250, COL.z, 'Z8', '南陽街（予備校街・安うまグルメ多し）方面。');
-    exitMarker(23, 312, COL.z, 'Z10', 'Z区南端。二二八公園・台大醫院方面へ。');
-
-    // ---- R区 中山地下街（北へ・中山駅方面）----
-    box(95, 235, 45, 67, B1, H1, COL.r, { opacity: .85, edges: false });   // MRT大廳→東への連絡
-    box(235, 257, -410, 67, B1, H1, COL.r, {
-      name: '中山地下街（R区）', tag: 'B1', tagColor: '#7c5cdb',
-      desc: '台北駅から中山駅・雙連駅まで約815m続く地下街。中山駅側に書店「誠品R79」。地上に出ず中山エリアまで歩ける＝DAY1夜・DAY3夜の中山戻りに使える。',
-      label: 'R区 中山地下街', lz: -60
-    });
-    spotLabel(246, -2, -430, '→ 中山駅・誠品R79（徒歩約10分）', 'dir', null, G.gB1);
-
-    // R区 出口
-    exitMarker(228, -60, COL.r, 'R1', '華陰街方面。');
-    exitMarker(264, -180, COL.r, 'R4', '中山北路東側。');
-    exitMarker(228, -320, COL.r, 'R7', '中山駅寄り。当代芸術館近く。');
-
-    // M出口（MRT）
-    exitMarker(-72, 30, COL.mrt, 'M1', '駅西側・北門寄り。');
-    exitMarker(-40, 90, COL.mrt, 'M3', '忠孝西路南側。');
-    exitMarker(10, 90, COL.mrt, 'M6', '凱撒大飯店前。Z区・新光三越へはここが近い。');
-    exitMarker(70, 90, COL.mrt, 'M8', '公園路寄り南側。');
-    exitMarker(102, 30, COL.mrt, 'M4', '駅東側・市民大道寄り。');
-
-    /* ============ B2: R線・台鉄/高鉄ホーム ============ */
-    const B2 = -20.5, H2 = 4.5;
-
-    box(45, 72, -40, 100, B2, H2, COL.lnRed, {
-      group: G.gB2,
-      name: 'R線ホーム（淡水信義線・B2）', tag: 'B2', tagColor: '#e3002c',
-      desc: '淡水信義線（レッドライン）。北行=淡水方面（中山・雙連・北投へ）、南行=象山方面（中正紀念堂・東門へ）。DAY2の北投行き・DAY3の中正紀念堂行きはここから。',
-      label: 'R線ホーム', labelColor: '#e3002c'
+    /* ============================================================
+       2F: 微風美食街
+       ============================================================ */
+    box('F2', -90, 90, -78, 8, 8, COL.breeze, {
+      opacity: .55,
+      name: '微風台北車站（2F 美食街）', tag: '2F', color: '#e8a33d',
+      desc: '駅舎2Fを回廊状に囲むフードコート「Breeze 台北車站」。台湾各地の名店が集まり、1F大廳を見下ろすカウンター席が人気。<b>列車に乗る前の食事はここが定番</b>。',
+      label: '2F 微風美食街', labelColor: '#e8a33d'
     });
 
-    // 台鉄・高鉄ホーム（島式4面のイメージ）
-    const traP = (z, name, desc) => box(-95, 95, z, z + 9, B2, H2, 0x8d8576, {
-      group: G.gB2, name, tag: 'B2', tagColor: '#8d8576', desc
-    });
-    traP(-80, '高鉄ホーム（B2）', '台湾高速鉄道。台中・台南・左営（高雄）方面。桃園空港へは台鉄/MRTが便利。');
-    traP(-62, '台鉄ホーム 1（B2）', '台湾鉄路。基隆・宜蘭方面など。');
-    traP(-44, '台鉄ホーム 2（B2）', '台湾鉄路。台中・南部方面など。');
-    spotLabel(0, B2 + 14, -68, '台鉄・高鉄ホーム（B2）', 'spot', '#8d8576', G.gB2);
+    /* ============================================================
+       B1: 地下街ネットワーク＋台鉄・高鉄改札
+       ============================================================ */
 
-    /* ============ B4: BL線ホーム ============ */
-    const B4 = -32, H4 = 4.5;
-
-    box(-75, 60, 44, 70, B4, H4, COL.lnBlue, {
-      group: G.gB4,
-      name: 'BL線ホーム（板南線・B4）', tag: 'B4', tagColor: '#0070bd',
-      desc: '板南線（ブルーライン）。東行=南港方面（善導寺・忠孝復興へ）、西行=頂埔方面（西門・龍山寺へ）。DAY3朝の善導寺（阜杭豆漿）行きはここから。R線とは同じ駅内でエスカレーター乗換（B4→B2）。',
-      label: 'BL線ホーム（B4）', labelColor: '#0070bd'
+    box('B1', -100, 100, -88, 14, 6, COL.tra, {
+      name: '台鉄・高鉄 B1コンコース（改札）', tag: 'B1', color: '#9a7b3f',
+      desc: '台鉄・高鉄の改札フロア。ここを起点に四方の地下街（Y・Z・K・R区）と機捷A1へつながる地下都市のハブ。改札を入るとB2ホームへ降りる。',
+      label: '台鉄・高鉄 改札', ly: 7
     });
 
-    /* ============ ルートアニメーション ============ */
+    // ---- K区（站前広場の真下） ----
+    box('B1', -100, 130, 24, 44, 6, COL.k, {
+      name: '台北車站 K区地下街（誠品站前店）', tag: 'B1', color: '#b0413e',
+      desc: '台鉄駅舎と忠孝西路の間、<b>站前広場の真下</b>にある地下街。B1は書店<b>「誠品站前店」</b>を中心とした商店街、B2は駐車場。出口はK1（東端）〜K12。捷運M4出口とも連通。',
+      label: 'K区 誠品站前', lx: -40, ly: 7
+    });
 
+    // ---- Z区 站前地下街（忠孝西路の下・東西343m） ----
+    box('B1', -185, 72, 48, 72, 6, COL.z, {
+      name: '站前地下街（Z区）', tag: 'B1', color: '#1fa15f',
+      desc: '忠孝西路の真下を<b>東西に343m</b>のびる地下街（東端＝南陽街・新光三越前、西端＝重慶南路）。軽食・ファッション・雑貨など。1日5〜15万人が行き交う。<b>Z2出口で新光三越前</b>、Z10から台北郵局・北門方面。',
+      label: 'Z区 站前地下街', lx: -60, ly: 7
+    });
+    // K⇄Z連絡
+    box('B1', -20, 6, 44, 48, 6, COL.z, { opacity: .8, edges: false });
+    box('B1', 60, 86, 44, 48, 6, COL.z, { opacity: .8, edges: false });
+
+    // ---- Y区 台北地下街（市民大道の下・東西825m） ----
+    box('B1', -558, 170, -128, -110, 6, COL.y, {
+      name: '台北地下街（Y区）', tag: 'B1', color: '#f2a517',
+      desc: '市民大道（鄭州路）の下を<b>東西825m</b>、店舗187店の台湾最長級地下街。ゲーセン・ガチャ・アニメ・カードショップが密集する<b>「台北のアキバ」</b>。B2は駐車場。営業は平日11:00〜21:30／土日〜22:00。南側出口は台鉄・高鉄・機捷、北側出口は京站・轉運站方面。',
+      label: 'Y区 台北地下街', lx: -150, ly: 7
+    });
+    // Y⇄台鉄連絡
+    box('B1', -60, -32, -110, -88, 6, COL.y, { opacity: .8, edges: false });
+    box('B1', 18, 46, -110, -88, 6, COL.y, { opacity: .8, edges: false });
+    // Y⇄京站連絡
+    box('B1', 70, 100, -168, -128, 6, COL.y, { opacity: .8, edges: false });
+    box('B1', 50, 120, -250, -168, 6, 0xf15a35, {
+      opacity: .85,
+      name: '京站 B1（Y区直結）', tag: 'B1', color: '#f15a35',
+      desc: 'Y区東端の北側からそのまま入れる。<b>B3フードコート</b>と映画館・君品酒店へ。台北轉運站（九份・基隆方面バス）もこの建物群。'
+    });
+
+    // 北門駅（G線）
+    box('B1', -618, -558, -95, -35, 6, COL.lnGreen, {
+      opacity: .9,
+      name: 'MRT北門駅（松山新店線）', tag: 'B1', color: '#0a8f54',
+      desc: 'Y区西端（Y28）と直結。G線で西門へ1駅・松山方面へ。駅構内に清代の機器局遺構の展示がある。',
+      label: '北門駅（G線）', labelColor: '#0a8f54', ly: 7
+    });
+    box('B1', -558, -530, -80, -58, 6, COL.lnGreen, { opacity: .7, edges: false });
+
+    // ---- 機捷 A1（桃園空港MRT） ----
+    box('B1', -420, -260, -95, -40, 6, COL.air, {
+      name: '機捷 台北車站（A1）B1ホール', tag: 'B1', color: '#8246af',
+      desc: '桃園空港MRTのターミナル。<b>B1で市區預辦登機（インタウンチェックイン）</b>＝搭乗手続き＋荷物預けが可能。受付06:00〜21:30・<b>離陸3時間前まで</b>・当日便のみ。対象：中華航空・華信・長榮（エバー）・立榮・國泰・星宇。直達車（快速）で桃園空港まで<b>約39分</b>、15分間隔。',
+      label: '機捷 A1（空港MRT）', labelColor: '#8246af', ly: 7
+    });
+    box('B1', -260, -100, -72, -50, 6, 0xc9bda4, {
+      opacity: .85,
+      name: 'A1連絡通道（動く歩道）', tag: 'B1', color: '#9a9080',
+      desc: '台鉄B1コンコースと機捷A1を結ぶ連絡通路。動く歩道あり、徒歩4〜5分。Y区南側（Y14前後）からも入れる。'
+    });
+    box('B1', -340, -310, -110, -95, 6, COL.air, { opacity: .7, edges: false });
+
+    // ---- R区 中山地下街（北へ815m） ----
+    box('B1', 130, 176, -128, -98, 6, COL.r, { opacity: .8, edges: false });
+    {
+      const sx = 158, sz = -112, exx = 185, ez = -470;
+      const len = Math.hypot(exx - sx, ez - sz), w = 22;
+      const angle = Math.atan2(exx - sx, -(ez - sz));
+      box('B1', -w / 2, w / 2, -len / 2, len / 2, 6, COL.r, {
+        cx: (sx + exx) / 2, cz: (sz + ez) / 2,
+        rotY: angle,
+        name: '中山地下街（R区）', tag: 'B1', color: '#7c5cdb',
+        desc: '台北車站北端から中山駅を経て雙連駅まで<b>全長815m</b>（出口R1〜R11）。旧台鉄淡水線跡で、地上は線形公園「心中山」。中山駅側の区間は書店街<b>「誠品R79」</b>。営業11:00〜22:00（書店街11:30〜21:30）。<b>地上に出ずに中山エリアまで歩ける</b>＝DAY1・DAY3の夜の中山戻りに◎。',
+        label: 'R区 中山地下街', ly: 7
+      });
+      dirLabel('B1', 190, 4, -492, '→ 中山駅・誠品R79・雙連（徒歩約10分）');
+    }
+
+    /* ---- 出口マーカー ---- */
+    // Y区（東→西に番号増・南側＝台鉄/機捷側・北側＝京站側）
+    exitMarker('B1', 160, -132, COL.y, 'Y1', 'Y区東端・北側。市民大道北側へ。');
+    exitMarker('B1', 145, -106, COL.y, 'Y2', 'Y区東端・南側。<b>捷運M1と共用階段</b>、台鉄・高鉄改札方面。');
+    exitMarker('B1', 60, -132, COL.y, 'Y5', '北側。<b>京站・台北轉運站方面</b>。');
+    exitMarker('B1', -100, -132, COL.y, 'Y9', '北側。華陰街（問屋街）方面。');
+    exitMarker('B1', -250, -132, COL.y, 'Y13', 'Y区中央。');
+    exitMarker('B1', -300, -106, COL.y, 'Y14', '南側。<b>機捷A1への連絡口</b>。');
+    exitMarker('B1', -400, -132, COL.y, 'Y19', '北側。大稻埕方面。');
+    exitMarker('B1', -500, -106, COL.y, 'Y26', '南側。台北郵局方面。');
+    exitMarker('B1', -552, -125, COL.y, 'Y28', 'Y区西端。<b>北門駅（G線）直結</b>・北門へ地上すぐ。一號廣場（コスプレ撮影で有名）近く。');
+    // Z区（東→西・北＝奇数／南＝偶数）
+    exitMarker('B1', 66, 46, COL.z, 'Z1', 'Z区東端・北側。K区・台北車站方面。');
+    exitMarker('B1', 40, 76, COL.z, 'Z2', '南側。<b>新光三越站前店の目の前</b>・南陽街（予備校街グルメ）口。');
+    exitMarker('B1', -20, 76, COL.z, 'Z4', '南側。館前路西側。');
+    exitMarker('B1', -70, 76, COL.z, 'Z6', '南側。重慶南路方面・台湾博物館へ徒歩圏。');
+    exitMarker('B1', -130, 76, COL.z, 'Z8', '南側。重慶南路の書店街方面。');
+    exitMarker('B1', -182, 60, COL.z, 'Z10', 'Z区西端。<b>台北郵局・北門方面</b>。');
+    // K区（東端K1＝誠品）
+    exitMarker('B1', 110, 46, COL.k, 'K1', 'K区東端。<b>誠品站前店</b>側の出入口。');
+    exitMarker('B1', 10, 22, COL.k, 'K5', '站前広場（駅正面）へ。');
+    exitMarker('B1', -90, 30, COL.k, 'K12', 'K区西端。');
+    // R区
+    exitMarker('B1', 150, -125, COL.r, 'R1', 'R区南端。<b>市民大道・台北轉運站前</b>。');
+    exitMarker('B1', 172, -170, COL.r, 'R2', '華陰街（問屋街）方面。');
+    exitMarker('B1', 158, -240, COL.r, 'R4', '長安西路方面。');
+    exitMarker('B1', 182, -330, COL.r, 'R7', '<b>赤峰街</b>（リノベカフェ・古着の人気エリア）方面。');
+    exitMarker('B1', 168, -425, COL.r, 'R9', '中山駅寄り。台北當代藝術館近く。');
+    // M出口（捷運）
+    exitMarker('B1', -70, 85, COL.mrt, 'M2', '忠孝西路南側・西寄り。');
+    exitMarker('B1', -20, 85, COL.mrt, 'M3', '忠孝西路南側。重慶南路方面。');
+    exitMarker('B1', 105, 42, COL.mrt, 'M4', '<b>K区（誠品站前店）と連通</b>。');
+    exitMarker('B1', 125, 80, COL.mrt, 'M5', '公園路西側。');
+    exitMarker('B1', 36, 85, COL.mrt, 'M6', '<b>凱撒大飯店前</b>。新光三越・館前路へ地上で行くならここ。');
+    exitMarker('B1', 158, 85, COL.mrt, 'M7', '公園路沿い南側。');
+    exitMarker('B1', 186, 60, COL.mrt, 'M8', '公園路東側。華山1914・善導寺方面へ歩くならここ。');
+
+    /* ---- B1 スポット ---- */
+    poi('B1', -300, -119, COL.y, 'Y区中央：ゲーセン・ガチャ街', 'Y区の中央〜西寄りはゲームセンター・ガチャガチャ・カード・アニメグッズ店が密集。「台北のアキバ」の核心部。', 'ゲーセン・ガチャ街');
+    poi('B1', -540, -119, COL.y, '一號廣場', 'Y28出口近くの広場。週末はコスプレ撮影の聖地として有名。', '一號廣場');
+    poi('B1', 85, -210, 0xf15a35, '京站 B3フードコート', '駅直結で一番使いやすいフードコート。小籠包から牛肉麺・豆花まで。雨の日の夕食に最適。', '京站B3フードコート');
+    poi('B1', 80, 34, COL.k, '誠品站前店', 'K区の核となる誠品書店。台湾デザインの文具・雑貨はおみやげにも。M4出口連通。', '誠品站前店');
+
+    /* ============================================================
+       B2: 台鉄・高鉄ホーム ＋ 捷運大廳（板南線改札）
+       ============================================================ */
+
+    // 捷運大廳（忠孝西路下・B2）
+    box('B2', -58, 95, 36, 80, 5, COL.mrt, {
+      name: '捷運大廳（板南線改札・B2）', tag: 'B2', color: '#0e9fb3',
+      desc: '捷運（MRT）の改札・きっぷ売場フロア。<b>BL線⇄R線の乗換はこの階を経由</b>する（両線のホームは直接つながっていない）。悠遊卡（EasyCard）チャージ機多数。M出口へはここから上がる。',
+      label: '捷運大廳（改札）', ly: 6
+    });
+    box('B2', 95, 150, 40, 70, 5, COL.mrt, {
+      opacity: .8, edges: false,
+      name: '捷運連絡通路（B2）', tag: 'B2', color: '#0e9fb3',
+      desc: '捷運大廳から東へ、淡水信義線（公園路下）方面への連絡通路。'
+    });
+
+    // 台鉄・高鉄ホーム（高鉄1・2月台＝南側／台鉄3・4月台＝北側）
+    const traP = (z1, z2, name, desc, color) => box('B2', -95, 95, z1, z2, 4, COL.platform, {
+      name, tag: 'B2', color: color || '#9a7b3f', desc
+    });
+    traP(-30, -20, '高鉄 第1月台', '台湾高速鉄道（南側ホーム）。台中・台南・左営（高雄）方面。全席指定の早割「早鳥」は最大35%オフ。', '#c47a2e');
+    box('B2', -95, 95, -38, -32, 1.4, COL.track, { edges: false });
+    traP(-48, -38, '高鉄 第2月台', '台湾高速鉄道（南側ホーム）。乗車券があれば台鉄側と行き来できる中間改札あり。', '#c47a2e');
+    box('B2', -95, 95, -56, -50, 1.4, COL.track, { edges: false });
+    traP(-66, -56, '台鉄 第3月台', '台湾鉄路（北側ホーム）。基隆・宜蘭・花蓮方面など東部幹線。');
+    box('B2', -95, 95, -74, -68, 1.4, COL.track, { edges: false });
+    traP(-84, -74, '台鉄 第4月台', '台湾鉄路（北側ホーム）。桃園・新竹・台中方面など西部幹線。');
+    const traL = makeLabel('台鉄・高鉄ホーム（B2）', 'zone', '#9a7b3f');
+    traL.position.set(-60, 9, -52);
+    F['B2'].add(traL);
+
+    // 機捷ホーム
+    box('B2', -410, -270, -85, -50, 4, COL.airDark, {
+      opacity: .9,
+      name: '機捷ホーム（桃園空港MRT）', tag: 'B2', color: '#8246af',
+      desc: '<b>紫の直達車（快速）</b>と青の普通車が交互に発車（各15分間隔）。空港へは直達車で<b>T2まで約39分</b>。座席は新幹線型でWi-Fi・荷物置き場つき。',
+      label: '機捷ホーム', labelColor: '#8246af', ly: 6
+    });
+
+    /* ============================================================
+       B3: 板南線ホーム（忠孝西路下）＋ 淡水信義線大廳（公園路下）
+       ============================================================ */
+
+    box('B3', -75, 60, 48, 68, 4, COL.platform, {
+      name: 'BL線ホーム（板南線・B3）', tag: 'B3', color: '#0070bd',
+      desc: '忠孝西路の真下・東西方向の島式ホーム。<b>東行＝南港方面</b>（善導寺・忠孝復興へ／DAY3朝の阜杭豆漿は善導寺下車）、<b>西行＝頂埔方面</b>（西門・龍山寺へ）。R線への乗換はB2大廳へ上がって東へ。',
+      label: 'BL線ホーム', labelColor: '#0070bd', ly: 6
+    });
+    box('B3', -115, 100, 41, 48, 1.4, COL.track, { edges: false });
+    box('B3', -115, 100, 68, 75, 1.4, COL.track, { edges: false });
+
+    box('B3', 150, 176, -60, 40, 5, 0xd96a85, {
+      opacity: .9,
+      name: 'R線大廳（淡水信義線改札・B3）', tag: 'B3', color: '#e3002c',
+      desc: '公園路の下にある淡水信義線の改札階。<b>北端の通路は台鉄・高鉄エリアと直結</b>していて、R線⇄台鉄/高鉄の乗換はここが最短。',
+      label: 'R線大廳', labelColor: '#e3002c', ly: 6
+    });
+
+    /* ============================================================
+       B4: 淡水信義線ホーム（公園路下・南北）
+       ============================================================ */
+    box('B4', 152, 174, -50, 90, 4, COL.platform, {
+      name: 'R線ホーム（淡水信義線・B4）', tag: 'B4', color: '#e3002c',
+      desc: '公園路の真下・南北方向の島式ホーム。駅で最深部。<b>北行＝淡水方面</b>（中山・雙連・北投へ／DAY2の北投行き）、<b>南行＝象山方面</b>（台大醫院・中正紀念堂・東門へ／DAY3）。',
+      label: 'R線ホーム', labelColor: '#e3002c', ly: 6
+    });
+    box('B4', 144, 152, -70, 110, 1.4, COL.track, { edges: false });
+    box('B4', 174, 182, -70, 110, 1.4, COL.track, { edges: false });
+
+    /* ============================================================
+       電車（アニメーション）
+       ============================================================ */
+    const trains = [];
+    function train(fk, color, axis, fixedCoord, from, to, speed) {
+      const g = new THREE.Group();
+      const bodyM = mat(color);
+      for (let i = 0; i < 3; i++) {
+        const car = new THREE.Mesh(
+          new THREE.BoxGeometry(axis === 'x' ? 11 : 6, 4.2, axis === 'x' ? 6 : 11), bodyM);
+        if (axis === 'x') car.position.x = (i - 1) * 12.5; else car.position.z = (i - 1) * 12.5;
+        car.position.y = 3.6;
+        g.add(car);
+      }
+      if (axis === 'x') g.position.z = fixedCoord; else g.position.x = fixedCoord;
+      g.userData = { axis, from, to, speed, phase: Math.random() };
+      F[fk].add(g);
+      trains.push(g);
+    }
+    train('B4', COL.lnRed, 'z', 148, -55, 95, .045);          // R線（南北）
+    train('B3', COL.lnBlue, 'x', 44.5, -70, 55, .05);         // BL線（東西）
+    train('B2', COL.airDark, 'x', -67.5, -395, -290, .04);    // 機捷
+    train('B2', 0xd97f2e, 'x', -35, -80, 80, .03);            // 高鉄/台鉄
+
+    /* ============================================================
+       エスカレーター／エレベーター（縦動線）
+       ============================================================ */
+    const CONNS = [
+      { x: 0, z: -40, a: 'F1', b: 'B1', name: '台鉄改札へのエスカレーター', desc: '1F大廳からB1改札階へ。' },
+      { x: -35, z: -40, a: 'F1', b: 'F2', name: '微風美食街へのエスカレーター', desc: '1F大廳から2Fフードコートへ。' },
+      { x: -50, z: -55, a: 'B1', b: 'B2', name: '台鉄・高鉄ホームへ（西）', desc: 'B1改札からB2ホームへ。' },
+      { x: 40, z: -55, a: 'B1', b: 'B2', name: '台鉄・高鉄ホームへ（東）', desc: 'B1改札からB2ホームへ。' },
+      { x: 20, z: 58, a: 'B1', b: 'B2', name: '捷運大廳へ', desc: 'B1（Z区・K区・M出口レベル）からB2の捷運改札へ。' },
+      { x: -20, z: 58, a: 'B2', b: 'B3', name: 'BL線ホームへ', desc: 'B2捷運大廳からB3板南線ホームへ。' },
+      { x: 160, z: 30, a: 'B2', b: 'B3', name: 'R線大廳へ', desc: 'B2連絡通路からB3淡水信義線大廳へ。' },
+      { x: 163, z: 0, a: 'B3', b: 'B4', name: 'R線ホームへ', desc: 'B3 R線大廳から最深部B4ホームへ。' },
+      { x: 160, z: -52, a: 'B3', b: 'B2', name: 'R線⇄台鉄・高鉄 連絡', desc: 'R線大廳北端の通路から台鉄・高鉄ホーム階へ直結。<b>R線⇄台鉄/高鉄乗換の最短ルート</b>。' },
+      { x: -340, z: -66, a: 'B1', b: 'B2', name: '機捷ホームへ', desc: 'A1ホール（チェックイン階）からホームへ。' },
+      { x: 85, z: -205, a: 'B1', b: 'F1', name: '京站館内エスカレーター', desc: 'B1からB3フードコート・上階モールへ。' },
+      { x: -588, z: -65, a: 'B1', b: 'F1', name: '北門駅出入口', desc: '北門駅から地上（北門前）へ。' }
+    ];
+    const connMeshes = CONNS.map(c => {
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.8, 1, 12), mat(COL.conn, .92));
+      m.userData.floor = '_conn';
+      m.userData.conn = c;
+      m.userData.info = { name: c.name, desc: c.desc, tag: '昇降', color: '#caa53d', floor: c.a + '⇄' + c.b };
+      pickables.push(m);
+      scene.add(m);
+      return m;
+    });
+    function updateConns() {
+      for (const m of connMeshes) {
+        const c = m.userData.conn;
+        const ya = F[c.a].position.y + 3, yb = F[c.b].position.y + 3;
+        m.position.set(c.x, (ya + yb) / 2, c.z);
+        m.scale.y = Math.max(Math.abs(ya - yb), 2);
+      }
+    }
+
+    /* ============================================================
+       歩行ルート
+       ============================================================ */
     const ROUTES = [
       {
-        name: 'BL線 → R線 乗換（駅構内）',
-        desc: 'B4のBL線ホームからエスカレーターでB1のMRT大廳へ上がり、R線改札内をそのままB2のR線ホームへ。<b>約4〜6分</b>。DAY3「善導寺→中正紀念堂」の台北車站乗換がこれ。',
-        pts: [[-8, -30, 57], [-8, -8, 57], [40, -8, 57], [58, -8, 50], [58, -18, 30]]
+        name: 'BL線 → R線 乗換（台北車站の駅構内）',
+        desc: 'B3のBL線ホーム → B2の捷運大廳へ上がる → 改札内を東へ（公園路方面） → B3のR線大廳 → B4のR線ホームへ。<b>約4〜6分</b>。DAY3「善導寺→中正紀念堂」の台北車站乗換がまさにこれ。<b>「淡水信義線」の赤いサイン</b>を追えばOK。',
+        pts: [[-50, 58, 'B3'], [-20, 58, 'B3'], [-20, 58, 'B2'], [60, 58, 'B2'], [120, 55, 'B2'], [160, 30, 'B2'], [160, 30, 'B3'], [163, 0, 'B3'], [163, 0, 'B4'], [163, 60, 'B4']]
       },
       {
-        name: '台鉄改札 → Y区 → 京站',
-        desc: '台鉄B1コンコースから北の連絡通路でY区（台北地下街）へ。東端まで歩けば京站時尚廣場と台北轉運站に直結。<b>約5〜7分・雨に濡れない</b>。',
-        pts: [[0, -8, -40], [-45, -8, -75], [-45, -8, -121], [90, -8, -121], [90, -8, -160], [100, -8, -210]]
+        name: '台鉄改札 → Y区 → 京站（雨に濡れないルート）',
+        desc: '台鉄B1コンコースから北の連絡通路でY区（台北地下街）へ。東端方向に歩き、北側のY5付近から<b>京站時尚廣場・台北轉運站へ直結</b>。約5〜7分。九份行きバスに乗る日もこのルート。',
+        pts: [[0, -40, 'B1'], [-46, -75, 'B1'], [-46, -119, 'B1'], [80, -119, 'B1'], [85, -150, 'B1'], [85, -205, 'B1']]
       },
       {
-        name: 'M6 → Z区 → 新光三越（Z4）',
-        desc: 'MRT大廳からM6方面に出ずにそのままZ区（站前地下街）へ南下。Z4出口で新光三越に直結。<b>約4分</b>。南陽街の安うまグルメはZ8から。',
-        pts: [[23, -8, 60], [23, -8, 120], [23, -8, 195], [6, -8, 200]]
+        name: '捷運大廳 → Z区 → 新光三越（Z2）',
+        desc: 'B2の捷運大廳から改札を出てB1へ上がり、Z区（站前地下街）を東へ。<b>Z2出口を上がれば新光三越站前店の目の前</b>。約4分。南陽街の安うまグルメ（學生メシ）もZ2から。',
+        pts: [[20, 58, 'B2'], [20, 58, 'B1'], [0, 60, 'B1'], [38, 62, 'B1'], [40, 74, 'B1']]
+      },
+      {
+        name: '帰国日：台鉄B1 → 機捷A1（インタウンチェックイン）',
+        desc: '台鉄B1コンコースから西の連絡通道（動く歩道）で機捷A1へ徒歩4〜5分。<b>B1でチェックイン・荷物を預けて</b>（離陸3時間前まで・06:00〜21:30）からホームへ。直達車で桃園空港T2まで<b>約39分</b>。<b>13:10発のフライトなら9:30前にA1着→10:10までに手続き完了</b>が安全。',
+        pts: [[-60, -65, 'B1'], [-150, -61, 'B1'], [-250, -62, 'B1'], [-340, -66, 'B1'], [-340, -66, 'B2'], [-380, -67, 'B2']]
       }
     ];
 
-    let routeObj = null, routeBall = null, routeCurve = null, routeT = 0, activeRoute = -1;
+    let routeTube = null, routeBall = null, routeCurve = null, routeT = 0, activeRoute = -1;
 
-    function clearRoute() {
-      G.gRoute.clear();
-      routeObj = routeBall = routeCurve = null;
-      activeRoute = -1;
+    function routePts(i) {
+      return ROUTES[i].pts.map(p => new THREE.Vector3(p[0], F[p[2]].position.y + 4, p[1]));
     }
-
+    function buildRouteGeo(i) {
+      routeCurve = new THREE.CatmullRomCurve3(routePts(i), false, 'catmullrom', .08);
+      if (routeTube) { routeTube.geometry.dispose(); gRoute.remove(routeTube); }
+      routeTube = new THREE.Mesh(
+        new THREE.TubeGeometry(routeCurve, 110, 1.5, 8),
+        new THREE.MeshBasicMaterial({ color: COL.route, transparent: true, opacity: .92 })
+      );
+      gRoute.add(routeTube);
+    }
+    function clearRoute() {
+      if (routeTube) routeTube.geometry.dispose();
+      gRoute.clear();
+      routeTube = routeBall = routeCurve = null;
+      activeRoute = -1;
+      document.querySelectorAll('#routes .chip').forEach(c => c.classList.remove('on'));
+    }
     function showRoute(i) {
       clearRoute();
       activeRoute = i;
-      const r = ROUTES[i];
-      routeCurve = new THREE.CatmullRomCurve3(r.pts.map(p => new THREE.Vector3(...p)), false, 'catmullrom', .1);
-      const tube = new THREE.Mesh(
-        new THREE.TubeGeometry(routeCurve, 80, 1.4, 8),
-        new THREE.MeshBasicMaterial({ color: COL.route, transparent: true, opacity: .9 })
-      );
-      routeBall = new THREE.Mesh(
-        new THREE.SphereGeometry(3.6, 16, 16),
-        new THREE.MeshBasicMaterial({ color: 0xffd24d })
-      );
+      buildRouteGeo(i);
+      routeBall = new THREE.Mesh(new THREE.SphereGeometry(4, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffd24d }));
+      const halo = new THREE.Mesh(new THREE.SphereGeometry(6.5, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffd24d, transparent: true, opacity: .3 }));
+      routeBall.add(halo);
       routeT = 0;
-      G.gRoute.add(tube, routeBall);
-      showInfo({ name: r.name, desc: r.desc, tag: 'ルート', tagColor: '#f15a35' });
+      gRoute.add(routeBall);
+      const r = ROUTES[i];
+      showInfo({ name: r.name, desc: r.desc, tag: 'ルート', color: '#f15a35', floor: '徒歩' });
     }
 
-    /* ============ UI ============ */
+    /* ============================================================
+       UI
+       ============================================================ */
 
     const infoEl = document.getElementById('info');
     function showInfo(d) {
-      document.getElementById('iname').innerHTML =
-        d.name + (d.tag ? `<span class="tag" style="background:${d.tagColor || '#9a9080'}">${d.tag}</span>` : '');
+      document.getElementById('ibar').style.background = d.color || '#f15a35';
+      document.getElementById('iname').textContent = d.name;
+      const badges = [];
+      if (d.floor) badges.push(`<span class="bdg" style="--b:${d.color || '#9a9080'}">${d.floor}</span>`);
+      if (d.tag) badges.push(`<span class="bdg ghost">${d.tag}</span>`);
+      document.getElementById('ibadges').innerHTML = badges.join('');
       document.getElementById('idesc').innerHTML = d.desc || '';
       infoEl.classList.add('show');
     }
     document.getElementById('iclose').onclick = () => infoEl.classList.remove('show');
 
-    // レイヤー切替
-    document.getElementById('layers').addEventListener('click', e => {
-      const b = e.target.closest('.chip'); if (!b) return;
-      b.classList.toggle('on');
-      G[b.dataset.g].visible = b.classList.contains('on');
-    });
+    // ヘッダー折りたたみ
+    const head = document.getElementById('head');
+    document.getElementById('fold').onclick = () => head.classList.toggle('folded');
+    if (innerWidth < 640) head.classList.add('folded');
 
-    // 視点プリセット
+    // ---- フロア絞り込み ----
+    let FOCUS = null;
+    function applyFocus() {
+      for (const k of FKEY) {
+        const active = !FOCUS || FOCUS === k;
+        F[k].traverse(o => {
+          if (o.isMesh || o.isLineSegments || o.isLine) {
+            const mt = o.material;
+            if (mt && mt.userData) {
+              const b = mt.userData.baseOp ?? 1;
+              mt.opacity = active ? b : b * .06;
+              mt.depthWrite = active;
+            }
+          }
+          if (o.isCSS2DObject) o.visible = active;
+        });
+      }
+      for (const m of connMeshes) {
+        const c = m.userData.conn;
+        const active = !FOCUS || FOCUS === c.a || FOCUS === c.b;
+        m.material.opacity = active ? m.material.userData.baseOp : .05;
+      }
+      document.querySelectorAll('#rail .flr').forEach(b =>
+        b.classList.toggle('on', b.dataset.f === FOCUS));
+    }
+    document.getElementById('rail').addEventListener('click', e => {
+      const b = e.target.closest('.flr');
+      if (b) {
+        FOCUS = (FOCUS === b.dataset.f) ? null : b.dataset.f;
+        applyFocus();
+      }
+    });
+    document.getElementById('btnAll').onclick = () => { FOCUS = null; applyFocus(); };
+
+    // ---- フロア分解（exploded view）----
+    let exploded = false, floorAnimating = false;
+    document.getElementById('btnExplode').onclick = function () {
+      exploded = !exploded;
+      floorAnimating = true;
+      this.classList.toggle('on', exploded);
+      toast(exploded ? 'フロア分解表示 — 6層の階層構造が見えます' : '通常表示に戻しました', 2200);
+    };
+
+    // ---- 視点プリセット ----
     const VIEWS = {
-      all: { pos: [-120, 430, 470], tgt: [-110, -10, -10] },
-      mrt: { pos: [110, 150, 260], tgt: [15, -18, 55] },
-      y:   { pos: [-210, 200, 140], tgt: [-200, -8, -125] },
-      z:   { pos: [190, 190, 330], tgt: [20, -8, 180] }
+      all: { pos: [-130, 460, 520], tgt: [-110, -15, -20] },
+      mrt: { pos: [300, 180, 290], tgt: [70, -35, 50] },
+      y: { pos: [-220, 230, 160], tgt: [-210, -10, -120] },
+      z: { pos: [110, 190, 330], tgt: [-30, -10, 90] },
+      air: { pos: [-540, 210, 150], tgt: [-330, -14, -65] }
     };
     let camAnim = null;
+    function flyTo(v, dur = 1.4) {
+      camAnim = {
+        t: 0, dur,
+        p0: camera.position.clone(), p1: new THREE.Vector3(...v.pos),
+        t0: controls.target.clone(), t1: new THREE.Vector3(...v.tgt)
+      };
+    }
     document.getElementById('views').addEventListener('click', e => {
       const b = e.target.closest('.chip'); if (!b) return;
       document.querySelectorAll('#views .chip').forEach(c => c.classList.remove('on'));
       b.classList.add('on');
-      const v = VIEWS[b.dataset.v];
-      camAnim = {
-        t: 0,
-        p0: camera.position.clone(), p1: new THREE.Vector3(...v.pos),
-        t0: controls.target.clone(), t1: new THREE.Vector3(...v.tgt)
-      };
+      flyTo(VIEWS[b.dataset.v]);
     });
 
-    // ルート切替
+    // ---- ルート切替 ----
     document.getElementById('routes').addEventListener('click', e => {
       const b = e.target.closest('.chip'); if (!b) return;
       const i = +b.dataset.r;
-      document.querySelectorAll('#routes .chip').forEach(c => c.classList.remove('on'));
-      if (activeRoute === i) { clearRoute(); infoEl.classList.remove('show'); }
-      else { b.classList.add('on'); showRoute(i); }
+      if (activeRoute === i) { clearRoute(); infoEl.classList.remove('show'); return; }
+      clearRoute();
+      b.classList.add('on');
+      showRoute(i);
     });
 
-    // クリックで情報表示（ドラッグと区別）
+    // ---- クリック＆ホバー ----
     const ray = new THREE.Raycaster();
     const ptr = new THREE.Vector2();
-    let downXY = null;
+    let downXY = null, hovered = null;
+
+    function pickAt(cx, cy) {
+      ptr.set((cx / innerWidth) * 2 - 1, -(cy / innerHeight) * 2 + 1);
+      ray.setFromCamera(ptr, camera);
+      const hits = ray.intersectObjects(pickables.filter(m => {
+        const fk = m.userData.floor;
+        if (fk === '_conn') {
+          const c = m.userData.conn;
+          return !FOCUS || FOCUS === c.a || FOCUS === c.b;
+        }
+        return !FOCUS || FOCUS === fk;
+      }), false);
+      return hits.length ? hits[0].object : null;
+    }
+
     renderer.domElement.addEventListener('pointerdown', e => { downXY = [e.clientX, e.clientY]; });
     renderer.domElement.addEventListener('pointerup', e => {
       if (!downXY) return;
       const dx = e.clientX - downXY[0], dy = e.clientY - downXY[1];
       downXY = null;
-      if (dx * dx + dy * dy > 36) return;            // ドラッグは無視
-      ptr.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
-      ray.setFromCamera(ptr, camera);
-      const hits = ray.intersectObjects(pickables.filter(m => {
-        let o = m; while (o.parent && o.parent !== scene) o = o.parent;
-        return o.visible;
-      }));
-      if (hits.length) showInfo(hits[0].object.userData);
+      if (dx * dx + dy * dy > 40) return;
+      const m = pickAt(e.clientX, e.clientY);
+      if (m) showInfo(m.userData.info);
+    });
+    renderer.domElement.addEventListener('pointermove', e => {
+      if (e.pointerType === 'touch') return;
+      const m = pickAt(e.clientX, e.clientY);
+      if (hovered && hovered !== m) {
+        hovered.material.emissive?.setHex(0x000000);
+        hovered = null;
+      }
+      if (m && m !== hovered) {
+        hovered = m;
+        m.material.emissive?.setHex(0x2a2208);
+      }
+      renderer.domElement.style.cursor = m ? 'pointer' : '';
     });
 
-    /* ============ loop ============ */
+    // ---- toast ----
+    let toastTimer = null;
+    function toast(msg, ms = 3000) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+    }
+
+    /* ============================================================
+       loop
+       ============================================================ */
+    updateConns();
     const clock = new THREE.Clock();
+    let time = 0;
+
     function tick() {
       requestAnimationFrame(tick);
-      const dt = clock.getDelta();
+      const dt = Math.min(clock.getDelta(), .05);
+      time += dt;
 
       if (camAnim) {
-        camAnim.t = Math.min(1, camAnim.t + dt * 1.4);
-        const k = 1 - Math.pow(1 - camAnim.t, 3);      // easeOutCubic
+        camAnim.t = Math.min(1, camAnim.t + dt / camAnim.dur);
+        const k = 1 - Math.pow(1 - camAnim.t, 3);
         camera.position.lerpVectors(camAnim.p0, camAnim.p1, k);
         controls.target.lerpVectors(camAnim.t0, camAnim.t1, k);
         if (camAnim.t >= 1) camAnim = null;
       }
 
-      if (routeCurve && routeBall) {
-        routeT = (routeT + dt * .14) % 1;
-        routeBall.position.copy(routeCurve.getPointAt(routeT));
+      if (floorAnimating) {
+        let done = true;
+        for (const k of FKEY) {
+          const target = exploded ? FLOORS[k].ey : FLOORS[k].y;
+          const cur = F[k].position.y;
+          const next = cur + (target - cur) * Math.min(1, dt * 5);
+          F[k].position.y = next;
+          if (Math.abs(target - next) > .15) done = false; else F[k].position.y = target;
+        }
+        updateConns();
+        if (activeRoute >= 0) buildRouteGeo(activeRoute);
+        if (done) floorAnimating = false;
       }
+
+      for (const g of trains) {
+        const u = g.userData;
+        const span = u.to - u.from;
+        let t = (time * u.speed * 60 / Math.abs(span) + u.phase) % 2;
+        if (t > 1) t = 2 - t;
+        const e = t * t * (3 - 2 * t);
+        const v = u.from + span * e;
+        if (u.axis === 'x') g.position.x = v; else g.position.z = v;
+      }
+
+      if (routeCurve && routeBall) {
+        routeT = (routeT + dt * .11) % 1.15;
+        const tt = Math.min(routeT, 1);
+        routeBall.position.copy(routeCurve.getPointAt(tt));
+        routeBall.visible = routeT <= 1;
+      }
+
+      {
+        const v = new THREE.Vector3(0, 0, -1).transformDirection(camera.matrixWorldInverse);
+        const deg = Math.atan2(v.x, v.y) * 180 / Math.PI;
+        document.getElementById('needle').style.transform = `rotate(${deg}deg)`;
+      }
+
+      const dist = camera.position.distanceTo(controls.target);
+      app.classList.toggle('far', dist > 680);
 
       controls.update();
       renderer.render(scene, camera);
       labelRenderer.render(scene, camera);
     }
     tick();
+
+    // intro
+    flyTo(VIEWS.all, 2.2);
+    document.querySelector('#views .chip[data-v="all"]').classList.add('on');
+    setTimeout(() => toast('ドラッグで回転｜右の階数ボタンでフロア絞り込み｜⇕でフロア分解表示', 5200), 800);
 
     addEventListener('resize', () => {
       camera.aspect = innerWidth / innerHeight;

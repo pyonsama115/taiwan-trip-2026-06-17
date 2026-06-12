@@ -3846,8 +3846,10 @@ setTimeout(() => {
   const boot = $('#boot');
   if (boot) { boot.classList.add('off'); setTimeout(() => boot.remove(), 700); }
 }, bootWait);
-flyTo(VIEWS.all, 2.2);
-$('#views .chip[data-v="all"]').classList.add('on');
+// 初期表示はB1（地下街・台鉄高鉄改札）を選択した状態で開始
+FOCUS = 'B1';
+applyFocus();
+flyToFloor('B1');
 if (!localStorage.getItem('tps3d.guided')) {
   setTimeout(() => showGuide(true), bootWait + 700);
 } else {

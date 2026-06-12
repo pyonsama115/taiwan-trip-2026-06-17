@@ -1906,6 +1906,45 @@
       }
     }
 
+    /* flight scene: Japan -> Taiwan */
+    .splash-flight {
+      position: relative;
+      z-index: 1;
+      width: min(340px, 82vw);
+      margin-top: -8px
+    }
+
+    .splash-flight svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible
+    }
+
+    .fl-label {
+      font-family: var(--jp);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .12em;
+      fill: #fff
+    }
+
+    .fl-plane-bob {
+      animation: flBob 1.6s ease-in-out infinite
+    }
+
+    @keyframes flBob {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-2.5px)
+      }
+    }
+
     @keyframes splashPop {
       0% {
         opacity: 0
@@ -1924,8 +1963,15 @@
       .splash-steam span,
       .splash-dots i,
       .splash-confetti b,
-      .splash-stage {
+      .splash-stage,
+      .fl-plane-bob {
         animation: none
+      }
+
+      /* SMILアニメはCSSで止められないため非表示にする */
+      .fl-plane,
+      .fl-trail {
+        display: none
       }
 
       #splash {
@@ -2102,6 +2148,48 @@
         <ellipse cx="26" cy="44" rx="5" ry="3.2" fill="#ffc1ac" />
         <ellipse cx="48" cy="44" rx="5" ry="3.2" fill="#ffc1ac" />
         <path d="M32 43q5 4 10 0" stroke="#d98a5a" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
+    </div>
+    <div class="splash-flight" aria-hidden="true">
+      <svg viewBox="0 0 360 134" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 日本 -->
+        <g>
+          <path d="M299 78 Q305 64 318 60 Q334 56 344 64 Q350 69 348 76 Q338 72 328 75 Q312 80 299 78Z"
+            fill="#ffd24d" />
+          <circle cx="296" cy="84" r="5" fill="#ffd24d" />
+          <text class="fl-label" x="322" y="102" text-anchor="middle">日本</text>
+        </g>
+        <!-- 台灣 -->
+        <g>
+          <path d="M46 70 Q58 76 56 92 Q54 108 42 114 Q34 105 34 90 Q34 76 46 70Z" fill="#4fd1c5" />
+          <text class="fl-label" x="46" y="130" text-anchor="middle">台灣</text>
+        </g>
+        <!-- 航路(うっすら点線ガイド) -->
+        <path d="M312 62 Q180 -16 52 66" stroke="rgba(255,255,255,.4)" stroke-width="2.5" stroke-dasharray="1 8"
+          stroke-linecap="round" />
+        <!-- 飛行機が描いていく航跡 -->
+        <path class="fl-trail" id="flTrailPath" d="M312 62 Q180 -16 52 66" stroke="#fff" stroke-width="3"
+          stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100">
+          <animate attributeName="stroke-dashoffset" dur="3.6s" repeatCount="indefinite" calcMode="spline"
+            values="100;100;0;0" keyTimes="0;.08;.82;1" keySplines="0 0 1 1;.45 0 .25 1;0 0 1 1" />
+        </path>
+        <!-- 飛行機(rotate=auto で約180°回転するため上下反転で描画) -->
+        <g class="fl-plane">
+          <g class="fl-plane-bob">
+            <path d="M-15 0 Q-15 -4 -9 -4 L7 -4 Q15 -4 18 0 Q15 4 7 4 L-9 4 Q-15 4 -15 0Z" fill="#fff"
+              stroke="#f0c79a" stroke-width="1.2" />
+            <path d="M-14 3 L-8 3 L-4 12 Q-7 13 -10 11Z" fill="#f15a35" />
+            <path d="M0 -2 L8 -2 L3 -10 Q0 -11 -2 -9Z" fill="#ffe9d2" />
+            <circle cx="11" cy="1" r="1.8" fill="#4fd1c5" />
+            <circle cx="5" cy="1" r="1.5" fill="#bfeee9" />
+            <circle cx="0" cy="1" r="1.5" fill="#bfeee9" />
+            <circle cx="-5" cy="1" r="1.5" fill="#bfeee9" />
+          </g>
+          <animateMotion dur="3.6s" repeatCount="indefinite" rotate="auto" keyPoints="0;0;1;1" keyTimes="0;.08;.82;1"
+            calcMode="spline" keySplines="0 0 1 1;.45 0 .25 1;0 0 1 1">
+            <mpath href="#flTrailPath" />
+          </animateMotion>
+        </g>
       </svg>
     </div>
     <div class="splash-dots"><i></i><i></i><i></i></div>

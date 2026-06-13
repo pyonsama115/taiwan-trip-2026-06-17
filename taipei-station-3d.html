@@ -518,7 +518,9 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
 #player .pmeta { flex: 1; min-width: 0; }
 #player .ptitle {
   font-weight: 900; font-size: 12px; line-height: 1.35; color: var(--panel-fg);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  /* 行き先（A → B）が省略されないよう最大2行まで折り返す */
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
 }
 #player input[type=range] {
   appearance: none; -webkit-appearance: none;
@@ -796,7 +798,13 @@ button { transition: transform .12s ease, background-color .15s, border-color .1
     left: 10px; width: calc(100vw - 20px);
     padding: 9px 10px;
   }
-  #head h1 { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* タイトルは省略せず、最大2行に折り返して全文を見せる */
+  #head h1 {
+    font-size: 12.5px; line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #head .blogo { width: 28px; height: 28px; }
   .mark-sm { width: 30px; height: 30px; font-size: 13px; border-radius: 9px; }
   .icon-btn { width: 38px; height: 38px; }
   #head .body { padding: 0 3px; }
